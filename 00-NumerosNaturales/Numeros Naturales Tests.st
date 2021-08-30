@@ -11,62 +11,64 @@ DenotativeObject subclass: #NumerosNaturalesTest
 NumerosNaturalesTest class
 	instanceVariableNames: ''!
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:56:37'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 19:31:21'!
 test01UnoMasUnSumandoEsElProximoDelSumando
+
 	Assert that: I + II isEqualTo: II next.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:57:15'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:36:38'!
 test02NumerosMayoresaUnoSumanBien
 
 	Assert that: II + II isEqualTo: IIII.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:58:52'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:38:44'!
 test03UnNumeroMenosUnoEsElPrevioDelNumero
 
 	Assert that: II - I isEqualTo: II previous.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:59:01'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:38:55'!
 test04NumerosMayoresaUnoRestanBien
 
 	Assert that: IIII - II isEqualTo: II.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:59:12'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 12:51:02'!
 test05RestaNoSoportaNumerosNegativos
 
 	Assert should: [ I - II ] signal: Error withDescription: I descripcionDeErrorDeNumerosNegativosNoSoportados.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:59:18'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:18'!
 test06UnNumeroMultiplicadoPorUnoEsIgualAlNumero
 
 	Assert that: II * I isEqualTo: II.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:59:26'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:30'!
 test07NumerosMayoresaUnoMultiplicanBien
 
 	Assert that: II * II isEqualTo: IIII.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 13:16:46'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:44'!
 test08UnoMultiplicadoUnoEsIgualAUno
 
 	Assert that: I * I isEqualTo: I.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 13:01:58'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:54'!
 test09NumerosMayoresaUnoDividenBien
 
 	Assert that: IIII / II isEqualTo: II.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 13:17:28'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:40:07'!
 test10UnNumeroDivididoUnoEsIgualAlNumero
 
 	Assert that: II / I isEqualTo: II.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'WB 8/28/2021 17:56:18'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:40:18'!
 test11UnoDivididoUnoEsIgualAUno
+
 	Assert that: I / I isEqualTo: I.! !
 
 !NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 13:17:59'!

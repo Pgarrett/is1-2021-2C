@@ -9,7 +9,7 @@ DenotativeObject subclass: #I
 
 !classDefinition: 'I class' category: 'Numeros Naturales'!
 I class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'next'!
 
 !I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 18:33:36'!
 *unNumeroNatural
@@ -50,6 +50,13 @@ serMultiplicado: n
 !I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 18:55:36'!
 serRestado: unNumeroNatural
 	^unNumeroNatural previous.! !
+
+
+!I class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
+initializeCollaboratorsFromFile
+	"Auto generated method for loading purposes - Do not modify it"
+
+	next := II.! !
 
 
 !classDefinition: #II category: 'Numeros Naturales'!
@@ -94,11 +101,11 @@ descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
 multiplica: numeroAMultiplicar
 	^numeroAMultiplicar + (self previous multiplica: numeroAMultiplicar)! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'WB 8/26/2021 21:31:43'!
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 19:32:36'!
 next
 
 	next ifNotNil: [^next].
-	next _ II createChildNamed: self name, 'I'.
+	next _ self createChildNamed: self name, 'I'.
 	next previous: self.
 	^next! !
 
@@ -119,7 +126,7 @@ serRestado: unNumeroNatural
 	^ self previous serRestado: unNumeroNatural previous.! !
 
 
-!II class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
+!II class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -140,7 +147,7 @@ II subclass: #III
 III class
 	instanceVariableNames: ''!
 
-!III class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
+!III class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -149,7 +156,7 @@ initializeCollaboratorsFromFile
 
 
 !classDefinition: #IIII category: 'Numeros Naturales'!
-II subclass: #IIII
+III subclass: #IIII
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -161,123 +168,14 @@ II subclass: #IIII
 IIII class
 	instanceVariableNames: ''!
 
-!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
-initializeCollaboratorsFromFile
-	"Auto generated method for loading purposes - Do not modify it"
-
-	next := IIIII.
-	previous := III.! !
-
-
-!classDefinition: #IIIII category: 'Numeros Naturales'!
-II subclass: #IIIII
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros Naturales'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'IIIII class' category: 'Numeros Naturales'!
-IIIII class
-	instanceVariableNames: ''!
-
-!IIIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
-initializeCollaboratorsFromFile
-	"Auto generated method for loading purposes - Do not modify it"
-
-	next := IIIIII.
-	previous := IIII.! !
-
-
-!classDefinition: #IIIIII category: 'Numeros Naturales'!
-II subclass: #IIIIII
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros Naturales'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'IIIIII class' category: 'Numeros Naturales'!
-IIIIII class
-	instanceVariableNames: ''!
-
-!IIIIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
-initializeCollaboratorsFromFile
-	"Auto generated method for loading purposes - Do not modify it"
-
-	next := IIIIIII.
-	previous := IIIII.! !
-
-
-!classDefinition: #IIIIIII category: 'Numeros Naturales'!
-II subclass: #IIIIIII
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros Naturales'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'IIIIIII class' category: 'Numeros Naturales'!
-IIIIIII class
-	instanceVariableNames: ''!
-
-!IIIIIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
-initializeCollaboratorsFromFile
-	"Auto generated method for loading purposes - Do not modify it"
-
-	next := IIIIIIII.
-	previous := IIIIII.! !
-
-
-!classDefinition: #IIIIIIII category: 'Numeros Naturales'!
-II subclass: #IIIIIIII
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros Naturales'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'IIIIIIII class' category: 'Numeros Naturales'!
-IIIIIIII class
-	instanceVariableNames: ''!
-
-!IIIIIIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
-initializeCollaboratorsFromFile
-	"Auto generated method for loading purposes - Do not modify it"
-
-	next := IIIIIIIII.
-	previous := IIIIIII.! !
-
-
-!classDefinition: #IIIIIIIII category: 'Numeros Naturales'!
-II subclass: #IIIIIIIII
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros Naturales'!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'IIIIIIIII class' category: 'Numeros Naturales'!
-IIIIIIIII class
-	instanceVariableNames: ''!
-
-!IIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/28/2021 20:22:20'!
+!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
 	next := nil.
-	previous := IIIIIIII.! !
+	previous := III.! !
 
+I initializeAfterFileIn!
 II initializeAfterFileIn!
 III initializeAfterFileIn!
 IIII initializeAfterFileIn!
-IIIII initializeAfterFileIn!
-IIIIII initializeAfterFileIn!
-IIIIIII initializeAfterFileIn!
-IIIIIIII initializeAfterFileIn!
-IIIIIIIII initializeAfterFileIn!
