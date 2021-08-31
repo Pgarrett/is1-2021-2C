@@ -33,7 +33,7 @@ test04NumerosMayoresaUnoRestanBien
 	Assert that: IIII - II isEqualTo: II.
 ! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 12:51:02'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 20:15:03'!
 test05RestaNoSoportaNumerosNegativos
 
 	Assert should: [ I - II ] signal: Error withDescription: I descripcionDeErrorDeNumerosNegativosNoSoportados.
@@ -71,7 +71,7 @@ test11UnoDivididoUnoEsIgualAUno
 
 	Assert that: I / I isEqualTo: I.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'ARM 3/26/2018 13:17:59'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:51:37'!
 test12DivisionNoSoportaDividirPorUnNumeroMayor
 
 	Assert should: [ III /  IIII ] signal: Error withDescription: II descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor.

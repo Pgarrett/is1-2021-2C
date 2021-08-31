@@ -11,48 +11,54 @@ DenotativeObject subclass: #I
 I class
 	instanceVariableNames: 'next'!
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 18:33:36'!
-*unNumeroNatural
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:01:46'!
+*unNumeroAMultiplicar
 
-	^unNumeroNatural ! !
+	^unNumeroAMultiplicar ! !
 
-!I class methodsFor: 'operaciones' stamp: 'WB 8/26/2021 21:16:32'!
-+ aNaturalNumber
-	^aNaturalNumber next.! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:01:22'!
++ unSumando
+	^unSumando next.! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 19:54:27'!
-- aNaturalNumber
-	^Error new signal: 'descripcionDeErrorDeNumerosNegativosNoSoportados'! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:01:12'!
+- unNumeroARestar
+	^Error signal: self descripcionDeErrorDeNumerosNegativosNoSoportados! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 19:53:41'!
-/ unNumeroNatural
-	(unNumeroNatural = self) ifTrue: [^self].
-	^Error new signal: 'descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor'! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:01:04'!
+/ unDivisor
+	(unDivisor = self) ifTrue: [^self].
+	^Error new signal: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 20:10:05'!
-> aNaturalNumber
-	^False! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:54'!
+> unNumeroAComparar
+	^false! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 19:45:08'!
-multiplica: unNumero
-	^unNumero! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 20:24:31'!
+descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
+	^'No se puede dividir por un numero mayor'! !
 
-!I class methodsFor: 'operaciones' stamp: 'WB 8/26/2021 20:42:35'!
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 20:27:59'!
+descripcionDeErrorDeNumerosNegativosNoSoportados
+	^'descripcionDeErrorDeNumerosNegativosNoSoportados'! !
+
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:33'!
+multiplica: unNumeroAMultiplicar
+	^unNumeroAMultiplicar! !
+
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:21'!
 next
-	"comment stating purpose of message"
-
 	^II! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 19:41:40'!
-serMultiplicado: n
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:14'!
+serMultiplicado: unNumeroAMultiplicar
 ^1! !
 
-!I class methodsFor: 'operaciones' stamp: 'PhG 8/28/2021 18:55:36'!
-serRestado: unNumeroNatural
-	^unNumeroNatural previous.! !
+!I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:01'!
+serRestado: unNumeroARestar
+	^unNumeroARestar previous.! !
 
 
-!I class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
+!I class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -72,34 +78,40 @@ DenotativeObject subclass: #II
 II class
 	instanceVariableNames: 'next previous'!
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 19:53:15'!
-* aNaturalNumber
-	^(aNaturalNumber multiplica: self previous) + aNaturalNumber! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:58:11'!
+* unNumeroAMultiplicar
+	^(unNumeroAMultiplicar multiplica: self previous) + unNumeroAMultiplicar! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'WB 8/28/2021 17:52:17'!
-+ aNaturalNumber
-	^self previous + aNaturalNumber next! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:57:19'!
++ unSumando
+	^self previous + unSumando next! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 19:24:34'!
-- aNaturalNumber 
-	^aNaturalNumber serRestado: self! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:57:59'!
+- unNumeroARestar 
+	^unNumeroARestar serRestado: self! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 20:22:12'!
-/ aNaturalNumber
-	self > aNaturalNumber ifTrue: [^Error new signal: 'descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor'].! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:58:23'!
+/ unDivisor
+	unDivisor > self
+		ifTrue: [^Error signal: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor].
+		^unDivisor divide: self! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 20:09:47'!
-> aNaturalNumber 
-	aNaturalNumber = I ifTrue: [^True ].
-	^self previous > aNaturalNumber previous ! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:58:45'!
+> unNumeroAComparar 
+	unNumeroAComparar = I ifTrue: [^true ].
+	^self previous > unNumeroAComparar previous ! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 20:12:16'!
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:28:08'!
 descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
 	^'No se puede dividir por un numero mayor'! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 19:44:42'!
-multiplica: numeroAMultiplicar
-	^numeroAMultiplicar + (self previous multiplica: numeroAMultiplicar)! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:56:47'!
+divide: unDividendo
+	^unDividendo ! !
+
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:59:00'!
+multiplica: unNumeroAMultiplicar
+	^unNumeroAMultiplicar + (self previous multiplica: unNumeroAMultiplicar)! !
 
 !II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 19:32:36'!
 next
@@ -113,20 +125,20 @@ next
 previous
 	^previous! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'WB 8/26/2021 21:31:17'!
-previous: aNaturalNumber
-	previous _ aNaturalNumber! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:59:17'!
+previous: unNumeroPrevio
+	previous _ unNumeroPrevio! !
 
 !II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 19:40:52'!
 serMultiplicado: nVeces
 	^self + (self serMultiplicado: nVeces previous)! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/28/2021 19:23:33'!
-serRestado: unNumeroNatural
-	^ self previous serRestado: unNumeroNatural previous.! !
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:59:31'!
+serRestado: nVeces
+	^ self previous serRestado: nVeces previous.! !
 
 
-!II class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
+!II class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -147,7 +159,7 @@ II subclass: #III
 III class
 	instanceVariableNames: ''!
 
-!III class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
+!III class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -168,7 +180,7 @@ III subclass: #IIII
 IIII class
 	instanceVariableNames: ''!
 
-!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:42:13'!
+!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
