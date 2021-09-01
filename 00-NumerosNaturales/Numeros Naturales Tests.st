@@ -16,7 +16,7 @@ test01UnoMasUnSumandoEsElProximoDelSumando
 
 	Assert that: I + II isEqualTo: II next.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:36:38'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:15:39'!
 test02NumerosMayoresaUnoSumanBien
 
 	Assert that: II + II isEqualTo: IIII.
@@ -27,7 +27,7 @@ test03UnNumeroMenosUnoEsElPrevioDelNumero
 
 	Assert that: II - I isEqualTo: II previous.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:38:55'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:15:48'!
 test04NumerosMayoresaUnoRestanBien
 
 	Assert that: IIII - II isEqualTo: II.
@@ -44,7 +44,7 @@ test06UnNumeroMultiplicadoPorUnoEsIgualAlNumero
 
 	Assert that: II * I isEqualTo: II.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:30'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:15:30'!
 test07NumerosMayoresaUnoMultiplicanBien
 
 	Assert that: II * II isEqualTo: IIII.
@@ -55,7 +55,7 @@ test08UnoMultiplicadoUnoEsIgualAUno
 
 	Assert that: I * I isEqualTo: I.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:39:54'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:16:01'!
 test09NumerosMayoresaUnoDividenBien
 
 	Assert that: IIII / II isEqualTo: II.
@@ -71,7 +71,7 @@ test11UnoDivididoUnoEsIgualAUno
 
 	Assert that: I / I isEqualTo: I.! !
 
-!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 19:51:37'!
+!NumerosNaturalesTest class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:16:08'!
 test12DivisionNoSoportaDividirPorUnNumeroMayor
 
 	Assert should: [ III /  IIII ] signal: Error withDescription: II descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor.

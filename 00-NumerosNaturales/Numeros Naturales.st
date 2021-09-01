@@ -11,6 +11,7 @@ DenotativeObject subclass: #I
 I class
 	instanceVariableNames: 'next'!
 
+
 !I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:01:46'!
 *unNumeroAMultiplicar
 
@@ -41,6 +42,10 @@ descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
 descripcionDeErrorDeNumerosNegativosNoSoportados
 	^'descripcionDeErrorDeNumerosNegativosNoSoportados'! !
 
+!I class methodsFor: 'operaciones' stamp: 'PhG 9/1/2021 18:18:49'!
+divide: unDividendo
+	^unDividendo! !
+
 !I class methodsFor: 'operaciones' stamp: 'PhG 8/30/2021 21:00:33'!
 multiplica: unNumeroAMultiplicar
 	^unNumeroAMultiplicar! !
@@ -58,7 +63,7 @@ serRestado: unNumeroARestar
 	^unNumeroARestar previous.! !
 
 
-!I class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
+!I class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:28:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -105,19 +110,21 @@ II class
 descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
 	^'No se puede dividir por un numero mayor'! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:56:47'!
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 9/1/2021 18:27:54'!
 divide: unDividendo
-	^unDividendo ! !
+	self = unDividendo ifTrue: [^I].
+	self > (unDividendo - self) ifTrue: [^I].
+	^(self divide: (unDividendo - self)) + I! !
 
 !II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 20:59:00'!
 multiplica: unNumeroAMultiplicar
 	^unNumeroAMultiplicar + (self previous multiplica: unNumeroAMultiplicar)! !
 
-!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 8/30/2021 19:32:36'!
+!II class methodsFor: 'NumerosNaturales' stamp: 'PhG 9/1/2021 18:12:58'!
 next
 
 	next ifNotNil: [^next].
-	next _ self createChildNamed: self name, 'I'.
+	next _ II createChildNamed: self name, 'I'.
 	next previous: self.
 	^next! !
 
@@ -138,7 +145,7 @@ serRestado: nVeces
 	^ self previous serRestado: nVeces previous.! !
 
 
-!II class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
+!II class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:28:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -159,7 +166,7 @@ II subclass: #III
 III class
 	instanceVariableNames: ''!
 
-!III class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
+!III class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:28:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -168,7 +175,7 @@ initializeCollaboratorsFromFile
 
 
 !classDefinition: #IIII category: 'Numeros Naturales'!
-III subclass: #IIII
+II subclass: #IIII
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -180,7 +187,7 @@ III subclass: #IIII
 IIII class
 	instanceVariableNames: ''!
 
-!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 8/30/2021 21:02:22'!
+!IIII class methodsFor: 'as yet unclassified' stamp: 'PhG 9/1/2021 18:28:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
