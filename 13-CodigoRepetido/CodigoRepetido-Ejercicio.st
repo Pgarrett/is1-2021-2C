@@ -232,11 +232,11 @@ numberOfSuspendedCustomers
 !CustomerBook methodsFor: 'customer management' stamp: 'bt 9/8/2021 17:36:51'!
 removeCustomerNamed: aName 
  	
-	| throwError tryToRemoveFromActive |
+	| throwError tryToRemoveFromSuspended |
 	
 	throwError := [^NotFound signal].
-	tryToRemoveFromActive := [active remove: aName ifAbsent: throwError ].
-	suspended remove: aName ifAbsent: tryToRemoveFromActive.
+	tryToRemoveFromSuspended := [suspended remove: aName ifAbsent: throwError ].
+	active remove: aName ifAbsent: tryToRemoveFromSuspended.
 	
 ! !
 
