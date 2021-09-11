@@ -364,28 +364,20 @@ Numero subclass: #Entero
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:31:43'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 10:55:22'!
 * aMultiplier 
-
-	(aMultiplier class = Fraccion) ifTrue: [^ (self value * aMultiplier numerator) / (aMultiplier denominator)].
 	
-	^self class with: value * aMultiplier integerValue
-	! !
+	^aMultiplier multiplyFromEntero: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:12:52'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 11:27:27'!
 + anAdder 
-	
-	(anAdder class = Fraccion) ifTrue: [^ (anAdder numerator + (self value * anAdder denominator)) / (anAdder denominator)].
-	
-	^self class with: value + anAdder integerValue
-! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:25:54'!
+	^anAdder addFromEntero: self! !
+
+!Entero methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 11:41:59'!
 - aSubtrahend 
 	
-	(aSubtrahend class = Fraccion) ifTrue: [^ ((self value * aSubtrahend denominator) - aSubtrahend numerator) / (aSubtrahend denominator)].
-	
-	^ self class with: value - aSubtrahend integerValue.! !
+	^aSubtrahend substractFromEntero: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:19:49'!
 / aDivisor 
@@ -465,6 +457,43 @@ isZero
 	
 	^value = 0! !
 
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:08:28'!
+addFromEntero: anAdder
+	"Called from entero + entero"
+	
+	^self class with: value + anAdder integerValue! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:08:21'!
+addFromFraccion: anAdder
+	"Called from fraccion + entero"
+
+	^ self + anAdder! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:53:21'!
+multiplyFromEntero: aMultiplier
+	"Called from entero * entero"
+
+	^self class with: value * aMultiplier integerValue! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:53:58'!
+multiplyFromFraccion: aFraccionMultiplier
+	"Called from fraccion * entero"
+	
+		^ self * aFraccionMultiplier .! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:42:09'!
+substractFromEntero: aSubtrahend
+	"Called from entero - entero"
+	
+	^ self class with: aSubtrahend integerValue - value.! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:42:15'!
+substractFromFraccion: aSubtrahend
+	"Called from fraccion - entero"
+	
+	^  (aSubtrahend numerator - (aSubtrahend denominator * self)) / aSubtrahend denominator.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Entero class' category: 'Numero-Exercise'!
@@ -491,40 +520,21 @@ Numero subclass: #Fraccion
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:17:31'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 10:54:59'!
 * aMultiplier 
 	
-	(aMultiplier class = Entero) ifTrue: [^ aMultiplier * self].
-	
-	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)
+	^aMultiplier multiplyFromFraccion: self.
 	! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:14:51'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 11:27:19'!
 + anAdder 
 	
-	| newNumerator newDenominator |
-	
-	(anAdder class = Entero) ifTrue: [^ anAdder + self].
-	
-	newNumerator := (numerator * anAdder denominator) + (denominator * anAdder numerator).
-	newDenominator := denominator * anAdder denominator.
-	
-	^newNumerator / newDenominator ! !
+	^anAdder addFromFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:33:17'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 11:41:28'!
 - aSubtrahend 
-	
-	| newNumerator newDenominator |
-	
-	
-	
-	(aSubtrahend class = Entero) ifTrue: [^  (numerator - (denominator * aSubtrahend)) / denominator].
-	
-	newNumerator := (numerator * aSubtrahend denominator) - (denominator * aSubtrahend numerator).
-	newDenominator := denominator * aSubtrahend denominator.
-	
-	^newNumerator / newDenominator 
-! !
+
+	^aSubtrahend substractFromFraccion: self.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:25:02'!
 / aDivisor 
@@ -590,6 +600,53 @@ printOn: aStream
 		print: numerator;
 		nextPut: $/;
 		print: denominator ! !
+
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:26:53'!
+addFromEntero: anAdder
+	"Called from entero + fraccion"
+
+	^ (self numerator + (anAdder value * self denominator)) / (self denominator)! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:10:31'!
+addFromFraccion: anAdder
+
+	| newNumerator newDenominator |
+	
+	newNumerator := (numerator * anAdder denominator) + (denominator * anAdder numerator).
+	newDenominator := denominator * anAdder denominator.
+	
+	^newNumerator / newDenominator ! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:30'!
+multiplyFromEntero: aMultiplier
+	"Called from message entero * fraccion"
+
+	^ (self numerator * aMultiplier) / (self denominator)! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:20'!
+multiplyFromFraccion: aMultiplier
+	"Called from message fraccion * fraccion"
+
+	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)	! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:41:36'!
+substractFromEntero: aSubtrahend
+	"Called from entero - fraccion"
+	
+	^ ((aSubtrahend * self denominator) - self numerator) / (self denominator).! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:41:43'!
+substractFromFraccion: aSubtrahend
+	"Called from fraccion - fraccion"
+	
+	
+	| newNumerator newDenominator |
+	
+	newNumerator := (aSubtrahend numerator * denominator) - (aSubtrahend denominator * numerator).
+	newDenominator := aSubtrahend denominator * denominator.
+	
+	^newNumerator / newDenominator.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
