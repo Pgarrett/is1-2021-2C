@@ -379,12 +379,10 @@ Numero subclass: #Entero
 	
 	^aSubtrahend substractFromEntero: self.! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:19:49'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 18:34:19'!
 / aDivisor 
 
-	(aDivisor class = Fraccion) ifTrue: [^ (self value * aDivisor denominator) / (aDivisor numerator)].
-	
-	^Fraccion with: self over: aDivisor! !
+	^aDivisor divideFromEntero: self.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:55'!
 // aDivisor 
@@ -470,6 +468,18 @@ addFromFraccion: anAdder
 
 	^ self + anAdder! !
 
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:33:15'!
+divideFromEntero: aDivisor
+	"Called from entero / entero"
+	
+	^Fraccion with: aDivisor over: self! !
+
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:30:48'!
+divideFromFraccion: aDivisor
+	"Called from fraccion / entero"
+
+	^aDivisor numerator / (aDivisor denominator * self)! !
+
 !Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:53:21'!
 multiplyFromEntero: aMultiplier
 	"Called from entero * entero"
@@ -536,12 +546,10 @@ Numero subclass: #Fraccion
 
 	^aSubtrahend substractFromFraccion: self.! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'bt 9/10/2021 11:25:02'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'PhG 9/11/2021 18:34:10'!
 / aDivisor 
 	
-	(aDivisor class = Entero) ifTrue: [^ numerator / (denominator * aDivisor) ].
-	
-	^(numerator * aDivisor denominator) / (denominator * aDivisor numerator)! !
+	^aDivisor divideFromFraccion: self.! !
 
 
 !Fraccion methodsFor: 'comparing' stamp: 'HernanWilkinson 5/7/2016 20:42'!
@@ -617,6 +625,18 @@ addFromFraccion: anAdder
 	newDenominator := denominator * anAdder denominator.
 	
 	^newNumerator / newDenominator ! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:32:33'!
+divideFromEntero: aDivisor
+	"Called from entero / fraccion"
+	
+	^ (aDivisor value * denominator) / numerator! !
+
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:31:28'!
+divideFromFraccion: aDivisor
+	"Called from fraccion / fraccion"
+	
+	^(aDivisor numerator * denominator) / (aDivisor denominator * numerator)! !
 
 !Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:30'!
 multiplyFromEntero: aMultiplier
