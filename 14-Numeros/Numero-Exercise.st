@@ -468,17 +468,17 @@ addFromFraccion: anAdder
 
 	^ self + anAdder! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:33:15'!
-divideFromEntero: aDivisor
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:44:29'!
+divideFromEntero: aDividend
 	"Called from entero / entero"
 	
-	^Fraccion with: aDivisor over: self! !
+	^Fraccion with: aDividend over: self! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:30:48'!
-divideFromFraccion: aDivisor
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:44:36'!
+divideFromFraccion: aDividend
 	"Called from fraccion / entero"
 
-	^aDivisor numerator / (aDivisor denominator * self)! !
+	^aDividend numerator / (aDividend denominator * self)! !
 
 !Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:53:21'!
 multiplyFromEntero: aMultiplier
@@ -486,23 +486,23 @@ multiplyFromEntero: aMultiplier
 
 	^self class with: value * aMultiplier integerValue! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:53:58'!
-multiplyFromFraccion: aFraccionMultiplier
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:44:53'!
+multiplyFromFraccion: aMultiplier
 	"Called from fraccion * entero"
 	
-		^ self * aFraccionMultiplier .! !
+		^ self * aMultiplier .! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:42:09'!
-substractFromEntero: aSubtrahend
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:02'!
+substractFromEntero: aMinuend
 	"Called from entero - entero"
 	
-	^ self class with: aSubtrahend integerValue - value.! !
+	^ self class with: aMinuend integerValue - value.! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:42:15'!
-substractFromFraccion: aSubtrahend
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:23'!
+substractFromFraccion: aMinuend
 	"Called from fraccion - entero"
 	
-	^  (aSubtrahend numerator - (aSubtrahend denominator * self)) / aSubtrahend denominator.! !
+	^  (aMinuend numerator - (aMinuend denominator * self)) / aMinuend denominator.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -626,17 +626,17 @@ addFromFraccion: anAdder
 	
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:32:33'!
-divideFromEntero: aDivisor
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:46:00'!
+divideFromEntero: aDividend
 	"Called from entero / fraccion"
 	
-	^ (aDivisor value * denominator) / numerator! !
+	^ (aDividend value * denominator) / numerator! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 18:31:28'!
-divideFromFraccion: aDivisor
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:46:07'!
+divideFromFraccion: aDividend
 	"Called from fraccion / fraccion"
 	
-	^(aDivisor numerator * denominator) / (aDivisor denominator * numerator)! !
+	^(aDividend numerator * denominator) / (aDividend denominator * numerator)! !
 
 !Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:30'!
 multiplyFromEntero: aMultiplier
@@ -650,21 +650,21 @@ multiplyFromFraccion: aMultiplier
 
 	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)	! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:41:36'!
-substractFromEntero: aSubtrahend
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:41'!
+substractFromEntero: aMinuend
 	"Called from entero - fraccion"
 	
-	^ ((aSubtrahend * self denominator) - self numerator) / (self denominator).! !
+	^ ((aMinuend * self denominator) - self numerator) / (self denominator).! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 11:41:43'!
-substractFromFraccion: aSubtrahend
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:50'!
+substractFromFraccion: aMinuend
 	"Called from fraccion - fraccion"
 	
 	
 	| newNumerator newDenominator |
 	
-	newNumerator := (aSubtrahend numerator * denominator) - (aSubtrahend denominator * numerator).
-	newDenominator := aSubtrahend denominator * denominator.
+	newNumerator := (aMinuend numerator * denominator) - (aMinuend denominator * numerator).
+	newDenominator := aMinuend denominator * denominator.
 	
 	^newNumerator / newDenominator.! !
 
