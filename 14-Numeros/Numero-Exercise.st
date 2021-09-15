@@ -389,20 +389,6 @@ Numero subclass: #Entero
 	
 	^self class with: value // aDivisor integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
-fibonacci
-
-	| one two |
-	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
-	^ (self - one) fibonacci + (self - two) fibonacci
-		! !
-
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
 greatestCommonDivisorWith: anEntero 
 	
@@ -486,11 +472,11 @@ multiplyFromEntero: aMultiplier
 
 	^self class with: value * aMultiplier integerValue! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:44:53'!
-multiplyFromFraccion: aMultiplier
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:41:28'!
+multiplyFromFraccion: aFraccionMultiplier
 	"Called from fraccion * entero"
 	
-		^ self * aMultiplier .! !
+		^ self * aFraccionMultiplier .! !
 
 !Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:02'!
 substractFromEntero: aMinuend
@@ -498,11 +484,11 @@ substractFromEntero: aMinuend
 	
 	^ self class with: aMinuend integerValue - value.! !
 
-!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:23'!
-substractFromFraccion: aMinuend
+!Entero methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:39:58'!
+substractFromFraccion: aFraccionMinuend
 	"Called from fraccion - entero"
 	
-	^  (aMinuend numerator - (aMinuend denominator * self)) / aMinuend denominator.! !
+	^  (aFraccionMinuend numerator - (aFraccionMinuend denominator * self)) / aFraccionMinuend denominator.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -514,13 +500,75 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos!!!!!!'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
+!Entero class methodsFor: 'instance creation' stamp: 'PhG 9/15/2021 19:10:22'!
 with: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
-	^self new initalizeWith: aValue! !
+	aValue = 0 ifTrue: [^Cero new initalizeWith: 0].
+	aValue < 0 ifTrue: [^Negativo new initalizeWith: aValue].
+	aValue = 1 ifTrue: [^Uno new initalizeWith: 1].
+	
+	^Natural new initalizeWith: aValue! !
+
+
+!classDefinition: #Cero category: 'Numero-Exercise'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Cero methodsFor: 'arithmetic operations' stamp: 'PhG 9/15/2021 19:13:39'!
+fibonacci
+
+	^Entero with: 1.
+! !
+
+
+!classDefinition: #Natural category: 'Numero-Exercise'!
+Entero subclass: #Natural
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Natural methodsFor: 'arithmetic operations' stamp: 'PhG 9/15/2021 19:14:11'!
+fibonacci
+
+	| one two |
+	
+	one := Entero with: 1.
+	two := Entero with: 2.
+	
+	^ (self - one) fibonacci + (self - two) fibonacci! !
+
+
+!classDefinition: #Negativo category: 'Numero-Exercise'!
+Entero subclass: #Negativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Negativo methodsFor: 'arithmetic operations' stamp: 'PhG 9/15/2021 19:13:57'!
+fibonacci
+
+	^self error: Entero negativeFibonacciErrorDescription.! !
+
+
+!classDefinition: #Uno category: 'Numero-Exercise'!
+Entero subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Uno methodsFor: 'arithmetic operations' stamp: 'PhG 9/15/2021 19:13:26'!
+fibonacci
+	
+	^Entero with: 1.! !
 
 
 !classDefinition: #Fraccion category: 'Numero-Exercise'!
@@ -626,11 +674,11 @@ addFromFraccion: anAdder
 	
 	^newNumerator / newDenominator ! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:46:00'!
-divideFromEntero: aDividend
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:42:51'!
+divideFromEntero: anEnteroDividend
 	"Called from entero / fraccion"
 	
-	^ (aDividend value * denominator) / numerator! !
+	^ (anEnteroDividend value * denominator) / numerator! !
 
 !Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:46:07'!
 divideFromFraccion: aDividend
@@ -638,33 +686,33 @@ divideFromFraccion: aDividend
 	
 	^(aDividend numerator * denominator) / (aDividend denominator * numerator)! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:30'!
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:42:06'!
 multiplyFromEntero: aMultiplier
 	"Called from message entero * fraccion"
 
-	^ (self numerator * aMultiplier) / (self denominator)! !
+	^ (numerator * aMultiplier) / (denominator)! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/11/2021 10:52:20'!
-multiplyFromFraccion: aMultiplier
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:42:31'!
+multiplyFromFraccion: aFraccionMultiplier
 	"Called from message fraccion * fraccion"
 
-	^(numerator * aMultiplier numerator) / (denominator * aMultiplier denominator)	! !
+	^(numerator * aFraccionMultiplier numerator) / (denominator * aFraccionMultiplier denominator)	! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:41'!
-substractFromEntero: aMinuend
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:40:35'!
+substractFromEntero: anEnteroMinuend
 	"Called from entero - fraccion"
 	
-	^ ((aMinuend * self denominator) - self numerator) / (self denominator).! !
+	^ ((anEnteroMinuend * denominator) - numerator) / (denominator).! !
 
-!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/14/2021 08:45:50'!
-substractFromFraccion: aMinuend
+!Fraccion methodsFor: 'arithmetic helpers' stamp: 'PhG 9/15/2021 18:40:55'!
+substractFromFraccion: aFraccionMinuend
 	"Called from fraccion - fraccion"
 	
 	
 	| newNumerator newDenominator |
 	
-	newNumerator := (aMinuend numerator * denominator) - (aMinuend denominator * numerator).
-	newDenominator := aMinuend denominator * denominator.
+	newNumerator := (aFraccionMinuend numerator * denominator) - (aFraccionMinuend denominator * numerator).
+	newDenominator := aFraccionMinuend denominator * denominator.
 	
 	^newNumerator / newDenominator.! !
 
