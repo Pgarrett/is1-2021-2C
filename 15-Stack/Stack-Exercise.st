@@ -147,10 +147,44 @@ TestCase subclass: #SentenceFinderByPrefixTest
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'contents'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'initialization' stamp: 'PhG 9/18/2021 11:35:28'!
+initialize
+	
+	contents := OrderedCollection new.! !
+
+
+!OOStack methodsFor: 'testing' stamp: 'PhG 9/18/2021 14:17:49'!
+isEmpty
+
+	^contents isEmpty ! !
+
+
+!OOStack methodsFor: 'adding' stamp: 'PhG 9/18/2021 14:19:20'!
+push: anElement
+
+	contents add: anElement.! !
+
+
+!OOStack methodsFor: 'removing' stamp: 'PhG 9/18/2021 14:25:36'!
+pop
+	contents isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.].
+	^contents removeLast .! !
+
+
+!OOStack methodsFor: 'accessing' stamp: 'PhG 9/18/2021 14:26:35'!
+size
+	^contents size.! !
+
+!OOStack methodsFor: 'accessing' stamp: 'PhG 9/18/2021 14:24:51'!
+top
+
+	contents isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.].
+	^contents at: (contents size)! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
