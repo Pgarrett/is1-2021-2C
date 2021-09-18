@@ -144,6 +144,62 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 15:30:32'!
+test01FindOnEmptyStackReturnsEmpty
+
+	|sentenceFinderByPrefix stack |
+	
+	stack := OOStack new.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: 'wint') equals: OrderedCollection new.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 15:35:17'!
+test02FindOnStackWithContentContainingPrefixReturnsCollectionWithContent
+
+	|sentenceFinderByPrefix stack prefix content|
+	
+	prefix := 'win'.
+	content := (prefix, 'ter').
+	stack := OOStack new.
+	
+	stack push: content.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: content).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 16:01:20'!
+test03FindOnStackIsCaseSensitive
+
+	|sentenceFinderByPrefix stack prefix content|
+	
+	prefix := 'win'.
+	content := 'Winter'.
+	stack := OOStack new.
+	
+	stack push: content.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection new).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 16:10:29'!
+test04ElementsContainingPrefixAfterWhitespaceAreNotIncluded
+
+	|sentenceFinderByPrefix stack prefix expectedContent|
+	
+	prefix := 'Wint'.
+	expectedContent := 'Winter is here'.
+
+	stack := OOStack new.
+	stack push: 'winter is coming'.
+	stack push: 'winning is everything'.
+	stack push: 'The winds of Winter'.
+	stack push: expectedContent.
+
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: expectedContent).! !
+
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
@@ -200,7 +256,44 @@ stackEmptyErrorDescription
 
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'stackToObserve'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'PhG 9/18/2021 15:27:41'!
+initializeWith: aStack
+
+	stackToObserve := aStack.! !
+
+
+!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'PhG 9/18/2021 15:59:34'!
+find: aPrefix 
+	
+	|elementsWithPrefix elementHolder currentStackElement|
+	
+	elementsWithPrefix := OrderedCollection new.
+	elementHolder := OrderedCollection new.
+	
+	[stackToObserve isEmpty not] whileTrue: [
+		currentStackElement := stackToObserve pop.
+		(currentStackElement beginsWith: aPrefix) ifTrue: [elementsWithPrefix add: currentStackElement].
+		elementHolder add: currentStackElement.
+	].
+
+	[elementHolder isEmpty not] whileTrue: [
+		stackToObserve push: (elementHolder removeFirst).
+	].
+	
+	^elementsWithPrefix.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: 'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'instance creation' stamp: 'PhG 9/18/2021 15:29:14'!
+on: aStack
+
+	^SentenceFinderByPrefix new initializeWith: aStack .! !
