@@ -303,6 +303,11 @@ Object subclass: #Container
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!Container methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:28:42'!
+isEmpty
+	self subclassResponsibility .! !
+
+
 !Container methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:46:10'!
 height
 	^self subclassResponsibility .! !
@@ -315,11 +320,6 @@ previous
 value
 	self subclassResponsibility .! !
 
-
-!Container methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:28:42'!
-isEmpty
-	self subclassResponsibility .! !
-
 
 !classDefinition: #EmptyContainer category: 'Stack-Exercise'!
 Container subclass: #EmptyContainer
@@ -327,6 +327,11 @@ Container subclass: #EmptyContainer
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!EmptyContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:05'!
+isEmpty
+	^true.! !
+
 
 !EmptyContainer methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:46:19'!
 height
@@ -340,22 +345,6 @@ previous
 value
 	^self error: 'Empty Container has no value'.! !
 
-
-!EmptyContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:05'!
-isEmpty
-	^true.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'EmptyContainer class' category: 'Stack-Exercise'!
-EmptyContainer class
-	instanceVariableNames: ''!
-
-!EmptyContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:37:39'!
-stackEmptyErrorDescription
-	
-	^ 'stack is empty!!!!!!'! !
-
 
 !classDefinition: #FullContainer category: 'Stack-Exercise'!
 Container subclass: #FullContainer
@@ -364,10 +353,15 @@ Container subclass: #FullContainer
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!FullContainer methodsFor: 'initialization' stamp: 'wb 9/20/2021 11:51:22'!
-initializeWith: aString previousBlock: aCuadrado
+!FullContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:38'!
+isEmpty
+	^false.! !
+
+
+!FullContainer methodsFor: 'initialization' stamp: 'wb 9/20/2021 16:53:37'!
+initializeWith: aString previousBlock: aContainer
 	element := aString.
-	previous := aCuadrado.
+	previous := aContainer.
 	height :=1+ previous height.
 	
 ! !
@@ -385,24 +379,15 @@ previous
 value
 	^element .! !
 
-
-!FullContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:38'!
-isEmpty
-	^false.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'FullContainer class' category: 'Stack-Exercise'!
 FullContainer class
 	instanceVariableNames: ''!
 
-!FullContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:31:40'!
-with: aString
-	^self new initializeWith: aString.! !
-
-!FullContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:33:55'!
-with: aString previousBlock: aCuadrado
-	^self new initializeWith: aString previousBlock: aCuadrado.! !
+!FullContainer class methodsFor: 'initializators' stamp: 'wb 9/20/2021 16:54:45'!
+with: aString previousBlock: aContainer
+	^self new initializeWith: aString previousBlock: aContainer.! !
 
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
@@ -451,14 +436,15 @@ top	"Dejamos que el error de contenedor vacio suba, como error de OOStack"
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:23:44'!
-new
-	^self basicNew initialize.! !
-
-!OOStack class methodsFor: 'as yet unclassified' stamp: 'bt 9/20/2021 14:23:21'!
+!OOStack class methodsFor: 'error descriptions' stamp: 'bt 9/20/2021 14:23:21'!
 stackEmptyErrorDescription
 	
 	^ 'stack is empty!!!!!!'! !
+
+
+!OOStack class methodsFor: 'initialize' stamp: 'wb 9/20/2021 11:23:44'!
+new
+	^self basicNew initialize.! !
 
 
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
