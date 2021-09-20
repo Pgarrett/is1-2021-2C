@@ -5,7 +5,7 @@ TestCase subclass: #OOStackTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'PhG 9/19/2021 19:14:40'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:35'!
 test01StackShouldBeEmptyWhenCreated
 
 	| stack |
@@ -14,7 +14,7 @@ test01StackShouldBeEmptyWhenCreated
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:29:55'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:49'!
 test02PushAddElementsToTheStack
 
 	| stack |
@@ -24,7 +24,7 @@ test02PushAddElementsToTheStack
 	
 	self deny: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:01'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:07'!
 test03PopRemovesElementsFromTheStack
 
 	| stack |
@@ -35,7 +35,7 @@ test03PopRemovesElementsFromTheStack
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:09'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:28'!
 test04PopReturnsLastPushedObject
 
 	| stack pushedObject |
@@ -46,7 +46,7 @@ test04PopReturnsLastPushedObject
 	
 	self assert: stack pop = pushedObject! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 9/16/2021 17:40:17'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:59'!
 test05StackBehavesLIFO
 
 	| stack firstPushedObject secondPushedObject |
@@ -63,7 +63,7 @@ test05StackBehavesLIFO
 	self assert: stack isEmpty 
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:20'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:53'!
 test06TopReturnsLastPushedObject
 
 	| stack pushedObject |
@@ -76,7 +76,7 @@ test06TopReturnsLastPushedObject
 	self assert: stack top = pushedObject.
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:24'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:22:39'!
 test07TopDoesNotRemoveObjectFromStack
 
 	| stack pushedObject |
@@ -91,7 +91,7 @@ test07TopDoesNotRemoveObjectFromStack
 	self assert: stack size = 1.
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:26'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:55:20'!
 test08CanNotPopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
@@ -105,7 +105,7 @@ test08CanNotPopWhenThereAreNoObjectsInTheStack
 		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:31'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:55:16'!
 test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 
 	| stack  |
@@ -122,7 +122,7 @@ test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:44'!
+!OOStackTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:55:12'!
 test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
@@ -144,7 +144,7 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:12:53'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'bt 9/20/2021 14:23:06'!
 test01FindOnEmptyStackReturnsEmpty
 
 	|sentenceFinderByPrefix stack |
@@ -278,7 +278,7 @@ executing: aClosure shouldFailWith: anErrorDescription
 		withExceptionDo: [ :anError | self assert: anError messageText = anErrorDescription ]! !
 
 
-!SentenceFinderByPrefixTest methodsFor: 'setUp' stamp: 'PhG 9/19/2021 20:04:47'!
+!SentenceFinderByPrefixTest methodsFor: 'setUp' stamp: 'bt 9/20/2021 14:23:03'!
 initializeStackWith: anElement
 	
 	|stack|
@@ -296,6 +296,114 @@ setUp
 ! !
 
 
+!classDefinition: #Container category: 'Stack-Exercise'!
+Object subclass: #Container
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:46:10'!
+height
+	^self subclassResponsibility .! !
+
+!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:28:42'!
+isEmpty
+	self subclassResponsibility .! !
+
+!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:36:51'!
+previous
+	self subclassResponsibility .! !
+
+!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:39:27'!
+value
+	self subclassResponsibility .! !
+
+
+!classDefinition: #EmptyContainer category: 'Stack-Exercise'!
+Container subclass: #EmptyContainer
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!EmptyContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:46:19'!
+height
+	^0.! !
+
+!EmptyContainer methodsFor: 'accesors' stamp: 'bt 9/20/2021 14:48:19'!
+previous
+	^self error: 'Empty Container has no previous'.! !
+
+!EmptyContainer methodsFor: 'accesors' stamp: 'bt 9/20/2021 14:50:06'!
+value
+	^self error: 'Empty Container has no value'.! !
+
+
+!EmptyContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:05'!
+isEmpty
+	^true.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'EmptyContainer class' category: 'Stack-Exercise'!
+EmptyContainer class
+	instanceVariableNames: ''!
+
+!EmptyContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:37:39'!
+stackEmptyErrorDescription
+	
+	^ 'stack is empty!!!!!!'! !
+
+
+!classDefinition: #FullContainer category: 'Stack-Exercise'!
+Container subclass: #FullContainer
+	instanceVariableNames: 'element previous height'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!FullContainer methodsFor: 'initialization' stamp: 'wb 9/20/2021 11:51:22'!
+initializeWith: aString previousBlock: aCuadrado
+	element := aString.
+	previous := aCuadrado.
+	height :=1+ previous height.
+	
+! !
+
+
+!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:51:12'!
+height
+	^height.! !
+
+!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:36:36'!
+previous
+	^previous .! !
+
+!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:39:49'!
+value
+	^element .! !
+
+
+!FullContainer methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:29:38'!
+isEmpty
+	^false.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'FullContainer class' category: 'Stack-Exercise'!
+FullContainer class
+	instanceVariableNames: ''!
+
+!FullContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:31:40'!
+with: aString
+	^self new initializeWith: aString.! !
+
+!FullContainer class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:33:55'!
+with: aString previousBlock: aCuadrado
+	^self new initializeWith: aString previousBlock: aCuadrado.! !
+
+
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
 	instanceVariableNames: 'contents'
@@ -303,48 +411,38 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'initialization' stamp: 'PhG 9/18/2021 11:35:28'!
+!OOStack methodsFor: 'initialization' stamp: 'bt 9/20/2021 14:18:03'!
 initialize
-	
-	contents := OrderedCollection new.! !
+	contents := EmptyContainer new.! !
 
 
-!OOStack methodsFor: 'testing' stamp: 'PhG 9/18/2021 14:17:49'!
-isEmpty
-
-	^contents isEmpty ! !
-
-
-!OOStack methodsFor: 'adding' stamp: 'PhG 9/18/2021 14:19:20'!
-push: anElement
-
-	contents add: anElement.! !
+!OOStack methodsFor: 'adding' stamp: 'bt 9/20/2021 14:18:03'!
+push: aString
+	contents := FullContainer with: aString previousBlock: contents.! !
 
 
-!OOStack methodsFor: 'removing' stamp: 'PhG 9/19/2021 19:14:34'!
+!OOStack methodsFor: 'removing' stamp: 'bt 9/20/2021 14:54:32'!
 pop
+	|previousContents currentValue|
+	"Dejamos que el error de contenedor vacio suba, como error de OOStack"
+	[ previousContents  := contents previous. ] on: Error do: [^self error: OOStack stackEmptyErrorDescription ].
+		
+	currentValue  := contents value.
+	contents := previousContents .
+	^currentValue.! !
 
-	self validateNonEmpty.
-	^contents removeLast .! !
 
+!OOStack methodsFor: 'accessing' stamp: 'bt 9/20/2021 14:18:03'!
+isEmpty
+	^contents isEmpty.! !
 
-!OOStack methodsFor: 'accessing' stamp: 'PhG 9/18/2021 14:26:35'!
+!OOStack methodsFor: 'accessing' stamp: 'bt 9/20/2021 14:18:03'!
 size
-	^contents size.! !
+	^contents height.! !
 
-!OOStack methodsFor: 'accessing' stamp: 'PhG 9/19/2021 19:14:17'!
-top
-
-	self validateNonEmpty.
-	^contents last! !
-
-
-!OOStack methodsFor: 'private' stamp: 'PhG 9/19/2021 19:29:05'!
-validateNonEmpty
-
-	"Después de debatir por un rato, optamos por esta implementación porque entendemos que el if no se va a poder sacar por completo, en algún lado tiene que estar. No llegamos a un punto en el que supimos encontrar los dominions distintos que justifiquen el if, no nos quedó claro donde hacer esa distinción de dominio, y por eso lo dejamos acá donde es declarativo porque no comparamos el tamaño de pila para tomar la decisión. Tuvimos en cuenta que tener dos tipos de stack (empty/nonEmpty) trae problemas de implementación (por lo visto en clase), y creemos que debe ser el mismo stack quien resuelva el caso. A su vez, nos inspiramos en la implementación de Collection que utiliza el emptyCheck como forma de validar que la colección no está vacía."
-
-	self isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.]! !
+!OOStack methodsFor: 'accessing' stamp: 'bt 9/20/2021 14:55:00'!
+top	"Dejamos que el error de contenedor vacio suba, como error de OOStack"
+	[ ^contents value ] on: Error do: [^self error: OOStack stackEmptyErrorDescription ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -352,7 +450,11 @@ validateNonEmpty
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'error descriptions' stamp: 'NR 9/16/2021 17:39:43'!
+!OOStack class methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:23:44'!
+new
+	^self basicNew initialize.! !
+
+!OOStack class methodsFor: 'as yet unclassified' stamp: 'bt 9/20/2021 14:23:21'!
 stackEmptyErrorDescription
 	
 	^ 'stack is empty!!!!!!'! !
