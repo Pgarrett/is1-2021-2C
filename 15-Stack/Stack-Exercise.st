@@ -303,20 +303,21 @@ Object subclass: #Container
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:46:10'!
+!Container methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:46:10'!
 height
 	^self subclassResponsibility .! !
 
-!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:28:42'!
-isEmpty
-	self subclassResponsibility .! !
-
-!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:36:51'!
+!Container methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:36:51'!
 previous
 	self subclassResponsibility .! !
 
-!Container methodsFor: 'as yet unclassified' stamp: 'wb 9/20/2021 11:39:27'!
+!Container methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:39:27'!
 value
+	self subclassResponsibility .! !
+
+
+!Container methodsFor: 'helpers' stamp: 'wb 9/20/2021 11:28:42'!
+isEmpty
 	self subclassResponsibility .! !
 
 
@@ -327,15 +328,15 @@ Container subclass: #EmptyContainer
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!EmptyContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:46:19'!
+!EmptyContainer methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:46:19'!
 height
 	^0.! !
 
-!EmptyContainer methodsFor: 'accesors' stamp: 'bt 9/20/2021 14:48:19'!
+!EmptyContainer methodsFor: 'accessors' stamp: 'bt 9/20/2021 14:48:19'!
 previous
 	^self error: 'Empty Container has no previous'.! !
 
-!EmptyContainer methodsFor: 'accesors' stamp: 'bt 9/20/2021 14:50:06'!
+!EmptyContainer methodsFor: 'accessors' stamp: 'bt 9/20/2021 14:50:06'!
 value
 	^self error: 'Empty Container has no value'.! !
 
@@ -372,15 +373,15 @@ initializeWith: aString previousBlock: aCuadrado
 ! !
 
 
-!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:51:12'!
+!FullContainer methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:51:12'!
 height
 	^height.! !
 
-!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:36:36'!
+!FullContainer methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:36:36'!
 previous
 	^previous .! !
 
-!FullContainer methodsFor: 'accesors' stamp: 'wb 9/20/2021 11:39:49'!
+!FullContainer methodsFor: 'accessors' stamp: 'wb 9/20/2021 11:39:49'!
 value
 	^element .! !
 
