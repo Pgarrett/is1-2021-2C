@@ -5,7 +5,7 @@ TestCase subclass: #OOStackTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:30'!
+!OOStackTest methodsFor: 'test' stamp: 'PhG 9/19/2021 19:14:40'!
 test01StackShouldBeEmptyWhenCreated
 
 	| stack |
@@ -144,7 +144,7 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 15:30:32'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:12:53'!
 test01FindOnEmptyStackReturnsEmpty
 
 	|sentenceFinderByPrefix stack |
@@ -154,51 +154,146 @@ test01FindOnEmptyStackReturnsEmpty
 	
 	self assert: (sentenceFinderByPrefix find: 'wint') equals: OrderedCollection new.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 15:35:17'!
-test02FindOnStackWithContentContainingPrefixReturnsCollectionWithContent
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:01'!
+test02PrefixShouldBeFoundWhenStackOnlyContainsThePrefix
+
+	|sentenceFinderByPrefix stack prefix |
+	
+	prefix := 'win'.
+		
+	stack := self initializeStackWith: prefix.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: prefix).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:12'!
+test03FindOnStackWithContentContainingPrefixReturnsCollectionWithContent
 
 	|sentenceFinderByPrefix stack prefix content|
 	
 	prefix := 'win'.
 	content := (prefix, 'ter').
-	stack := OOStack new.
 	
-	stack push: content.
+	stack := self initializeStackWith: content.
 	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
 	
 	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: content).! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 16:01:20'!
-test03FindOnStackIsCaseSensitive
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:23'!
+test04FindOnStackIsCaseSensitive
 
 	|sentenceFinderByPrefix stack prefix content|
 	
 	prefix := 'win'.
 	content := 'Winter'.
-	stack := OOStack new.
 	
-	stack push: content.
+	stack := self initializeStackWith: content.
 	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
 	
 	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection new).! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/18/2021 16:10:29'!
-test04ElementsContainingPrefixAfterWhitespaceAreNotIncluded
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:32'!
+test05PrefixMustStartTheSentenceStartingWithThePrefix
 
-	|sentenceFinderByPrefix stack prefix expectedContent|
+	|sentenceFinderByPrefix stack prefix sentenceWithPrefix|
 	
 	prefix := 'Wint'.
-	expectedContent := 'Winter is here'.
+	sentenceWithPrefix :=  (prefix, 'er is here').
 
-	stack := OOStack new.
-	stack push: 'winter is coming'.
-	stack push: 'winning is everything'.
-	stack push: 'The winds of Winter'.
-	stack push: expectedContent.
-
+	stack := self initializeStackWith: ('The winds of ', prefix, 'er').
+	stack push: sentenceWithPrefix.
 	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
 	
-	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: expectedContent).! !
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: sentenceWithPrefix).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:42'!
+test06MultipleSentencesWithPrefixAreFound
+
+	|sentenceFinderByPrefix stack prefix firstSentenceWithPrefix secondSentenceWithPrefix|
+	
+	prefix := 'Win'.
+	firstSentenceWithPrefix :=  (prefix, 'ter is here').
+	secondSentenceWithPrefix :=  (prefix, 'ning is awesome').
+
+	stack := self initializeStackWith: firstSentenceWithPrefix.
+	stack push: secondSentenceWithPrefix.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self assert: (sentenceFinderByPrefix find: prefix) equals: (OrderedCollection with: secondSentenceWithPrefix with: firstSentenceWithPrefix).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:51'!
+test07EmptyPrefixIsNotAllowed
+
+	|sentenceFinderByPrefix stack|
+
+	stack := self initializeStackWith: 'winter is coming'.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self executing: [ (sentenceFinderByPrefix find: '') ] 
+		shouldFailWith: SentenceFinderByPrefix prefixCanNotBeEmptyErrorDescription.
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:15:58'!
+test08PrefixWithWhitespaceIsNotAllowed
+
+	|sentenceFinderByPrefix stack|
+
+	stack := self initializeStackWith: 'winter is coming'.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	self executing: [ (sentenceFinderByPrefix find: 'winter is') ] 
+		shouldFailWith: SentenceFinderByPrefix prefixCanNotContainWhitespacesErrorDescription.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'PhG 9/19/2021 21:16:07'!
+test09StackIsPreservedAfterFind
+
+	|sentenceFinderByPrefix stack prefix firstPushedSentence secondPushedSentence lastPushedSentence|
+	
+	prefix := 'Wint'.
+	firstPushedSentence := 'winter is coming'.
+	secondPushedSentence := 'The winds of Winter'.
+	lastPushedSentence := 'Winter is here'.
+
+	stack := self initializeStackWith: firstPushedSentence.
+	stack push: secondPushedSentence.
+	stack push: lastPushedSentence.
+	sentenceFinderByPrefix  := SentenceFinderByPrefix on: stack.
+	
+	sentenceFinderByPrefix find: prefix.
+	
+	self assert: stack pop = lastPushedSentence.
+	self assert: stack pop = secondPushedSentence.
+	self assert: stack pop = firstPushedSentence.
+	self assert: stack isEmpty.
+	
+	! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'assertions' stamp: 'PhG 9/19/2021 19:57:56'!
+executing: aClosure shouldFailWith: anErrorDescription
+
+	self
+		should: aClosure
+		raise: Error - MessageNotUnderstood 
+		withExceptionDo: [ :anError | self assert: anError messageText = anErrorDescription ]! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'setUp' stamp: 'PhG 9/19/2021 20:04:47'!
+initializeStackWith: anElement
+	
+	|stack|
+	
+	stack := OOStack new.
+	stack push: anElement. 
+	
+	^stack.
+
+	
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'setUp' stamp: 'PhG 9/19/2021 20:24:03'!
+setUp
+! !
 
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
@@ -226,9 +321,10 @@ push: anElement
 	contents add: anElement.! !
 
 
-!OOStack methodsFor: 'removing' stamp: 'PhG 9/18/2021 14:25:36'!
+!OOStack methodsFor: 'removing' stamp: 'PhG 9/19/2021 19:14:34'!
 pop
-	contents isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.].
+
+	self validateNonEmpty.
 	^contents removeLast .! !
 
 
@@ -236,11 +332,19 @@ pop
 size
 	^contents size.! !
 
-!OOStack methodsFor: 'accessing' stamp: 'PhG 9/18/2021 14:24:51'!
+!OOStack methodsFor: 'accessing' stamp: 'PhG 9/19/2021 19:14:17'!
 top
 
-	contents isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.].
-	^contents at: (contents size)! !
+	self validateNonEmpty.
+	^contents last! !
+
+
+!OOStack methodsFor: 'private' stamp: 'PhG 9/19/2021 19:29:05'!
+validateNonEmpty
+
+	"Después de debatir por un rato, optamos por esta implementación porque entendemos que el if no se va a poder sacar por completo, en algún lado tiene que estar. No llegamos a un punto en el que supimos encontrar los dominions distintos que justifiquen el if, no nos quedó claro donde hacer esa distinción de dominio, y por eso lo dejamos acá donde es declarativo porque no comparamos el tamaño de pila para tomar la decisión. Tuvimos en cuenta que tener dos tipos de stack (empty/nonEmpty) trae problemas de implementación (por lo visto en clase), y creemos que debe ser el mismo stack quien resuelva el caso. A su vez, nos inspiramos en la implementación de Collection que utiliza el emptyCheck como forma de validar que la colección no está vacía."
+
+	self isEmpty ifTrue: [^self error: OOStack stackEmptyErrorDescription.]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -261,31 +365,81 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'PhG 9/18/2021 15:27:41'!
-initializeWith: aStack
-
-	stackToObserve := aStack.! !
-
-
-!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'PhG 9/18/2021 15:59:34'!
-find: aPrefix 
+!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'PhG 9/19/2021 21:12:29'!
+find: aPrefix
 	
 	|elementsWithPrefix elementHolder currentStackElement|
+	
+	self validatePrefixIsNotEmpty: aPrefix.
+	self validatePrefixDoesNotContainWhitespace: aPrefix.
 	
 	elementsWithPrefix := OrderedCollection new.
 	elementHolder := OrderedCollection new.
 	
+	"Esto no lo abstraemos a otro mensaje porque tiene dos responsabilidades y para separarlas necesitaríamos una nueva abstracción. Por el enunciado, y el horario de resolución, no nos quedó claro si valía generar nuevas abstracciones en nuevos objetos."
 	[stackToObserve isEmpty not] whileTrue: [
 		currentStackElement := stackToObserve pop.
 		(currentStackElement beginsWith: aPrefix) ifTrue: [elementsWithPrefix add: currentStackElement].
 		elementHolder add: currentStackElement.
 	].
 
-	[elementHolder isEmpty not] whileTrue: [
-		stackToObserve push: (elementHolder removeFirst).
-	].
+	self restoreStackFrom: elementHolder.
 	
 	^elementsWithPrefix.! !
+
+!SentenceFinderByPrefix methodsFor: 'searching' stamp: 'PhG 9/19/2021 21:12:01'!
+find: aPrefix on: aStack
+	
+	|elementsWithPrefix elementHolder currentStackElement|
+	
+	self validatePrefixIsNotEmpty: aPrefix.
+	self validatePrefixDoesNotContainWhitespace: aPrefix.
+	
+	elementsWithPrefix := OrderedCollection new.
+	elementHolder := OrderedCollection new.
+	
+	"Esto no lo abstraemos a otro mensaje porque tiene dos responsabilidades y para separarlas necesitaríamos una nueva abstracción. Por el enunciado, y el horario de resolución, no nos quedó claro si valía generar nuevas abstracciones en nuevos objetos."
+	[stackToObserve isEmpty not] whileTrue: [
+		currentStackElement := stackToObserve pop.
+		(currentStackElement beginsWith: aPrefix) ifTrue: [elementsWithPrefix add: currentStackElement].
+		elementHolder add: currentStackElement.
+	].
+
+	self restoreStackFrom: elementHolder.
+	
+	^elementsWithPrefix.! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'PhG 9/19/2021 20:57:30'!
+restore: aStack from: stackContentHolder
+
+	[stackContentHolder isEmpty not] whileTrue: [
+		aStack push: (stackContentHolder removeLast).
+	].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'PhG 9/19/2021 21:11:47'!
+restoreStackFrom: stackContentHolder
+
+	[stackContentHolder isEmpty not] whileTrue: [
+		stackToObserve push: (stackContentHolder removeLast).
+	].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'PhG 9/19/2021 20:53:56'!
+validatePrefixDoesNotContainWhitespace: aPrefix
+
+	(aPrefix includesSubString: ' ') ifTrue: 
+		[^self error: SentenceFinderByPrefix prefixCanNotContainWhitespacesErrorDescription .].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'PhG 9/19/2021 20:52:25'!
+validatePrefixIsNotEmpty: aPrefix
+
+	aPrefix isEmpty ifTrue: [^self error: SentenceFinderByPrefix prefixCanNotBeEmptyErrorDescription.].! !
+
+
+!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'PhG 9/19/2021 21:09:38'!
+initializeWith: aStack
+
+	stackToObserve := aStack.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -293,7 +447,18 @@ find: aPrefix
 SentenceFinderByPrefix class
 	instanceVariableNames: ''!
 
-!SentenceFinderByPrefix class methodsFor: 'instance creation' stamp: 'PhG 9/18/2021 15:29:14'!
+!SentenceFinderByPrefix class methodsFor: 'errror descriptions' stamp: 'PhG 9/19/2021 19:30:49'!
+prefixCanNotBeEmptyErrorDescription
+
+	^'Prefix can not be empty!!'! !
+
+!SentenceFinderByPrefix class methodsFor: 'errror descriptions' stamp: 'PhG 9/19/2021 19:31:11'!
+prefixCanNotContainWhitespacesErrorDescription
+
+	^'Prefix can not contain whitespaces!!'! !
+
+
+!SentenceFinderByPrefix class methodsFor: 'initialization' stamp: 'PhG 9/19/2021 21:10:21'!
 on: aStack
 
-	^SentenceFinderByPrefix new initializeWith: aStack .! !
+	^self new initializeWith: aStack.! !
