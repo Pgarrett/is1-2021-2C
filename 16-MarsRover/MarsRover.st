@@ -125,6 +125,28 @@ test09
 	
 	self assert: (marsRover isAt: 2@2 heading: direction).! !
 
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 22:46:05'!
+test20
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'ff'.
+	
+	self assert: (marsRover isAt: 1@4 heading: direction).! !
+
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 22:46:11'!
+test21
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'fxf'.
+	
+	self assert: (marsRover isAt: 1@4 heading: direction).! !
+
 
 !TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 19:12:11'!
 test10
@@ -159,6 +181,83 @@ test12
 	
 	self assert: (marsRover isAt: 1@2 heading: self north).! !
 
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:31:40'!
+test13
+	|marsRover direction|
+	
+	direction := self east.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'r'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self south).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:34:03'!
+test14
+	|marsRover direction|
+	
+	direction := self south.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'l'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self east).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:35:16'!
+test15
+	|marsRover direction|
+	
+	direction := self south.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'r'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self west).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:36:48'!
+test16
+	|marsRover direction|
+	
+	direction := self west.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'l'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self south).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:37:37'!
+test17
+	|marsRover direction|
+	
+	direction := self west.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'r'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self north).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:44:03'!
+test18
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'rr'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self south).! !
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:44:18'!
+test19
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'rxr'.
+	
+	self assert: (marsRover isAt: 1@2 heading: self south).! !
+
 
 !classDefinition: #Direction category: 'MarsRover'!
 Object subclass: #Direction
@@ -174,6 +273,15 @@ goBackwardsFrom: aPosition
 !Direction methodsFor: 'movement' stamp: 'PhG 10/5/2021 19:00:24'!
 goForwardFrom: aPosition
 	self subclassResponsibility.! !
+
+
+!Direction methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:39:14'!
+rotateLeft
+	self subclassResponsibility .! !
+
+!Direction methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:39:11'!
+rotateRight
+	self subclassResponsibility .! !
 
 
 !classDefinition: #East category: 'MarsRover'!
@@ -191,6 +299,15 @@ goBackwardsFrom: currentPosition
 goForwardFrom: currentPosition
 	^currentPosition + (1@0).! !
 
+
+!East methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:39:42'!
+rotateLeft
+	^North new.! !
+
+!East methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:39:56'!
+rotateRight
+	^South new.! !
+
 
 !classDefinition: #North category: 'MarsRover'!
 Direction subclass: #North
@@ -206,6 +323,15 @@ goBackwardsFrom: currentPosition
 !North methodsFor: 'movement' stamp: 'PhG 10/5/2021 19:00:54'!
 goForwardFrom: currentPosition
 	^currentPosition + (0@1).! !
+
+
+!North methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:03'!
+rotateLeft
+	^West new.! !
+
+!North methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:09'!
+rotateRight
+	^East new.! !
 
 
 !classDefinition: #South category: 'MarsRover'!
@@ -223,6 +349,15 @@ goBackwardsFrom: currentPosition
 goForwardFrom: currentPosition
 	^currentPosition - (0@1).! !
 
+
+!South methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:16'!
+rotateLeft
+	^East new.! !
+
+!South methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:22'!
+rotateRight
+	^West new.! !
+
 
 !classDefinition: #West category: 'MarsRover'!
 Direction subclass: #West
@@ -239,43 +374,47 @@ goBackwardsFrom: currentPosition
 goForwardFrom: currentPosition
 	^currentPosition - (1@0).! !
 
+
+!West methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:29'!
+rotateLeft
+	^South new.! !
+
+!West methodsFor: 'direction' stamp: 'PhG 10/5/2021 22:40:34'!
+rotateRight
+	^North new.! !
+
 
 !classDefinition: #MarsRover category: 'MarsRover'!
 Object subclass: #MarsRover
-	instanceVariableNames: 'position heading'
+	instanceVariableNames: 'position direction'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!MarsRover methodsFor: 'initialization' stamp: 'PhG 10/4/2021 20:51:55'!
+!MarsRover methodsFor: 'initialization' stamp: 'PhG 10/5/2021 22:46:42'!
 initializeAt: somePosition heading: aDirection
 
 	position := somePosition.
-	heading := aDirection.! !
+	direction := aDirection.! !
 
 
-!MarsRover methodsFor: 'command execution' stamp: 'PhG 10/5/2021 19:29:35'!
+!MarsRover methodsFor: 'command execution' stamp: 'PhG 10/5/2021 22:46:42'!
 process: aSequenceOfCommands
 
 	(aSequenceOfCommands asOrderedCollection) do: [:aCommand| 		
-		aCommand = $f ifTrue: [ position:= heading goForwardFrom: position.] 
-		ifFalse: [ 
-			aCommand = $b ifTrue: [position:= heading goBackwardsFrom: position.]
-					ifFalse: [
-						aCommand = $l ifTrue: [
-							(heading isKindOf: North) ifTrue: [heading := West new.]
-								ifFalse: [heading := North new.]
-							]
-								ifFalse: [heading := East new.]
-						]
-			]
-		].! !
+		
+		aCommand = $f ifTrue: [ position:= direction goForwardFrom: position ].
+		aCommand = $b ifTrue: [ position:= direction goBackwardsFrom: position ].
+		aCommand = $l ifTrue: [ direction := direction rotateLeft ].
+		aCommand = $r ifTrue: [ direction := direction rotateRight ].
+
+	].! !
 
 
-!MarsRover methodsFor: 'testing' stamp: 'PhG 10/5/2021 19:24:51'!
+!MarsRover methodsFor: 'testing' stamp: 'PhG 10/5/2021 22:46:42'!
 isAt: somePosition heading: aDirection
 
-	^position = somePosition and: [heading class = aDirection class].! !
+	^position = somePosition and: [direction class = aDirection class].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
