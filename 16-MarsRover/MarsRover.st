@@ -158,7 +158,7 @@ test22RoverMovesForwardThenRotatesToTheRightTwice
 	
 	self assert: (marsRover isAt: 2@3 heading: self south).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:13:32'!
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:17:31'!
 test23RoverDoesNotExecuteNextCommandsAfterInvalidCommand
 	|marsRover direction|
 	
@@ -167,7 +167,7 @@ test23RoverDoesNotExecuteNextCommandsAfterInvalidCommand
 	
 	marsRover process: 'frxfr'.
 	
-	self assert: (marsRover isAt: 2@3 heading: self south).! !
+	self assert: (marsRover isAt: 1@3 heading: self east).! !
 
 
 !TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:08:12'!
