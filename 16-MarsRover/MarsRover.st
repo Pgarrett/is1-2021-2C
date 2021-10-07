@@ -37,8 +37,8 @@ test01RoverDoesNotActWhenNoCommandsAreReceived
 	
 	self assert: (marsRover isAt: 1@2 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:10:32'!
-test02
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:01:49'!
+test02RoverMovesForwardHeadingNorth
 	|marsRover direction|
 	
 	direction := self north.
@@ -48,8 +48,8 @@ test02
 	
 	self assert: (marsRover isAt: 1@3 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:57'!
-test03
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:02:24'!
+test03RoverGoesBackwardsHeadingNorth
 	|marsRover direction|
 	
 	direction := self north.
@@ -59,8 +59,8 @@ test03
 	
 	self assert: (marsRover isAt: 1@1 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:51'!
-test04
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:02:53'!
+test04RoverMovesForwardHeadingSouth
 	|marsRover direction|
 	
 	direction := self south.
@@ -70,8 +70,8 @@ test04
 	
 	self assert: (marsRover isAt: 1@1 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:46'!
-test05
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:03:42'!
+test05RoverGoesBackwardsHeadingSouth
 	|marsRover direction|
 	
 	direction := self south.
@@ -81,8 +81,8 @@ test05
 	
 	self assert: (marsRover isAt: 1@3 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:41'!
-test06
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:03:10'!
+test06RoverMovesForwardHeadingEast
 	|marsRover direction|
 	
 	direction := self east.
@@ -92,8 +92,8 @@ test06
 	
 	self assert: (marsRover isAt: 2@2 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:36'!
-test07
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:03:54'!
+test07RoverGoesBackwardsHeadingEast
 	|marsRover direction|
 	
 	direction := self east.
@@ -103,8 +103,8 @@ test07
 	
 	self assert: (marsRover isAt: 0@2 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:30'!
-test08
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:03:23'!
+test08RoverMovesForwardHeadingWest
 	|marsRover direction|
 	
 	direction := self west.
@@ -114,8 +114,8 @@ test08
 	
 	self assert: (marsRover isAt: 0@2 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:12:24'!
-test09
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:04:04'!
+test09RoverGoesBackwardsHeadingWest
 	|marsRover direction|
 	
 	direction := self west.
@@ -125,8 +125,8 @@ test09
 	
 	self assert: (marsRover isAt: 2@2 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 22:46:05'!
-test20
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:04:44'!
+test20MovingForwardTwoTimesAdvancesToPointsOnYAxis
 	|marsRover direction|
 	
 	direction := self north.
@@ -136,8 +136,8 @@ test20
 	
 	self assert: (marsRover isAt: 1@4 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/6/2021 21:26:09'!
-test21
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:12:07'!
+test21RoverDoesNotExecuteNextMovementCommandsAfterInvalidCommand
 	|marsRover direction|
 	
 	direction := self north.
@@ -147,9 +147,31 @@ test21
 	
 	self assert: (marsRover isAt: 1@3 heading: direction).! !
 
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:13:59'!
+test22RoverMovesForwardThenRotatesToTheRightTwice
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'frfr'.
+	
+	self assert: (marsRover isAt: 2@3 heading: self south).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 19:12:11'!
-test10
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/7/2021 00:13:32'!
+test23RoverDoesNotExecuteNextCommandsAfterInvalidCommand
+	|marsRover direction|
+	
+	direction := self north.
+	marsRover := MarsRover at: 1@2 heading: direction.
+	
+	marsRover process: 'frxfr'.
+	
+	self assert: (marsRover isAt: 2@3 heading: self south).! !
+
+
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:08:12'!
+test10RotatingFromNorthToTheLeftMakesRoverHeadWest
 	|marsRover direction|
 	
 	direction := self north.
@@ -159,8 +181,8 @@ test10
 	
 	self assert: (marsRover isAt: 1@2 heading: self west).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 19:25:32'!
-test11
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:10:12'!
+test11RotatingFromNorthToTheRightMakesRoverHeadEast
 	|marsRover direction|
 	
 	direction := self north.
@@ -170,8 +192,8 @@ test11
 	
 	self assert: (marsRover isAt: 1@2 heading: self east).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 19:28:02'!
-test12
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:08:35'!
+test12RotatingFromEastToTheLeftMakesRoverHeadNorth
 	|marsRover direction|
 	
 	direction := self east.
@@ -181,8 +203,8 @@ test12
 	
 	self assert: (marsRover isAt: 1@2 heading: self north).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:31:40'!
-test13
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:10:30'!
+test13RotatingFromEastToTheRightMakesRoverHeadSouth
 	|marsRover direction|
 	
 	direction := self east.
@@ -192,8 +214,8 @@ test13
 	
 	self assert: (marsRover isAt: 1@2 heading: self south).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:34:03'!
-test14
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:09:04'!
+test14RotatingFromSouthToTheLeftMakesRoverHeadEast
 	|marsRover direction|
 	
 	direction := self south.
@@ -203,8 +225,8 @@ test14
 	
 	self assert: (marsRover isAt: 1@2 heading: self east).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:35:16'!
-test15
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:10:47'!
+test15RotatingFromSouthToTheRightMakesRoverHeadWest
 	|marsRover direction|
 	
 	direction := self south.
@@ -214,8 +236,8 @@ test15
 	
 	self assert: (marsRover isAt: 1@2 heading: self west).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:36:48'!
-test16
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:09:21'!
+test16RotatingFromWestToTheLeftMakesRoverHeadSouth
 	|marsRover direction|
 	
 	direction := self west.
@@ -225,8 +247,8 @@ test16
 	
 	self assert: (marsRover isAt: 1@2 heading: self south).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:37:37'!
-test17
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:11:10'!
+test17RotatingFromWestToTheRightMakesRoverHeadNorth
 	|marsRover direction|
 	
 	direction := self west.
@@ -236,8 +258,8 @@ test17
 	
 	self assert: (marsRover isAt: 1@2 heading: self north).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:44:03'!
-test18
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:11:30'!
+test18RotatingFromNorthToTheRightTwiceMakesRoverHeadSouth
 	|marsRover direction|
 	
 	direction := self north.
@@ -247,8 +269,8 @@ test18
 	
 	self assert: (marsRover isAt: 1@2 heading: self south).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/6/2021 21:25:38'!
-test19
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/7/2021 00:14:35'!
+test19RoverDoesNotExecuteNextHeadingCommandsAfterInvalidCommand
 	|marsRover direction|
 	
 	direction := self north.
@@ -265,6 +287,10 @@ Object subclass: #Command
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover'!
+
+!Command methodsFor: 'execution' stamp: 'PhG 10/6/2021 23:58:56'!
+executeFor: aRover at: aPosition heading: someDirection
+	self subclassResponsibility .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -284,9 +310,9 @@ Command subclass: #BackwardCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!BackwardCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:18:48'!
-executeFor: aRover at: aPosition heading: someDirection.
-	aRover moveBackwardFrom: 	aPosition heading: someDirection.! !
+!BackwardCommand methodsFor: 'execution' stamp: 'PhG 10/7/2021 00:00:18'!
+executeFor: aRover at: aPosition heading: someDirection
+	aRover moveBackwardsFrom: 	aPosition heading: someDirection.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -306,8 +332,8 @@ Command subclass: #ForwardCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!ForwardCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:15:46'!
-executeFor: aRover at: aPosition heading: someDirection.
+!ForwardCommand methodsFor: 'execution' stamp: 'PhG 10/6/2021 23:59:16'!
+executeFor: aRover at: aPosition heading: someDirection
 	aRover moveForwardFrom: 	aPosition heading: someDirection.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -328,8 +354,8 @@ Command subclass: #RotateLeftCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!RotateLeftCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:19:05'!
-executeFor: aRover at: aPosition heading: someDirection.
+!RotateLeftCommand methodsFor: 'execution' stamp: 'PhG 10/6/2021 23:59:21'!
+executeFor: aRover at: aPosition heading: someDirection
 	aRover rotateLeftFrom: someDirection.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -350,8 +376,8 @@ Command subclass: #RotateRightCommand
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!RotateRightCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:19:14'!
-executeFor: aRover at: aPosition heading: someDirection.
+!RotateRightCommand methodsFor: 'execution' stamp: 'PhG 10/6/2021 23:59:26'!
+executeFor: aRover at: aPosition heading: someDirection
 	aRover rotateRightFrom: someDirection.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -527,9 +553,9 @@ isAt: somePosition heading: aDirection
 	^position = somePosition and: [direction class = aDirection class].! !
 
 
-!MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:17:25'!
-moveBackwardFrom: 	aPosition heading: someDirection
-	position:= someDirection goBackwardsFrom: aPosition! !
+!MarsRover methodsFor: 'movement' stamp: 'PhG 10/7/2021 00:00:18'!
+moveBackwardsFrom: 	aPosition heading: someDirection
+	position := someDirection goBackwardsFrom: aPosition! !
 
 !MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:17:13'!
 moveForwardFrom: 	aPosition heading: someDirection
