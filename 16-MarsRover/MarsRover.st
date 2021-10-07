@@ -26,8 +26,8 @@ west
 	^West new.! !
 
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 19:10:06'!
-test01
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/6/2021 20:57:08'!
+test01RoverDoesNotActWhenNoCommandsAreReceived
 	|marsRover direction|
 	
 	direction := self north.
@@ -136,7 +136,7 @@ test20
 	
 	self assert: (marsRover isAt: 1@4 heading: direction).! !
 
-!TestRover methodsFor: 'tests position' stamp: 'PhG 10/5/2021 22:46:11'!
+!TestRover methodsFor: 'tests position' stamp: 'PhG 10/6/2021 21:26:09'!
 test21
 	|marsRover direction|
 	
@@ -145,7 +145,7 @@ test21
 	
 	marsRover process: 'fxf'.
 	
-	self assert: (marsRover isAt: 1@4 heading: direction).! !
+	self assert: (marsRover isAt: 1@3 heading: direction).! !
 
 
 !TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 19:12:11'!
@@ -247,7 +247,7 @@ test18
 	
 	self assert: (marsRover isAt: 1@2 heading: self south).! !
 
-!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/5/2021 22:44:18'!
+!TestRover methodsFor: 'tests heading' stamp: 'PhG 10/6/2021 21:25:38'!
 test19
 	|marsRover direction|
 	
@@ -256,7 +256,113 @@ test19
 	
 	marsRover process: 'rxr'.
 	
-	self assert: (marsRover isAt: 1@2 heading: self south).! !
+	self assert: (marsRover isAt: 1@2 heading: self east).! !
+
+
+!classDefinition: #Command category: 'MarsRover'!
+Object subclass: #Command
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Command class' category: 'MarsRover'!
+Command class
+	instanceVariableNames: ''!
+
+!Command class methodsFor: 'handlers' stamp: 'PhG 10/6/2021 21:02:07'!
+canHandle: aCommand
+	self subclassResponsibility .! !
+
+
+!classDefinition: #BackwardCommand category: 'MarsRover'!
+Command subclass: #BackwardCommand
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!BackwardCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:18:48'!
+executeFor: aRover at: aPosition heading: someDirection.
+	aRover moveBackwardFrom: 	aPosition heading: someDirection.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'BackwardCommand class' category: 'MarsRover'!
+BackwardCommand class
+	instanceVariableNames: ''!
+
+!BackwardCommand class methodsFor: 'handlers' stamp: 'PhG 10/6/2021 21:23:30'!
+canHandle: aCommand
+	^$b = aCommand! !
+
+
+!classDefinition: #ForwardCommand category: 'MarsRover'!
+Command subclass: #ForwardCommand
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!ForwardCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:15:46'!
+executeFor: aRover at: aPosition heading: someDirection.
+	aRover moveForwardFrom: 	aPosition heading: someDirection.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ForwardCommand class' category: 'MarsRover'!
+ForwardCommand class
+	instanceVariableNames: ''!
+
+!ForwardCommand class methodsFor: 'handlers' stamp: 'PhG 10/6/2021 21:23:35'!
+canHandle: aCommand
+	^$f = aCommand! !
+
+
+!classDefinition: #RotateLeftCommand category: 'MarsRover'!
+Command subclass: #RotateLeftCommand
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!RotateLeftCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:19:05'!
+executeFor: aRover at: aPosition heading: someDirection.
+	aRover rotateLeftFrom: someDirection.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'RotateLeftCommand class' category: 'MarsRover'!
+RotateLeftCommand class
+	instanceVariableNames: ''!
+
+!RotateLeftCommand class methodsFor: 'handlers' stamp: 'PhG 10/6/2021 21:23:42'!
+canHandle: aCommand
+	^$l = aCommand! !
+
+
+!classDefinition: #RotateRightCommand category: 'MarsRover'!
+Command subclass: #RotateRightCommand
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover'!
+
+!RotateRightCommand methodsFor: 'as yet unclassified' stamp: 'PhG 10/6/2021 21:19:14'!
+executeFor: aRover at: aPosition heading: someDirection.
+	aRover rotateRightFrom: someDirection.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'RotateRightCommand class' category: 'MarsRover'!
+RotateRightCommand class
+	instanceVariableNames: ''!
+
+!RotateRightCommand class methodsFor: 'handlers' stamp: 'PhG 10/6/2021 21:23:48'!
+canHandle: aCommand
+	^$r = aCommand! !
 
 
 !classDefinition: #Direction category: 'MarsRover'!
@@ -398,15 +504,19 @@ initializeAt: somePosition heading: aDirection
 	direction := aDirection.! !
 
 
-!MarsRover methodsFor: 'command execution' stamp: 'PhG 10/5/2021 22:46:42'!
+!MarsRover methodsFor: 'command execution' stamp: 'PhG 10/6/2021 21:19:27'!
 process: aSequenceOfCommands
+	
+	|commandToExecute|
 
 	(aSequenceOfCommands asOrderedCollection) do: [:aCommand| 		
 		
-		aCommand = $f ifTrue: [ position:= direction goForwardFrom: position ].
+		commandToExecute := (Command allSubclasses) detect: [:aSubclass | aSubclass canHandle: aCommand] ifNone: [^nil].
+		(commandToExecute new) executeFor: self at: position heading: direction.
+"		aCommand = $f ifTrue: [ position:= direction goForwardFrom: position ].
 		aCommand = $b ifTrue: [ position:= direction goBackwardsFrom: position ].
 		aCommand = $l ifTrue: [ direction := direction rotateLeft ].
-		aCommand = $r ifTrue: [ direction := direction rotateRight ].
+		aCommand = $r ifTrue: [ direction := direction rotateRight ]."
 
 	].! !
 
@@ -415,6 +525,23 @@ process: aSequenceOfCommands
 isAt: somePosition heading: aDirection
 
 	^position = somePosition and: [direction class = aDirection class].! !
+
+
+!MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:17:25'!
+moveBackwardFrom: 	aPosition heading: someDirection
+	position:= someDirection goBackwardsFrom: aPosition! !
+
+!MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:17:13'!
+moveForwardFrom: 	aPosition heading: someDirection
+	position := someDirection goForwardFrom: aPosition! !
+
+!MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:18:07'!
+rotateLeftFrom: someDirection
+	direction := someDirection rotateLeft.! !
+
+!MarsRover methodsFor: 'movement' stamp: 'PhG 10/6/2021 21:18:17'!
+rotateRightFrom: someDirection
+	direction := someDirection rotateRight.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
