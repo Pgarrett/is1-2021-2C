@@ -34,3 +34,14 @@
 		2. Make things visible.
 
 	* PG: Por un lado, a mayor cantidad de funcionalidades que se intentan cubrir/resolver, más difícil es hacer visible todo sin tener un objeto lleno de controles; por otro lado, el avance de la tecnología también nos ayuda a abstraer ciertas operaciones/controles del objeto, lo cual nos impide formar un buen modelo conceptual.
+
+
+## No Silver Bullet
+
+1. ¿Cuales son las diferencias y similitudes entre las concepciones de Naur y de Brooks en lo que refiere a qué son los programas?
+	* PG: Ambos coinciden en que los programas son la representación de una parte del universo, llevada a cabo por los programadores. Naur, por su parte, habla de los programas como teorías concebidas por una persona y/o su equipo. Esas personas son quienes conocen las decisiones sobre las cuales se creo la teoría que está representada por el programa. Brooks, en cambio, hace mucho énfasis en los programas como frutos del diseño, y que los mismos deben poder crecer y no simplemente ser construidos. Los dos mencionan que es importante la transferencia de conocimiento como parte de la vida del programa, y que fundamentalmente, un programa existe por la gente que lo crea. Por último, pero más a modo de apreciación personal, me dio la impresión de que Naur y su concepto de Teoría llaman a un programa más estático, donde los cambios son más difíciles. En cambio, Brooks y la noción de diseño + crecimiento, dan la impresión de que el programa y su vida son mucho más dinámicos.
+
+
+2. ¿Cuales es la propuestas de Brooks en lo que refiere a la formación de los desarrolladores de programas?
+	* PG: A lo largo del paper, podemos identificar algunos indicios de las propuestas de Brooks para la formación de los desarrolladores de programas. Por un lado, menciona que es importante tener buenas herramientas como programas para escribir, dibujar y hojas de cálculo. Por otro lado, y más importantemente, menciona que hay que enseñarle a los programadores con menos experiencia mediante aquellos con más experiencia/sabiduría. Esto vuelve a ser mencionado cerca del final cuando sugiere asignar un mentor para cada persona y tener un seguimiento de esa carrera con un plan que incluya por ejemplo cursos con grandes diseñadores, ejercicios desafiantes y oportunidad para que los diseñadores que estén aprendiendo puedan interactuar entre ellos, estimulando su crecimiento.
+		
