@@ -39,9 +39,23 @@
 ## No Silver Bullet
 
 1. ¿Cuales son las diferencias y similitudes entre las concepciones de Naur y de Brooks en lo que refiere a qué son los programas?
+	
 	* PG: Ambos coinciden en que los programas son la representación de una parte del universo, llevada a cabo por los programadores. Naur, por su parte, habla de los programas como teorías concebidas por una persona y/o su equipo. Esas personas son quienes conocen las decisiones sobre las cuales se creo la teoría que está representada por el programa. Brooks, en cambio, hace mucho énfasis en los programas como frutos del diseño, y que los mismos deben poder crecer y no simplemente ser construidos. Los dos mencionan que es importante la transferencia de conocimiento como parte de la vida del programa, y que fundamentalmente, un programa existe por la gente que lo crea. Por último, pero más a modo de apreciación personal, me dio la impresión de que Naur y su concepto de Teoría llaman a un programa más estático, donde los cambios son más difíciles. En cambio, Brooks y la noción de diseño + crecimiento, dan la impresión de que el programa y su vida son mucho más dinámicos.
 
 
 2. ¿Cuales es la propuestas de Brooks en lo que refiere a la formación de los desarrolladores de programas?
+	
 	* PG: A lo largo del paper, podemos identificar algunos indicios de las propuestas de Brooks para la formación de los desarrolladores de programas. Por un lado, menciona que es importante tener buenas herramientas como programas para escribir, dibujar y hojas de cálculo. Por otro lado, y más importantemente, menciona que hay que enseñarle a los programadores con menos experiencia mediante aquellos con más experiencia/sabiduría. Esto vuelve a ser mencionado cerca del final cuando sugiere asignar un mentor para cada persona y tener un seguimiento de esa carrera con un plan que incluya por ejemplo cursos con grandes diseñadores, ejercicios desafiantes y oportunidad para que los diseñadores que estén aprendiendo puedan interactuar entre ellos, estimulando su crecimiento.
 		
+
+## Self: The Power Of Simplicity
+
+1. Nombre y explique los 3 principios que guiaron el diseño de Self.
+
+	* PG:
+		1. Messages-at-the-bottom: Todas las operaciones en Self se realizan mediante el envío de mensajes entre objetos. No existen las variables y solo se puede acceder al estado interno de un objeto mediante el envío de un mensaje.
+		2. Occam's Razor: La simpleza como bandera de diseño del lenguaje. Como fue mencionado anteriormente, todas las operaciones se realizan mediante el envío de mensajes y todos los objetos se obtienen mediante la clonación de prototipos, incluidos los closures y procedures. Esto nos permite una interacción más simple al momento de utilizar el lenguaje.
+		3. Concreteness: En cierta sintonía con que todo sea lo más simple posible, Self opta por que sus elementos sean lo más concreto posibles, que no haya "magia" detrás, podríamos decir. Es por eso que, por ejemplo en la creación de objetos, la decisión fue de utilizar prototipos. Esto permite utilizar el concepto biológico de clonación para poder crear nuevas instancias de objetos, una metáfora mucho más entendible que la de creación mediante un plano escrito en una clase.
+
+2. En Self los objetos se crean a partir de:
+	* PG: Ninguna de las anteriores.
