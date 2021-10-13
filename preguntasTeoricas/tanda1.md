@@ -64,13 +64,12 @@
 
 ## 5. Design Principles Behind Smalltalk
 http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Behind%20Smalltalk.pdf
+
 5.1 ¿De que no debe depender un componente en un sistema complejo?
-	
 	* Un componente no puede depender de la detalles internos de implementación de otros objetos. Esto quiere decir que a un componente
 	le debe bastar conocer el protocolo externo con el cual comunicarse con otros objetos, no los detalles internos de estos.
 	
 5.2 El paper enumera rápidamente dos principios en los que se basa el diseño de Smalltalk. ¿Cuál es el tercero y que significa?
-	
 	* El tercero es "all parts of the system should be held in a uniform framework.".
 
 
