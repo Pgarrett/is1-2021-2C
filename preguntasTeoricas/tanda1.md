@@ -73,8 +73,7 @@ http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Beh
 	
 2. El paper enumera rápidamente dos principios en los que se basa el diseño de Smalltalk. ¿Cuál es el tercero y que significa?
 
-	* El tercero es "all parts of the system should be held in a uniform framework.".
-
+	* El tercero es "all parts of the system should be held in a uniform framework.". Esto significa que todos los objetos del lenguaje deben estar al mismo 	nivel, y uno debe poder comunicarse con ellos de la misma manera (a través de mensajes). Por ejemplo, en otros lenguajes, un entero, un caracter o un bloque de 	código de una control structure no son objetos, sino tipos primitivos o sintácticos. Al funcionar todos los componentes de la misma manera (ya que todos son 		objetos), se evita la complejidad extra de tener que interactuar con ellos de forma distinta.
 
 ## 6. Polymorphic Hierarchy
 
