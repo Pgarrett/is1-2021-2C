@@ -62,7 +62,7 @@
 
 
 
-5. Design Principles Behind Smalltalk
+## 5. Design Principles Behind Smalltalk
 http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Behind%20Smalltalk.pdf
 5.1 ¿De que no debe depender un componente en un sistema complejo?
 	
@@ -74,7 +74,7 @@ http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Beh
 	* El tercero es "all parts of the system should be held in a uniform framework.".
 
 
-6. Polymorphic Hierarchy
+## 6. Polymorphic Hierarchy
 https://www.dropbox.com/s/jyy87o2a3ljdr7w/Polymorphic%20Hierarchy.pdf?dl=0
 6.1 ¿La cabeza de la jerarquía polimórfica puede presentar mas Core Interfaces que las subclases o al revés?
 	
@@ -87,7 +87,7 @@ https://www.dropbox.com/s/jyy87o2a3ljdr7w/Polymorphic%20Hierarchy.pdf?dl=0
 	embargo, aplica solamente a ese código, ya que involucra la implementación concreta de la idea general del método. 
 
 
-7. A Simple Technique for Handling Multiple Polymorphism
+## 7. A Simple Technique for Handling Multiple Polymorphism
 https://www.dropbox.com/s/f00ujuvfgqnkm55/A%20simple%20technique%20for%20handling%20multiple%20polymorphism%20-%20double%20dispatch.pdf?dl=0
 7.1 El paper presenta la situación en la que una expresión posee …
 	
