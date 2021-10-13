@@ -63,23 +63,28 @@
 
 
 ## 5. Design Principles Behind Smalltalk
+
 http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Behind%20Smalltalk.pdf
 
-5.1 ¿De que no debe depender un componente en un sistema complejo?
+1. ¿De que no debe depender un componente en un sistema complejo?
+
 	* Un componente no puede depender de la detalles internos de implementación de otros objetos. Esto quiere decir que a un componente
 	le debe bastar conocer el protocolo externo con el cual comunicarse con otros objetos, no los detalles internos de estos.
 	
-5.2 El paper enumera rápidamente dos principios en los que se basa el diseño de Smalltalk. ¿Cuál es el tercero y que significa?
+2. El paper enumera rápidamente dos principios en los que se basa el diseño de Smalltalk. ¿Cuál es el tercero y que significa?
+
 	* El tercero es "all parts of the system should be held in a uniform framework.".
 
 
 ## 6. Polymorphic Hierarchy
+
 https://www.dropbox.com/s/jyy87o2a3ljdr7w/Polymorphic%20Hierarchy.pdf?dl=0
-6.1 ¿La cabeza de la jerarquía polimórfica puede presentar mas Core Interfaces que las subclases o al revés?
+
+1. ¿La cabeza de la jerarquía polimórfica puede presentar mas Core Interfaces que las subclases o al revés?
 	
 	* Las subclases pueden presentar más Core Interfaces, ya que pueden extender a la superclase y tener más funcionalidad que esta.
 
-6.2. ¿Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código o al revés?
+2. ¿Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código o al revés?
 
 	* Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código. El código 
 	de toda la jerarquía debe tener el mismo objetivo, realizar la misma tarea, su semántica no debería diferir. Una descripción de código en concreto, sin
@@ -88,10 +93,10 @@ https://www.dropbox.com/s/jyy87o2a3ljdr7w/Polymorphic%20Hierarchy.pdf?dl=0
 
 ## 7. A Simple Technique for Handling Multiple Polymorphism
 https://www.dropbox.com/s/f00ujuvfgqnkm55/A%20simple%20technique%20for%20handling%20multiple%20polymorphism%20-%20double%20dispatch.pdf?dl=0
-7.1 El paper presenta la situación en la que una expresión posee …
-	
+1. El paper presenta la situación en la que una expresión posee …
+	a
 	* … más de una variable independientemente polimórficas.
 
-7.2 Teniendo en cuenta el ejemplo del paper (Graphical Objects y Display Ports). La solución final, donde los nuevos métodos se encuentran en la clase Ports …
+2. Teniendo en cuenta el ejemplo del paper (Graphical Objects y Display Ports). La solución final, donde los nuevos métodos se encuentran en la clase Ports …
 	
-	*... es igual de buena que la solución donde los métodos se encuentran en las clases graphical y solo depende de una decisión de diseño.
+	* ... es igual de buena que la solución donde los métodos se encuentran en las clases graphical y solo depende de una decisión de diseño.
