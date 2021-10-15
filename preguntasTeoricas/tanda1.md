@@ -60,20 +60,20 @@
 	* PG: Ninguna de las anteriores.
 
 
-
-
 ## 5. Design Principles Behind Smalltalk
 
 http://sdmeta.gforge.inria.fr/FreeBooks/BlueBookHughes/Design%20Principles%20Behind%20Smalltalk.pdf
 
 1. ¿De que no debe depender un componente en un sistema complejo?
 
-	* Un componente no puede depender de la detalles internos de implementación de otros objetos. Esto quiere decir que a un componente
-	le debe bastar conocer el protocolo externo con el cual comunicarse con otros objetos, no los detalles internos de estos.
+	* WB: Un componente no puede depender de la detalles internos de implementación de otros objetos. Esto quiere decir que a un componente le debe bastar conocer el protocolo externo con el cual comunicarse con otros objetos, no los detalles internos de estos.
 	
 2. El paper enumera rápidamente dos principios en los que se basa el diseño de Smalltalk. ¿Cuál es el tercero y que significa?
 
-	* El tercero es "all parts of the system should be held in a uniform framework.". Esto significa que todos los objetos del lenguaje deben estar al mismo 	nivel, y uno debe poder comunicarse con ellos de la misma manera (a través de mensajes). Por ejemplo, en otros lenguajes, un entero, un caracter o un bloque de 	código de una control structure no son objetos, sino tipos primitivos o sintácticos. Al funcionar todos los componentes de la misma manera (ya que todos son 		objetos), se evita la complejidad extra de tener que interactuar con ellos de forma distinta.
+	* WB: El tercero es "all parts of the system should be held in a uniform framework.". Esto significa que todos los objetos del lenguaje deben estar al mismo nivel, y uno debe poder comunicarse con ellos de la misma manera (a través de mensajes). Por ejemplo, en otros lenguajes, un entero, un caracter o un bloque de código de una control structure no son objetos, sino tipos primitivos o sintácticos. Al funcionar todos los componentes de la misma manera (ya que todos son objetos), se evita la complejidad extra de tener que interactuar con ellos de forma distinta.
+
+	* PG: El tercer principio de diseño es "Messages: Computing should be viewed as an intrinsic capability of objects that can be uniformly invoked by sending messages." Tomando lo mencionado en el paper de Self acerca de la metáfora biológica, el envío de mensajes también nos lleva hacia ese terreno. Nosotros como personas nos comunicamos mediante el envío de mensajes, entre nosotros e incluso con los objetos del mundo real. Prepararnos un café involucra la tarea de apretar un botón en una cafetera por ejemplo, ese es el mensaje, y es la cafetera quien sabe interpretar y resolver ese mensaje con los argumentos que nosotros le enviamos (como por ejemplo cuantas tazas esperamos que sirva). En esa sintonía, el envío de mensajes nos proporciona la posibilidad de que la interacción entre objetos se acerque aún más al mundo "real" que intentamos modelar. Los objetos saben responder cierto conjunto de mensajes, por lo tanto la ejecución de un sistema se basa en ese ida y vuelta de mensajes que piden a un objeto que ejecute una operación, de la forma que el mismo objeto sabe mejor.
+
 
 ## 6. Polymorphic Hierarchy
 
@@ -81,21 +81,21 @@ https://www.dropbox.com/s/jyy87o2a3ljdr7w/Polymorphic%20Hierarchy.pdf?dl=0
 
 1. ¿La cabeza de la jerarquía polimórfica puede presentar mas Core Interfaces que las subclases o al revés?
 	
-	* Las subclases pueden presentar más Core Interfaces, ya que pueden extender a la superclase y tener más funcionalidad que esta.
+	* WB: Las subclases pueden presentar más Core Interfaces, ya que pueden extender a la superclase y tener más funcionalidad que esta.
 
 2. ¿Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código o al revés?
 
-	* Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código. El código 
-	de toda la jerarquía debe tener el mismo objetivo, realizar la misma tarea, su semántica no debería diferir. Una descripción de código en concreto, sin
-	embargo, aplica solamente a ese código, ya que involucra la implementación concreta de la idea general del método. 
+	* WB: Una descripción semántica vale para el código que describe en toda la jerarquía y una descripción de código vale sólo para ese código. El código de toda la jerarquía debe tener el mismo objetivo, realizar la misma tarea, su semántica no debería diferir. Una descripción de código en concreto, sin embargo, aplica solamente a ese código, ya que involucra la implementación concreta de la idea general del método. 
 
 
 ## 7. A Simple Technique for Handling Multiple Polymorphism
+
 https://www.dropbox.com/s/f00ujuvfgqnkm55/A%20simple%20technique%20for%20handling%20multiple%20polymorphism%20-%20double%20dispatch.pdf?dl=0
+
 1. El paper presenta la situación en la que una expresión posee …
 	a
-	* … más de una variable independientemente polimórficas.
+	* WB: … más de una variable independientemente polimórficas.
 
 2. Teniendo en cuenta el ejemplo del paper (Graphical Objects y Display Ports). La solución final, donde los nuevos métodos se encuentran en la clase Ports …
 	
-	* ... es igual de buena que la solución donde los métodos se encuentran en las clases graphical y solo depende de una decisión de diseño.
+	* WB: ... es igual de buena que la solución donde los métodos se encuentran en las clases graphical y solo depende de una decisión de diseño.
