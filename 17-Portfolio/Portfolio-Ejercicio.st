@@ -74,8 +74,8 @@ test06BalanceOfPortfolioWithPortfolioIsPortfolioBalance
 	
 	self assert: (innerPortfolio balance) equals: portfolio balance.! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/7/2021 21:22:51'!
-test07BalanceOfPortfolioWithTwoAccountsIsAddedBalance
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/14/2021 21:12:09'!
+test07BalanceOfPortfolioWithManyAccountsIsAddedBalance
 	
 	|portfolio innerPortfolio anAccount otherAccount|
 	
@@ -92,6 +92,83 @@ test07BalanceOfPortfolioWithTwoAccountsIsAddedBalance
 	portfolio add: innerPortfolio .
 	
 	self assert: 300 equals: portfolio balance.! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/14/2021 21:20:29'!
+test08BalanceOfPortfolioWithManyPortfoliosIsAddedBalance
+	
+	|portfolio innerPortfolio anAccount otherAccount|
+	
+	portfolio := Portfolio new.
+	innerPortfolio := Portfolio new.
+	anAccount := ReceptiveAccount new.
+	otherAccount := ReceptiveAccount new.
+	
+	Deposit register: 100 on: anAccount.
+	innerPortfolio add: anAccount.
+	Deposit register: 200 on: otherAccount.
+	portfolio add: otherAccount.
+	
+	portfolio add: innerPortfolio .
+	
+	self assert: 300 equals: portfolio balance.! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/14/2021 21:37:54'!
+test09PortfolioCanNotBeAddedToItself
+	
+	|portfolio|
+	
+	portfolio := Portfolio new.
+	
+	self should: [portfolio add: portfolio]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotBeAddedToItselfDescription ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 09:52:10'!
+test10PortfolioCanNotAddTheSameAccountMoreThanOnce
+	
+	|portfolio anAccount|
+	
+	portfolio := Portfolio new.
+	anAccount := ReceptiveAccount new.
+	
+	portfolio add: anAccount .
+	
+	self should: [portfolio add: anAccount]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSamePositionMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 09:51:10'!
+test11PortfolioCanNotAddTheSamePortfolioMoreThanOnce
+	
+	|portfolio anAccount innerPortfolio| 
+	
+	portfolio := Portfolio new.
+	anAccount := ReceptiveAccount new.
+	innerPortfolio := Portfolio new.
+	
+	innerPortfolio add: anAccount.
+	portfolio add: innerPortfolio.
+		
+	self should: [portfolio add: innerPortfolio]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSamePositionMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 09:53:35'!
+test12PortfolioCanNotAddAccountPresentInAListedPortfolio
+	
+	|portfolio anAccount innerPortfolio| 
+	
+	portfolio := Portfolio new.
+	anAccount := ReceptiveAccount new.
+	innerPortfolio := Portfolio new.
+	
+	innerPortfolio add: anAccount.
+	portfolio add: innerPortfolio.
+		
+	self should: [portfolio add: innerPortfolio]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSamePositionMoreThanOnce ].! !
+
 
 
 !classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
@@ -295,10 +372,17 @@ Object subclass: #Portfolio
 isEmpty
 	^positions isEmpty.! !
 
+!Portfolio methodsFor: 'testing' stamp: 'PhG 10/15/2021 18:57:49'!
+isEqualTo: anAccount
+	^self = anAccount.! !
 
-!Portfolio methodsFor: 'operations' stamp: 'PhG 10/7/2021 21:15:05'!
-add: aPortfolio
-	positions add: aPortfolio .! !
+
+!Portfolio methodsFor: 'operations' stamp: 'PhG 10/15/2021 19:40:48'!
+add: positionToBeAdded
+	
+	self assertPositionCanBeAdded: positionToBeAdded .
+	
+	positions add: positionToBeAdded .! !
 
 !Portfolio methodsFor: 'operations' stamp: 'PhG 10/7/2021 21:23:25'!
 balance
@@ -310,6 +394,44 @@ balance
 initialize
 
 	positions := OrderedCollection new.! !
+
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/15/2021 19:55:27'!
+assertDoesNotContainPosition: positionToBeAdded
+
+	self assertPositionCanBeAdded: positionToBeAdded.! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 09:51:33'!
+assertPositionCanBeAdded: positionToBeAdded
+	
+	self assertPositionIsNotSelf: positionToBeAdded.
+	self assertPositionHasNotYetBeenAdded: positionToBeAdded.
+	
+	"assert position is not present in any subtree"
+	"(positions do: [:position| position assertDoesNotContainPosition: positionToBeAdded]) ifTrue: [self error: Portfolio portfolioCanNotAddTheSameAccountMoreThanOnce ]"! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 09:52:10'!
+assertPositionHasNotYetBeenAdded: positionToBeAdded
+
+	(positions anySatisfy: [:position| position = positionToBeAdded]) ifTrue: [self error: Portfolio portfolioCanNotAddTheSamePositionMoreThanOnce ]! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/15/2021 19:39:36'!
+assertPositionIsNotSelf: positionToBeAdded
+	self = positionToBeAdded ifTrue: [self error: Portfolio portfolioCanNotBeAddedToItselfDescription ].! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Portfolio class' category: 'Portfolio-Ejercicio'!
+Portfolio class
+	instanceVariableNames: ''!
+
+!Portfolio class methodsFor: 'error descriptions' stamp: 'PhG 10/16/2021 09:52:14'!
+portfolioCanNotAddTheSamePositionMoreThanOnce
+	^'You can not add the same position more than once'! !
+
+!Portfolio class methodsFor: 'error descriptions' stamp: 'PhG 10/14/2021 21:39:25'!
+portfolioCanNotBeAddedToItselfDescription
+	^'You can not add a portfolio to itself'! !
 
 
 !classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
@@ -363,8 +485,16 @@ withdrawalTransactions
 	^ transactions select: [:aTransaction | aTransaction isDeposit not]! !
 
 
+!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/15/2021 19:54:25'!
+assertDoesNotContainPosition: positionToBeAdded
+	^true! !
+
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction 
 ! !
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/15/2021 15:57:47'!
+isEqualTo: anAccount
+	^self = anAccount.! !
