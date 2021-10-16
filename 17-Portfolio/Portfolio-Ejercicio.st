@@ -5,7 +5,7 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/7/2021 20:41:57'!
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 12:37:14'!
 test01NewPortfolioIsEmtpy
 	
 	|portfolio|
@@ -205,6 +205,22 @@ test14PortfolioCanNotBeAddedMoreThanOnce
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 12:29:14'!
+test15ExistingAccountInRootPortfolioCanNotBeAddedToChildPortfolio
+	
+	|p1 a1 p2| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	
+	p1 add: a1.
+	p1 add: p2.
+		
+	self should: [p2 add: a1.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
 
 
 !classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
@@ -399,7 +415,7 @@ for: aValue
 
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
 Object subclass: #Portfolio
-	instanceVariableNames: 'holdings id'
+	instanceVariableNames: 'holdings id parents'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -413,12 +429,19 @@ isEqualTo: anAccount
 	^self = anAccount.! !
 
 
-!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 11:31:07'!
+!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 12:47:52'!
 add: holdingToBeAdded
 	
 	self assertHoldingCanBeAdded: holdingToBeAdded .
 	
-	holdings add: holdingToBeAdded .! !
+	holdings add: holdingToBeAdded.
+
+	(holdingToBeAdded isKindOf: Portfolio) ifTrue: [ 		holdingToBeAdded addParent: self ].! !
+
+!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 12:34:51'!
+addParent: parentHolding
+	
+	parents add: parentHolding.! !
 
 !Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 11:30:51'!
 balance
@@ -431,14 +454,15 @@ initialize
 
 	holdings := OrderedCollection new.! !
 
-!Portfolio methodsFor: 'initialization' stamp: 'PhG 10/16/2021 12:06:27'!
+!Portfolio methodsFor: 'initialization' stamp: 'PhG 10/16/2021 12:31:04'!
 initializeWith: anId
 
 	holdings := OrderedCollection new.
+	parents := OrderedCollection new.
 	id := anId! !
 
 
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 12:01:13'!
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 12:59:09'!
 assertHoldingCanBeAdded: holdingToBeAdded
 	
 	self assertHoldingIsNotSelf: holdingToBeAdded.
@@ -448,6 +472,13 @@ assertHoldingCanBeAdded: holdingToBeAdded
 	(holdingToBeAdded isKindOf: Portfolio) ifTrue: [ 
 				 
 		holdingToBeAdded isIncludedIn: self.
+
+		].
+	
+	(holdingToBeAdded isKindOf: ReceptiveAccount ) ifTrue: [ 
+				 
+		holdingToBeAdded isIncludedIn: self.
+		parents anySatisfy: [:parent | parent contains: holdingToBeAdded ]
 
 		].! !
 
@@ -492,6 +523,11 @@ portfolioCanNotAddTheSameHoldingMoreThanOnce
 portfolioCanNotBeAddedToItselfDescription
 	^'You can not add a portfolio to itself'! !
 
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:44:14'!
+new
+
+	^Portfolio basicNew initializeWith: Time localMillisecondClock.! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:06:06'!
 withId: id
@@ -575,6 +611,10 @@ isEqualTo: anAccount
 contains: aHolding
 	^self = aHolding! !
 
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:53:13'!
+isIncludedIn: aPortfolio
+	aPortfolio contains: self.! !
+
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:25:46'!
 printOn: aStream
 		
@@ -585,6 +625,11 @@ printOn: aStream
 !classDefinition: 'ReceptiveAccount class' category: 'Portfolio-Ejercicio'!
 ReceptiveAccount class
 	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:44:33'!
+new
+
+	^ReceptiveAccount basicNew initializeWith: Time localMillisecondClock.! !
 
 !ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:22:32'!
 withId: id
