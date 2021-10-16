@@ -341,6 +341,55 @@ test21xxx
 	self assert: (a1 balance) equals: p1 balance.		
 	! !
 
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:24:02'!
+test22xxx
+	
+	|p1 a1 deposit| 
+	
+	p1 := Portfolio withId: 'p1'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	p1 add: a1.
+
+	deposit _ Deposit register: 100 on: a1.
+
+	self assert: (p1 hasRegistered: deposit) equals: true.
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:23:49'!
+test23xxx
+	
+	|p1 a1 p2 a2 deposit1 deposit2| 
+	
+	p1 := Portfolio withId: 'p1'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	p1 add: a1.
+
+	p2 := Portfolio withId: 'p2'.
+	a2 := ReceptiveAccount withId: 'a2'.
+	p2 add: a2. 	
+	deposit1 _ Deposit register: 100 on: a1.
+	deposit2 _ Deposit register: 100 on: a2.
+
+	self assert: (p1 hasRegistered: deposit2) equals: false.
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:20:44'!
+test24xxx
+	
+	|p1 a1 p2 a2 deposit1 deposit2| 
+	
+	p1 := Portfolio withId: 'p1'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	p1 add: a1.
+
+	p2 := Portfolio withId: 'p2'.
+	a2 := ReceptiveAccount withId: 'a2'.
+	p2 add: a2. 	
+	deposit1 _ Deposit register: 100 on: a1.
+	deposit2 _ Deposit register: 100 on: a2.
+
+	self assert: (a1 hasRegistered: deposit2) equals: false.
+	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
@@ -553,15 +602,15 @@ isEmpty
 	^holdings isEmpty.! !
 
 
-!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 14:47:41'!
+!Portfolio methodsFor: 'operations' stamp: 'wb 10/16/2021 20:31:19'!
 add: holdingToBeAdded
 	
 	(self holdingCanBeAdded: holdingToBeAdded) 
 		ifFalse: [self error: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].
 	
 	holdings add: holdingToBeAdded.
-
-	(holdingToBeAdded isKindOf: Portfolio) ifTrue: [ 		holdingToBeAdded addParent: self ].! !
+	
+	holdingToBeAdded addParent: self.! !
 
 !Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 12:34:51'!
 addParent: parentHolding
@@ -628,6 +677,12 @@ holdingCanBeAdded: holdingToBeAdded forChild: aChildHolding
 holdingIsSelf: holdingToBeAdded
 	^self = holdingToBeAdded.! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:34:20'!
+hasRegistered: aTransaction
+
+	^ holdings anySatisfy: [:aHolding| aHolding hasRegistered: aTransaction].
+! !
 
 !Portfolio methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
 printOn: aStream
@@ -724,9 +779,17 @@ hasRegistered: aTransaction
 ! !
 
 
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:31:49'!
+addParent: aHolding
+	^nil.! !
+
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 11:41:16'!
 contains: aHolding
 	^self = aHolding! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:30:41'!
+holdingToBeAdded: aHolding
+	^nil.! !
 
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
 printOn: aStream
