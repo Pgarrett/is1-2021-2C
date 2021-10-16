@@ -187,14 +187,14 @@ test13AccountPresentInAListedPortfolioCanNotBeAdded
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 12:07:03'!
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 12:22:45'!
 test14PortfolioCanNotBeAddedMoreThanOnce
 	
 	|p1 a1 p2 p3| 
 	
 	p1 := Portfolio withId: 'p1'.
 	p2 := Portfolio withId: 'p2'.
-	a1 := ReceptiveAccount new.
+	a1 := ReceptiveAccount withId: 'a1'.
 	p3 := Portfolio withId: 'p3'.
 	
 	p2 add: a1.
@@ -472,6 +472,12 @@ isIncludedIn: aPortfolio
 	aPortfolio contains: self.
 ! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:25:21'!
+printOn: aStream
+		
+	aStream nextPutAll: self class name withArticle, '-', id! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'Portfolio-Ejercicio'!
@@ -495,7 +501,7 @@ withId: id
 
 !classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
 Object subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
+	instanceVariableNames: 'transactions id'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -504,6 +510,12 @@ Object subclass: #ReceptiveAccount
 initialize
 
 	transactions := OrderedCollection new.! !
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'PhG 10/16/2021 12:22:13'!
+initializeWith: anId
+
+	transactions := OrderedCollection new.
+	id := anId.! !
 
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'PhG 10/7/2021 21:04:56'!
@@ -562,3 +574,19 @@ isEqualTo: anAccount
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 11:41:16'!
 contains: aHolding
 	^self = aHolding! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:25:46'!
+printOn: aStream
+		
+	aStream nextPutAll: self class name withArticle, '-', id! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: 'Portfolio-Ejercicio'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:22:32'!
+withId: id
+
+	^ReceptiveAccount basicNew initializeWith: id.! !
