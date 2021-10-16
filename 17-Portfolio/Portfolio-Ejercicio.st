@@ -112,7 +112,7 @@ test08BalanceOfPortfolioWithManyPortfoliosIsAddedBalance
 	
 	self assert: 300 equals: portfolio balance.! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/14/2021 21:37:54'!
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 15:13:30'!
 test09PortfolioCanNotBeAddedToItself
 	
 	|portfolio|
@@ -121,7 +121,7 @@ test09PortfolioCanNotBeAddedToItself
 	
 	self should: [portfolio add: portfolio]
 		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotBeAddedToItselfDescription ].! !
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
 !PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 11:31:46'!
 test10PortfolioCanNotAddTheSameAccountMoreThanOnce
@@ -169,21 +169,21 @@ test12PortfolioCanNotAddAccountPresentInAListedPortfolio
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 11:31:46'!
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 15:27:08'!
 test13AccountPresentInAListedPortfolioCanNotBeAdded
 	
-	|portfolio anAccount innerPortfolio anotherInnerPortfolio| 
+	|p1 a1 p2 p3| 
 	
-	portfolio := Portfolio new.
-	anAccount := ReceptiveAccount new.
-	innerPortfolio := Portfolio new.
-	anotherInnerPortfolio := Portfolio new.
+	p1 := Portfolio withId: 'p1'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
 	
-	innerPortfolio add: anAccount.
-	anotherInnerPortfolio add: anAccount.
-	portfolio add: innerPortfolio.
+	p2 add: a1.
+	p3 add: a1.
+	p1 add: p2.
 		
-	self should: [portfolio add: anotherInnerPortfolio]
+	self should: [p1 add: p3]
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
@@ -218,6 +218,80 @@ test15ExistingAccountInRootPortfolioCanNotBeAddedToChildPortfolio
 	p1 add: p2.
 		
 	self should: [p2 add: a1.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 14:01:01'!
+test16CheckAccountNotPresentInParentsTree
+	
+	|p1 p2 p3 p4 a2| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
+	p4 := Portfolio withId: 'p4'.
+	a2 := ReceptiveAccount withId: 'a2'.
+	
+	p1 add: p2.
+	p2 add: p3.
+	p3 add: a2.
+	p1 add: p4.
+		
+	self should: [p4 add: a2.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 14:02:00'!
+test17ParentPortfolioCanNotBeChildOfAnotherPortfolio
+	
+	|p1 p2| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	
+	p1 add: p2.
+		
+	self should: [p2 add: p1.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 14:10:40'!
+test18CheckPortfolioNotPresentInParentsTree
+	
+	|p1 p2 p3 p4| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
+	p4 := Portfolio withId: 'p4'.
+	
+	p1 add: p2.
+	p2 add: p3.
+	p1 add: p4.
+		
+	self should: [p4 add: p3.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 14:15:47'!
+test19CheckAccountIsNotPresentInHigherParentTree
+	
+	|p1 p2 p3 p4 p5 a1| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
+	p4 := Portfolio withId: 'p4'.
+	p5 := Portfolio withId: 'p5'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	
+	p1 add: p2.
+	p2 add: p3.
+	p3 add: a1.
+	p1 add: p4.
+	p4 add: p5.
+		
+	self should: [p5 add: a1.]
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
@@ -413,8 +487,16 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #Holding category: 'Portfolio-Ejercicio'!
+Object subclass: #Holding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
-Object subclass: #Portfolio
+Holding subclass: #Portfolio
 	instanceVariableNames: 'holdings id parents'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -424,15 +506,12 @@ Object subclass: #Portfolio
 isEmpty
 	^holdings isEmpty.! !
 
-!Portfolio methodsFor: 'testing' stamp: 'PhG 10/15/2021 18:57:49'!
-isEqualTo: anAccount
-	^self = anAccount.! !
 
-
-!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 12:47:52'!
+!Portfolio methodsFor: 'operations' stamp: 'PhG 10/16/2021 14:47:41'!
 add: holdingToBeAdded
 	
-	self assertHoldingCanBeAdded: holdingToBeAdded .
+	(self holdingCanBeAdded: holdingToBeAdded) 
+		ifFalse: [self error: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].
 	
 	holdings add: holdingToBeAdded.
 
@@ -462,49 +541,49 @@ initializeWith: anId
 	id := anId! !
 
 
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 12:59:09'!
-assertHoldingCanBeAdded: holdingToBeAdded
-	
-	self assertHoldingIsNotSelf: holdingToBeAdded.
-	self assertHoldingIsNotListedInCurrentHoldings: holdingToBeAdded.
-	
-	
-	(holdingToBeAdded isKindOf: Portfolio) ifTrue: [ 
-				 
-		holdingToBeAdded isIncludedIn: self.
-
-		].
-	
-	(holdingToBeAdded isKindOf: ReceptiveAccount ) ifTrue: [ 
-				 
-		holdingToBeAdded isIncludedIn: self.
-		parents anySatisfy: [:parent | parent contains: holdingToBeAdded ]
-
-		].! !
-
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 11:31:46'!
-assertHoldingIsNotListedInCurrentHoldings: holdingToBeAdded
-
-	(holdings anySatisfy: [:holding| holding = holdingToBeAdded]) ifTrue: [self error: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ]! !
-
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 11:31:59'!
-assertHoldingIsNotSelf: holdingToBeAdded
-	self = holdingToBeAdded ifTrue: [self error: Portfolio portfolioCanNotBeAddedToItselfDescription ].! !
-
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 12:17:20'!
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 15:50:33'!
 contains: aHoldingToSearch
+
+	self = aHoldingToSearch ifTrue: [^true].
+	^holdings anySatisfy: [:holding | holding contains: aHoldingToSearch].! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 15:49:58'!
+getHoldings
+	^holdings! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 15:50:42'!
+holdingCanBeAdded: holdingToBeAdded
 	
-	(holdings anySatisfy: [:holding | (holding = aHoldingToSearch) or: [holding contains: aHoldingToSearch]]) ifTrue: [self error: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
-
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 12:01:46'!
-isIncludedIn: aPortfolio
+	(self holdingIsSelf: holdingToBeAdded) ifTrue: [^false].
 	
-	holdings do: [:holding | aPortfolio contains: holding].
-	aPortfolio contains: self.
-! !
+	(holdingToBeAdded isKindOf: Portfolio ) ifTrue: [
+		((holdingToBeAdded getHoldings) allSatisfy: [:holding | self holdingCanBeAdded: holding]) ifFalse: [^false].
+	].
+	
+	(holdings anySatisfy: [:holding | holding contains: holdingToBeAdded ]) ifTrue: [^false].
+	
+	^parents allSatisfy: [:holdingParent | holdingParent holdingCanBeAdded: holdingToBeAdded forChild: self].! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 15:50:51'!
+holdingCanBeAdded: holdingToBeAdded forChild: aChildHolding
+
+	|holdingPresentInParentTree holdingPresentInChildren|
+	
+	(self holdingIsSelf: holdingToBeAdded) ifTrue: [^false].
+	
+	holdingPresentInParentTree := (parents allSatisfy: [:holdingParent | holdingParent holdingCanBeAdded: holdingToBeAdded forChild: self]) not.
+	holdingPresentInParentTree ifTrue: [^false].
+
+	holdingPresentInChildren := holdings anySatisfy: [:holding | holding contains: holdingToBeAdded ].
+	holdingPresentInChildren ifTrue: [^false].
+	^true.! !
+
+!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 14:53:12'!
+holdingIsSelf: holdingToBeAdded
+	^self = holdingToBeAdded.! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:25:21'!
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
 printOn: aStream
 		
 	aStream nextPutAll: self class name withArticle, '-', id! !
@@ -536,7 +615,7 @@ withId: id
 
 
 !classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
-Object subclass: #ReceptiveAccount
+Holding subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions id'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -592,30 +671,18 @@ withdrawalTransactions
 	^ transactions select: [:aTransaction | aTransaction isDeposit not]! !
 
 
-!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/15/2021 19:54:25'!
-assertDoesNotContainPosition: positionToBeAdded
-	^true! !
-
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction 
 ! !
 
-!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/15/2021 15:57:47'!
-isEqualTo: anAccount
-	^self = anAccount.! !
-
 
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 11:41:16'!
 contains: aHolding
 	^self = aHolding! !
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:53:13'!
-isIncludedIn: aPortfolio
-	aPortfolio contains: self.! !
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:25:46'!
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
 printOn: aStream
 		
 	aStream nextPutAll: self class name withArticle, '-', id! !
