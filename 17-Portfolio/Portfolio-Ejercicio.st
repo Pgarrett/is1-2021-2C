@@ -295,6 +295,52 @@ test19CheckAccountIsNotPresentInHigherParentTree
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 16:03:14'!
+test20xxx
+	
+	|p1 p2 p3 p4 a1| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
+	p4 := Portfolio withId: 'p4'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	
+	Deposit register: 100 on: a1.
+	p1 add: p2.
+	p1 add: p3.
+	p4 add: p3.
+	p4 add: a1.
+	
+	p2 add: a1.
+		
+	self assert: (a1 balance) equals: p4 balance.
+	self assert: (a1 balance) equals: p1 balance.		
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 16:04:22'!
+test21xxx
+	
+	|p1 p2 p3 p4 a1| 
+	
+	p1 := Portfolio withId: 'p1'.
+	p2 := Portfolio withId: 'p2'.
+	p3 := Portfolio withId: 'p3'.
+	p4 := Portfolio withId: 'p4'.
+	a1 := ReceptiveAccount withId: 'a1'.
+	
+	Deposit register: 100 on: a1.
+	p1 add: p2.
+	p1 add: p3.
+	p4 add: p2.
+	p3 add: a1.
+	
+	p4 add: p3.
+		
+	self assert: (a1 balance) equals: p4 balance.
+	self assert: (a1 balance) equals: p1 balance.		
+	! !
+
 
 
 !classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
