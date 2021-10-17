@@ -453,7 +453,15 @@ withdraw50From: anAccount
 	^Withdraw register: 50 on: anAccount.! !
 
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/17/2021 00:11:24'!
+!PortfolioTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 01:04:43'!
+assertAddSameHoldingFailureOnAdding: aHolding to: aPortfolio
+
+	self should: [aPortfolio add: aHolding]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
+
+
+!PortfolioTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 00:11:24'!
 createAccountWith: aTransaction of: anAmount
 	|account|
 	
@@ -462,7 +470,7 @@ createAccountWith: aTransaction of: anAmount
 "	self deposit100On: account."
 	^account! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/17/2021 00:25:35'!
+!PortfolioTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 00:25:35'!
 createPortfolioWith: aHolding
 	
 	|portfolio|
@@ -472,7 +480,7 @@ createPortfolioWith: aHolding
 
 	^portfolio.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/17/2021 00:29:27'!
+!PortfolioTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 00:29:27'!
 createPortfolioWith: aHolding with: anotherHolding
 	
 	|portfolio|
@@ -482,35 +490,6 @@ createPortfolioWith: aHolding with: anotherHolding
 	portfolio add: anotherHolding.
 
 	^portfolio.! !
-
-
-!PortfolioTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 01:04:43'!
-assertAddSameHoldingFailureOnAdding: aHolding to: aPortfolio
-
-	self should: [aPortfolio add: aHolding]
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
-
-!PortfolioTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 00:35:58'!
-assertAdding: anAction failsWithDescription: errorDescription
-
-	self should: anAction
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
-
-!PortfolioTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 00:36:31'!
-assertAdding: aHolding to: aPortfolio failsWithDescription: errorDescription
-
-	self should: [aPortfolio add: aHolding]
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
-
-!PortfolioTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 00:34:22'!
-assertPortfolio: aPortfolio on: anAction failsWithDescription: errorDescription
-
-	self should: anAction
-		raise: Error
-		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
