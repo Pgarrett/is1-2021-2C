@@ -96,43 +96,43 @@ TestCase subclass: #PortfoliosTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 12:37:14'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:39:12'!
 test01NewPortfolioIsEmtpy
-	
+
 	|portfolio|
 	
-	portfolio := Portfolio new.
+	portfolio := self createEmptyPortfolio.
 	
 	self assert: true equals: portfolio isEmpty.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:39:28'!
 test02PortfolioWithAnAccountAddedIsNotEmtpy
 	
 	|portfolio|
 	
-	portfolio := self createPortfolioWith: Account new.
+	portfolio := self createPortfolioWith: (self createEmptyAccount).
 	
 	self assert: false equals: portfolio isEmpty.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:27:10'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:39:38'!
 test03PortfolioWithAPortfolioAddedIsNotEmtpy
 	
 	|portfolio|
 	
-	portfolio := self createPortfolioWith: Portfolio new.
+	portfolio := self createPortfolioWith: (self createEmptyPortfolio).
 	
 	self assert: false equals: portfolio isEmpty.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/7/2021 20:59:45'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:39:44'!
 test04BalanceOfNewPortfolioIsZero
 	
 	|portfolio|
 	
-	portfolio := Portfolio new.
+	portfolio := self createEmptyPortfolio.
 	
 	self assert: 0 equals: portfolio balance.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:27:41'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 18:35:08'!
 test05BalanceOfPortfolioWithAccountIsAccountBalance
 	
 	|portfolio account|
@@ -142,7 +142,7 @@ test05BalanceOfPortfolioWithAccountIsAccountBalance
 	
 	self assert: (account balance) equals: portfolio balance.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:28:30'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 18:35:20'!
 test06BalanceOfPortfolioWithPortfolioIsPortfolioBalance
 	
 	|portfolio childPortfolio|
@@ -152,7 +152,7 @@ test06BalanceOfPortfolioWithPortfolioIsPortfolioBalance
 	
 	self assert: (childPortfolio balance) equals: portfolio balance.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 01:20:18'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 18:35:31'!
 test07BalanceOfPortfolioWithManyAccountsIsAddedBalance
 	
 	|portfolio childPortfolio|
@@ -162,7 +162,7 @@ test07BalanceOfPortfolioWithManyAccountsIsAddedBalance
 	
 	self assert: 300 equals: portfolio balance.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 01:19:43'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 18:35:42'!
 test08BalanceOfPortfolioWithManyPortfoliosIsAddedBalance
 	
 	|portfolio childPortfolio|
@@ -172,55 +172,55 @@ test08BalanceOfPortfolioWithManyPortfoliosIsAddedBalance
 	
 	self assert: 300 equals: portfolio balance.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 01:05:07'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:39:59'!
 test09PortfolioCanNotBeAddedToItself
 	
 	|portfolio|
 	
-	portfolio := Portfolio new.
+	portfolio := self createEmptyPortfolio.
 	
 	self assertAddSameHoldingFailureOnAdding: portfolio to: portfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:40:08'!
 test10PortfolioCanNotAddTheSameAccountMoreThanOnce
 	
 	|portfolio anAccount|
 	
-	anAccount := Account new.
+	anAccount := self createEmptyAccount.
 	portfolio := self createPortfolioWith: anAccount.
 	
 	self assertAddSameHoldingFailureOnAdding: anAccount to: portfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:40:23'!
 test11PortfolioCanNotAddTheSamePortfolioMoreThanOnce
 	
 	|portfolio childPortfolio| 
 	
-	portfolio := Portfolio new.
-	childPortfolio := self createPortfolioWith: Account new.
+	portfolio := self createEmptyPortfolio.
+	childPortfolio := self createPortfolioWith: self createEmptyAccount.
 	
 	portfolio add: childPortfolio.
 	
 	self assertAddSameHoldingFailureOnAdding: childPortfolio to: portfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:40:35'!
 test12PortfolioCanNotAddAccountPresentInAnInnerPortfolio
 	
 	|portfolio anAccount childPortfolio| 
 	
-	anAccount := Account new.
-	childPortfolio := Portfolio new.
+	anAccount := self createEmptyAccount.
+	childPortfolio := self createEmptyPortfolio.
 	childPortfolio add: anAccount.
 	portfolio := self createPortfolioWith: childPortfolio.
 	
 	self assertAddSameHoldingFailureOnAdding: anAccount to: portfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:40:45'!
 test13AccountPresentInAListedPortfolioCanNotBeAdded
 	
 	|rootPortfolio anAccount childPortfolio portfolioWithAccountToBeRejected| 
 	
-	anAccount := Account withId: 'a1'.
+	anAccount := self createEmptyAccount.
 	childPortfolio := self createPortfolioWith: anAccount.
 	portfolioWithAccountToBeRejected := self createPortfolioWith: anAccount.
 	
@@ -228,39 +228,39 @@ test13AccountPresentInAListedPortfolioCanNotBeAdded
 	
 	self assertAddSameHoldingFailureOnAdding: portfolioWithAccountToBeRejected to: rootPortfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:41:04'!
 test14PortfolioCanNotBeAddedMoreThanOnce
 	
 	|rootPortfolio childPortfolio portfolioToBeAddedTwice| 
 	
-	portfolioToBeAddedTwice := Portfolio withId: 'p3'.
+	portfolioToBeAddedTwice := self createEmptyPortfolio.
 	
-	childPortfolio := self createPortfolioWith: Account new with: portfolioToBeAddedTwice.
+	childPortfolio := self createPortfolioWith: (self createEmptyAccount) with: portfolioToBeAddedTwice.
 	rootPortfolio := self createPortfolioWith: childPortfolio.
 		
 	self assertAddSameHoldingFailureOnAdding: portfolioToBeAddedTwice to: rootPortfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:44:00'!
 test15ExistingAccountInRootPortfolioCanNotBeAddedToChildPortfolio
 	
 	|anAccount childPortfolio| 
 	
-	childPortfolio := Portfolio withId: 'p2'.
-	anAccount := Account withId: 'a1'.
+	childPortfolio := self createEmptyPortfolio.
+	anAccount := self createEmptyAccount.
 	
 	self createPortfolioWith: anAccount with: childPortfolio.
 		
 	self assertAddSameHoldingFailureOnAdding: anAccount to: childPortfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:55'!
 test16CheckAccountNotPresentInParentsTree
 	
 	|firstChildPortfolio nestedPortfolio childPortfolioWhereAccountAddingShouldFail anAccount| 
 	
-	firstChildPortfolio := Portfolio withId: 'p2'.
-	nestedPortfolio := Portfolio withId: 'p3'.
-	childPortfolioWhereAccountAddingShouldFail := Portfolio withId: 'p4'.
-	anAccount := Account withId: 'a2'.
+	firstChildPortfolio := self createEmptyPortfolio.
+	nestedPortfolio := self createEmptyPortfolio.
+	childPortfolioWhereAccountAddingShouldFail := self createEmptyPortfolio.
+	anAccount := self createEmptyAccount.
 	
 	firstChildPortfolio := self createPortfolioWith: nestedPortfolio.
 	nestedPortfolio add: anAccount.
@@ -269,38 +269,37 @@ test16CheckAccountNotPresentInParentsTree
 	self assertAddSameHoldingFailureOnAdding: anAccount to: childPortfolioWhereAccountAddingShouldFail.
 ! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 01:06:29'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:41:29'!
 test17ParentPortfolioCanNotBeChildOfAnotherPortfolio
 	
 	|rootPortfolio childPortfolio| 
 	
-	childPortfolio := Portfolio withId: 'p2'.
-	
+	childPortfolio := self createEmptyPortfolio.
 	rootPortfolio := self createPortfolioWith: childPortfolio.
 	
 	self assertAddSameHoldingFailureOnAdding: rootPortfolio to: childPortfolio.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 01:09:23'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:41:41'!
 test18CheckPortfolioNotPresentInParentsTree
 	
 	|childPortfolio portfolioToBeAddedTwice childPortfolioWhereAddingShouldBeRejected| 
 	
-	childPortfolio := Portfolio withId: 'p2'.
-	portfolioToBeAddedTwice := Portfolio withId: 'p3'.
-	childPortfolioWhereAddingShouldBeRejected := Portfolio withId: 'p4'.
+	childPortfolio := self createEmptyPortfolio.
+	portfolioToBeAddedTwice := self createEmptyPortfolio.
+	childPortfolioWhereAddingShouldBeRejected := self createEmptyPortfolio.
 	
 	childPortfolio add: portfolioToBeAddedTwice.
 	self createPortfolioWith: childPortfolio with: childPortfolioWhereAddingShouldBeRejected.
 	
 	self assertAddSameHoldingFailureOnAdding: portfolioToBeAddedTwice to: childPortfolioWhereAddingShouldBeRejected.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:46'!
 test19CheckAccountIsNotPresentInHigherParentTree
 	
 	|portfolioContaingAccount childPortfolioWhereAddingShouldBeRejected anAccountToBeAddedTwice| 
 	
-	childPortfolioWhereAddingShouldBeRejected := Portfolio withId: 'p5'.
-	anAccountToBeAddedTwice := Account withId: 'a1'.
+	childPortfolioWhereAddingShouldBeRejected := self createEmptyPortfolio.
+	anAccountToBeAddedTwice := self createEmptyAccount.
 	
 	portfolioContaingAccount := self createPortfolioWith: anAccountToBeAddedTwice.
 	self createPortfolioWith: (self createPortfolioWith: portfolioContaingAccount) 
@@ -308,311 +307,222 @@ test19CheckAccountIsNotPresentInHigherParentTree
 	
 	self assertAddSameHoldingFailureOnAdding: anAccountToBeAddedTwice to: childPortfolioWhereAddingShouldBeRejected.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 17:41:56'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:41'!
 test20DepositsMadeToSharedAccountsShouldCountTowardsEveryParentPortfolioBalance
 
-	|p1 p2 p3 p4 a1| 
+	|treeARootPortfolio treeBRootPortfolio sharedAccount| 
 
-	p1 := Portfolio withId: 'p1'.
-	p2 := Portfolio withId: 'p2'.
-	p3 := Portfolio withId: 'p3'.
-	p4 := Portfolio withId: 'p4'.
-	a1 := Account withId: 'a1'.
+	sharedAccount := self createEmptyAccount.
 
-	p1 add: p2.
-	p2 add: a1.
-	p1 add: p3.
+	treeARootPortfolio := self createPortfolioWith: (self createPortfolioWith: sharedAccount).
 	
-	p4 add: p3.
-	p4 add: a1.
-	Deposit register: 100 on: a1.
+	treeBRootPortfolio := self createPortfolioWith: sharedAccount.
+	self deposit100On: sharedAccount.
 
-	self assert: (a1 balance) equals: p4 balance.
-	self assert: (a1 balance) equals: p1 balance.		
+	self assert: (sharedAccount balance) equals: treeBRootPortfolio balance.
+	self assert: (sharedAccount balance) equals: treeARootPortfolio balance.		
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 18:10:44'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:37'!
 test21DepositsMadeToSharedPortfoliosShouldCountTowardsEveryParentPortfolioBalance
 	
-	|p1 p2 p3 p4 a1| 
+	|treeARootPortfolio sharedPortfolio treeBRootPortfolio sharedAccount| 
 	
-	p1 := Portfolio withId: 'p1'.
-	p2 := Portfolio withId: 'p2'.
-	p3 := Portfolio withId: 'p3'.
-	p4 := Portfolio withId: 'p4'.
-	a1 := Account withId: 'a1'.
+	sharedPortfolio := self createEmptyPortfolio.
+	sharedAccount := self createEmptyAccount.
 	
-	p1 add: p2.
-	p1 add: p3.
-	p4 add: p2.	p4 add: p3.
-	p3 add: a1.
+	treeARootPortfolio := self createPortfolioWith: sharedPortfolio.
+	treeBRootPortfolio := self createPortfolioWith: sharedPortfolio.
+	sharedPortfolio add: sharedAccount.
 
-	Deposit register: 100 on: a1.		
-	self assert: (a1 balance) equals: p4 balance.
-	self assert: (a1 balance) equals: p1 balance.		
+	self deposit100On: sharedAccount.
+	self assert: (sharedAccount balance) equals: treeBRootPortfolio balance.
+	self assert: (sharedAccount balance) equals: treeARootPortfolio balance.		
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:31'!
 test22AccountWithDepositShouldHaveDepositRegistered
 	
-	|p1 a1 deposit| 
+	|portfolio accountToRegisterDeposit deposit| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := Account withId: 'a1'.
-	p1 add: a1.
+	accountToRegisterDeposit := self createEmptyAccount.
+	portfolio := self createPortfolioWith: accountToRegisterDeposit.
 
-	deposit _ self deposit100On: a1.
+	deposit _ self deposit100On: accountToRegisterDeposit.
 
-	self assert: (p1 hasRegistered: deposit) equals: true.
+	self assert: (portfolio hasRegistered: deposit) equals: true.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:24'!
 test23AccountWithouADepositShouldNotHaveItRegistered
 	
-	|p1 a1 p2 a2 deposit1 deposit2| 
+	|treeAPortfolio treeAAccount treeBPortfolio treeBAccount deposit1 deposit2| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := Account withId: 'a1'.
-	p1 add: a1.
+	treeAAccount := self createEmptyAccount.
+	treeAPortfolio := self createPortfolioWith: treeAAccount.
+	treeBAccount := self createEmptyAccount.
+	treeBPortfolio := self createPortfolioWith: treeBAccount. 	
 
-	p2 := Portfolio withId: 'p2'.
-	a2 := Account withId: 'a2'.
-	p2 add: a2. 	
-	deposit1 _ self deposit100On: a1.
-	deposit2 _ self deposit100On: a2.
+	deposit1 _ self deposit100On: treeAAccount.
+	deposit2 _ self deposit100On: treeBAccount.
 
-	self assert: (p1 hasRegistered: deposit2) equals: false.
+	self assert: (treeAPortfolio hasRegistered: deposit2) equals: false.
+	self assert: (treeBPortfolio hasRegistered: deposit1) equals: false.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test24AccountShouldGiveTransactions
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:43:14'!
+test24DepositsMadeToNestedAccountsShouldBeRegisteredForTheRootPortfolio
 	
-	|p1 a1| 
+	|rootPortfolio childPortfolio account deposit| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := Account withId: 'a1'.
-	p1 add: a1.
+	account := self createEmptyAccount.
+	childPortfolio := self createPortfolioWith: account. 	
+	
+	rootPortfolio := self createPortfolioWith: childPortfolio.
+	
+	deposit _ self deposit100On: account.
 
-
-	self deposit100On: a1.
-
-	self assert: (a1 transactions size ) equals: 1.
+	self assert: (rootPortfolio hasRegistered: deposit) equals: true.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 17:38:14'!
-test25DepositsMadeToNestedAccountsShouldBeRegisteredForTheRootPortfolio
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:42:09'!
+test25NewPortfolioDoesNotContainTransactions
 	
-	|p1 a1 p2 a2 deposit1| 
+	|portfolio| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := Account withId: 'a1'.
-	p1 add: a1.
+	portfolio := self createEmptyPortfolio.
 
-	p2 := Portfolio withId: 'p2'.
-	a2 := Account withId: 'a2'.
-	p2 add: a2. 	
-	
-	p1 add: p2.
-	
-	deposit1 _ self deposit100On: a2.
-
-	self assert: (p1 hasRegistered: deposit1) equals: true.
+	self assert: 0 equals: (portfolio transactions size).
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:40:31'!
-test26NewPortfolioDoesNotContainTransactions
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:42:58'!
+test26PortfolioWithNewAccountDoesNotContainTransactions
 	
-	|p1| 
+	|portfolio| 
 	
-	p1 := Portfolio withId: 'p1'.
+	portfolio := self createPortfolioWith: (self createEmptyAccount).
 
-	self assert: 0 equals: (p1 numberOfTransactions).
+	self assert: 0 equals: (portfolio transactions size ).
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test27PortfolioWithNewAccountDoesNotContainTransactions
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:42:16'!
+test27PortfolioAccountWithTransactionsAreRegistered
 	
-	|p1 a1| 
+	|portfolio account| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := Account withId: 'a1'.
-	
-	p1 add: a1.
+	portfolio := self createEmptyPortfolio.
+	account := self createAccountWith: Deposit of: 100.
 
-	self assert: 0 equals: (p1 numberOfTransactions ).
+	self withdraw50From: account.
+	portfolio add: account.
+
+	self assert: account transactions size equals: portfolio transactions size.	! !
+
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:35:40'!
+test28PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
+	
+	|portfolio twoTransactionsAccount oneTransactionAccount| 
+	
+	twoTransactionsAccount := self createAccountWith: Deposit of: 100.
+	oneTransactionAccount := self createAccountWith: Withdraw of: 50.
+	
+	portfolio := self createPortfolioWith: twoTransactionsAccount with: oneTransactionAccount.
+	self withdraw50From: twoTransactionsAccount.
+
+	self assert: (twoTransactionsAccount transactions size ) + (oneTransactionAccount transactions size ) equals: portfolio transactions size .
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:40:53'!
-test28PortfolioAccountWithTransactionsAreRegistered
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:42:23'!
+test29TransactionsAreCollectedFromAccountsInChildPortfolios
 	
-	|p1 a1| 
+	|rootPortfolio childPortfolio accountWithTwoTransactions | 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := self createAccountWith: Deposit of: 100.
-	self withdraw50From: a1.
-	p1 add: a1.
+	childPortfolio := self createEmptyPortfolio.
+	accountWithTwoTransactions := self createAccountWith: Deposit of: 100.
+	
+	rootPortfolio := self createPortfolioWith: accountWithTwoTransactions.
+	childPortfolio add: (self createAccountWith: Withdraw of: 50).
+	rootPortfolio add: childPortfolio.
+	self withdraw50From: accountWithTwoTransactions.
 
-	self assert: a1 numberOfTransactions equals: p1 numberOfTransactions.
+	self assert: (accountWithTwoTransactions transactions size ) + (childPortfolio transactions size ) equals: rootPortfolio transactions size.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:41:11'!
-test29PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:35:48'!
+test30TransactionsAreCollectedFromManyAccountsInChildPortfolios
 	
-	|p1 a1 a2| 
+	|rootPortfolio accountWithTwoTransactions accountWithAWithdraw accountWithOneDeposit| 
 	
-	p1 := Portfolio withId: 'p1'.
-	a1 := self createAccountWith: Deposit of: 100.
-	a2 := self createAccountWith: Withdraw of: 50.
+	accountWithTwoTransactions := self createAccountWith: Deposit of: 100.
+	self withdraw50From: accountWithTwoTransactions.
+	accountWithAWithdraw := self createAccountWith: Withdraw of: 50.
+	accountWithOneDeposit := self createAccountWith: Deposit of: 100.
 	
-	p1 add: a1.
-	p1 add: a2.
-	self withdraw50From: a1.
-
-	self assert: (a1 numberOfTransactions ) + (a2 numberOfTransactions ) equals: p1 numberOfTransactions .
+	rootPortfolio := self createPortfolioWith: accountWithTwoTransactions.
+	rootPortfolio add: (self createPortfolioWith: accountWithAWithdraw).
+	rootPortfolio add: (self createPortfolioWith: accountWithOneDeposit).
+	
+	self assert: (accountWithTwoTransactions transactions size) + (accountWithAWithdraw transactions size) + (accountWithOneDeposit transactions size) equals: rootPortfolio transactions size.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:41:27'!
-test30TransactionsAreCollectedFromAccountsInChildPortfolios
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:35:52'!
+test31TransactionsOfChildPortfolioDoNotIncludeSiblingTransactions
 	
-	|p1 p2 a1 | 
+	|rootPortfolio childPortfolio firstLevelAccount| 
 	
-	p1 := Portfolio withId: 'p1'.
-	p2 := Portfolio withId: 'p2'.
-	a1 := self createAccountWith: Deposit of: 100.
+	firstLevelAccount := self createAccountWith: Deposit of: 100.
+	self withdraw50From: firstLevelAccount.
+	rootPortfolio := self createPortfolioWith: firstLevelAccount.
 	
-	p1 add: a1.
-	p2 add: (self createAccountWith: Withdraw of: 50).
-	p1 add: p2.
-	self withdraw50From: a1.
+	childPortfolio := self createPortfolioWith: (self createAccountWith: Withdraw of: 50).
+	rootPortfolio add: childPortfolio.
+	
+	self deny: (rootPortfolio transactions size = childPortfolio transactions size).! !
 
-	self assert: (a1 numberOfTransactions ) + (p2 numberOfTransactions ) equals: p1 numberOfTransactions.
-	! !
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 19:52:04'!
+test32AddingAnAccountFromADifferentTreeShouldNotThrowError
+	|treeARootPortfolio treeAChildPortfolio treeBRootPortfolio accountToBeShared|
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:21:21'!
-test31TransactionsAreCollectedFromManyAccountsInChildPortfolios
+	treeAChildPortfolio := self createEmptyPortfolio.
+	accountToBeShared _ self createEmptyAccount.
 	
-	|p1 p2 p3 a1 a2 a3| 
+	treeBRootPortfolio := self createPortfolioWith: accountToBeShared.
+	treeARootPortfolio := self createPortfolioWith: treeAChildPortfolio.
 	
-	p1 := Portfolio withId: 'p1'.
-	p2 := Portfolio withId: 'p2'.
-	p3 := Portfolio withId: 'p3'.
-	
-	a1 := self createAccountWith: Deposit of: 100.
-	self withdraw50From: a1.
-	a2 := self createAccountWith: Withdraw of: 50.
-	a3 := self createAccountWith: Deposit of: 100.
-	
-	p1 add: a1.
-	p2 add: a2.
-	p3 add: a3.
-	p1 add: p2.
-	p1 add: p3.
-	
-	self assert: (a1 transactions size) + (a2 transactions size) + (a3 transactions size) equals: p1 transactions size.
-	! !
+	self shouldnt: [treeAChildPortfolio add: accountToBeShared]		raise: Error.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:23:46'!
-test32TransactionsOfChildPortfolioDoNotIncludeSiblingTransactions
-	
-	|p1 p2 a1| 
-	
-	p1 := Portfolio withId: 'p1'.
-	p2 := Portfolio withId: 'p2'.
-	a1 := self createAccountWith: Deposit of: 100.
-	self withdraw50From: a1.
-	
-	p1 add: a1.
-	p2 add: (self createAccountWith: Withdraw of: 50).
-	p1 add: p2.
-	
-	self deny: (p1 transactions size = p2 transactions size).
-	! !
+!PortfoliosTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 20:17:15'!
+test33AddingAnAccountInAHigherParentShouldThrowError
+	|rootPortfolio childPortfolioA childPortfolioB portfolioWhereAccountAddingShouldFail accountToAttemptAddTwice |
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test33AddingAnAccountFromADifferentTreeShouldNotThrowError
-	|p1 p2 p3 p4 a1|
-	p1 _ Portfolio withId: 'p1'.
-	p2 _ Portfolio withId: 'p2'.
-	p3 _ Portfolio withId: 'p3'.
-	p4 _ Portfolio withId: 'p4'.
-	a1 _ Account withId: 'a1'.
+	rootPortfolio := self createEmptyPortfolio.
+	childPortfolioB := self createEmptyPortfolio.
+	portfolioWhereAccountAddingShouldFail := self createEmptyPortfolio.
+	accountToAttemptAddTwice := self createEmptyAccount.
 	
-	p4 add: a1.
-	p4 add: p3.
-	p1 add: p3.
-	p1 add: p2.
-	p2 add: a1.
-	! !
-
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
-test34AddingAnAccountFromADifferentTreeShouldNotThrowError
-	|p1 p2 p3 p4 p5 p6 a1 a2 a3|
-	p1 _ Portfolio withId: 'p1'.
-	p2 _ Portfolio withId: 'p2'.
-	p3 _ Portfolio withId: 'p3'.
-	p4 _ Portfolio withId: 'p4'.
-	p5 _ Portfolio withId: 'p5'.
-	p6 _ Portfolio withId: 'p6'.
-	a1 _ Account withId: 'a1'.
-	a2 _ Account withId: 'a2'.
-	a3 _ Account withId: 'a3'.
+	childPortfolioA := self createPortfolioWith: (self createEmptyAccount).
 	
-	p3 add: a2.
-	p5 add: a3.
-	p2 add: a1.
+	childPortfolioA add: (self createPortfolioWith: accountToAttemptAddTwice).
+	childPortfolioB add: (self createPortfolioWith: self createEmptyAccount).
+	childPortfolioB add: portfolioWhereAccountAddingShouldFail.
 	
-	p2 add: p3.
-	p4 add: p5.
-	p4 add: p6.
+	rootPortfolio add: childPortfolioA.
+	rootPortfolio add: childPortfolioB.
 	
-	p1 add: p2.
-	p1 add: p4.
-	
-	self assertAddSameHoldingFailureOnAdding: a2 to: p6. 
-	! !
-
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test34AddingAnAccountInAHigherParentShouldThrowError
-	|p1 p2 p3 p4 p5 p6 a1 a2 a3|
-	p1 _ Portfolio withId: 'p1'.
-	p2 _ Portfolio withId: 'p2'.
-	p3 _ Portfolio withId: 'p3'.
-	p4 _ Portfolio withId: 'p4'.
-	p5 _ Portfolio withId: 'p5'.
-	p6 _ Portfolio withId: 'p6'.
-	a1 _ Account withId: 'a1'.
-	a2 _ Account withId: 'a2'.
-	a3 _ Account withId: 'a3'.
-	
-	p3 add: a2.
-	p5 add: a3.
-	p2 add: a1.
-	
-	p2 add: p3.
-	p4 add: p5.
-	p4 add: p6.
-	
-	p1 add: p2.
-	p1 add: p4.
-	
-	self assertAddSameHoldingFailureOnAdding: a2 to: p6. 
+	self assertAddSameHoldingFailureOnAdding: accountToAttemptAddTwice to: portfolioWhereAccountAddingShouldFail. 
 	! !
 
 
-!PortfoliosTest methodsFor: 'transactions' stamp: 'PhG 10/16/2021 23:41:49'!
+!PortfoliosTest methodsFor: 'transactions' stamp: 'PhG 10/17/2021 19:38:10'!
 deposit100On: anAccount
 	^Deposit register: 100 on: anAccount.! !
 
-!PortfoliosTest methodsFor: 'transactions' stamp: 'PhG 10/16/2021 23:41:55'!
-deposit200On: anAccount
-	^Deposit register: 200 on: anAccount.! !
-
-!PortfoliosTest methodsFor: 'transactions' stamp: 'PhG 10/16/2021 23:45:38'!
+!PortfoliosTest methodsFor: 'transactions' stamp: 'PhG 10/17/2021 19:38:14'!
 withdraw50From: anAccount
 	^Withdraw register: 50 on: anAccount.! !
 
 
-!PortfoliosTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 01:04:43'!
+!PortfoliosTest methodsFor: 'assertions' stamp: 'PhG 10/17/2021 19:38:23'!
 assertAddSameHoldingFailureOnAdding: aHolding to: aPortfolio
 
 	self should: [aPortfolio add: aHolding]
@@ -620,16 +530,26 @@ assertAddSameHoldingFailureOnAdding: aHolding to: aPortfolio
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio portfolioCanNotAddTheSameHoldingMoreThanOnce ].! !
 
 
-!PortfoliosTest methodsFor: 'creation' stamp: 'wb 10/17/2021 14:55:03'!
+!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 19:37:44'!
 createAccountWith: aTransaction of: anAmount
 	|account|
 	
 	account := Account new.
 	aTransaction register: anAmount on: account.
-"	self deposit100On: account."
+	
 	^account! !
 
-!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 00:25:35'!
+!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 19:38:58'!
+createEmptyAccount
+	
+	^Account new.! !
+
+!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 19:38:43'!
+createEmptyPortfolio
+	
+	^Portfolio new.! !
+
+!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 19:37:26'!
 createPortfolioWith: aHolding
 	
 	|portfolio|
@@ -639,7 +559,7 @@ createPortfolioWith: aHolding
 
 	^portfolio.! !
 
-!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 00:29:27'!
+!PortfoliosTest methodsFor: 'creation' stamp: 'PhG 10/17/2021 19:38:05'!
 createPortfolioWith: aHolding with: anotherHolding
 	
 	|portfolio|
@@ -653,7 +573,7 @@ createPortfolioWith: aHolding with: anotherHolding
 
 !classDefinition: #Holding category: 'Portfolio-Ejercicio'!
 Object subclass: #Holding
-	instanceVariableNames: 'id'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -686,15 +606,6 @@ hasRegistered: aTransaction
 initialize
 	self subclassResponsibility .! !
 
-!Holding methodsFor: 'initialization' stamp: 'wb 10/16/2021 20:59:11'!
-initializeWith: anId
-	self subclassResponsibility .! !
-
-
-!Holding methodsFor: 'debugging' stamp: 'wb 10/16/2021 21:02:12'!
-printOn: aStream
-		
-	aStream nextPutAll: self class name withArticle, '-', id.! !
 
 
 !Holding methodsFor: 'assertions' stamp: 'asd 10/17/2021 17:33:49'!
@@ -714,17 +625,6 @@ initialize
 
 	transactions := OrderedCollection new.! !
 
-!Account methodsFor: 'initialization' stamp: 'PhG 10/16/2021 12:22:13'!
-initializeWith: anId
-
-	transactions := OrderedCollection new.
-	id := anId.! !
-
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 10:43:52'!
-numberOfTransactions 
-
-	^ self transactions size.! !
 
 !Account methodsFor: 'transactions' stamp: 'PhG 10/7/2021 21:04:56'!
 register: aTransaction
@@ -786,26 +686,6 @@ contains: aHolding
 	^self = aHolding! !
 
 
-!Account methodsFor: 'as yet unclassified' stamp: 'wb 10/17/2021 14:06:15'!
-getHoldings
-	^OrderedCollection new.! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Account class' category: 'Portfolio-Ejercicio'!
-Account class
-	instanceVariableNames: ''!
-
-!Account class methodsFor: 'as yet unclassified' stamp: 'wb 10/17/2021 14:55:03'!
-new
-
-	^Account basicNew initializeWith: Time localMillisecondClock.! !
-
-!Account class methodsFor: 'as yet unclassified' stamp: 'wb 10/17/2021 14:55:03'!
-withId: id
-
-	^Account basicNew initializeWith: id.! !
-
 
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
 Holding subclass: #Portfolio
@@ -840,17 +720,11 @@ addParent: aParent
 	parents add: aParent.! !
 
 
-!Portfolio methodsFor: 'initialization' stamp: 'PhG 10/16/2021 11:30:51'!
+!Portfolio methodsFor: 'initialization' stamp: 'PhG 10/17/2021 18:24:58'!
 initialize
 
-	holdings := OrderedCollection new.! !
-
-!Portfolio methodsFor: 'initialization' stamp: 'PhG 10/16/2021 12:31:04'!
-initializeWith: anId
-
 	holdings := OrderedCollection new.
-	parents := OrderedCollection new.
-	id := anId! !
+	parents := OrderedCollection new.! !
 
 
 !Portfolio methodsFor: 'assertions' stamp: 'wb 10/17/2021 14:57:25'!
@@ -887,15 +761,9 @@ assertNoChildrenContains: aHolding
 ! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'wb 10/17/2021 10:29:46'!
-numberOfTransactions
-	^self transactions size.! !
-
-!Portfolio methodsFor: 'transactions' stamp: 'PhG 10/16/2021 23:26:22'!
+!Portfolio methodsFor: 'transactions' stamp: 'PhG 10/17/2021 18:32:15'!
 transactions
-	
 	|collectedTransactions|
-
 	collectedTransactions := OrderedCollection new.
 	holdings do: [:holding | collectedTransactions addAll: holding transactions].
 	^collectedTransactions.! !
@@ -919,10 +787,6 @@ contains: aHoldingToSearch
 	self = aHoldingToSearch ifTrue: [^true].
 	^holdings anySatisfy: [:holding | holding contains: aHoldingToSearch].! !
 
-!Portfolio methodsFor: 'private' stamp: 'PhG 10/16/2021 15:49:58'!
-getHoldings
-	^holdings! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'Portfolio-Ejercicio'!
@@ -932,21 +796,6 @@ Portfolio class
 !Portfolio class methodsFor: 'error descriptions' stamp: 'PhG 10/16/2021 11:32:16'!
 portfolioCanNotAddTheSameHoldingMoreThanOnce
 	^'You can not add the same holding more than once'! !
-
-!Portfolio class methodsFor: 'error descriptions' stamp: 'PhG 10/14/2021 21:39:25'!
-portfolioCanNotBeAddedToItselfDescription
-	^'You can not add a portfolio to itself'! !
-
-
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:44:14'!
-new
-
-	^Portfolio basicNew initializeWith: Time localMillisecondClock.! !
-
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 12:06:06'!
-withId: id
-
-	^Portfolio basicNew initializeWith: id.! !
 
 
 !classDefinition: #Transaction category: 'Portfolio-Ejercicio'!
