@@ -330,17 +330,17 @@ test25xxx
 	self assert: (p1 hasRegistered: deposit1) equals: true.
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 21:39:54'!
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:40:31'!
 test26NewPortfolioDoesNotContainTransactions
 	
 	|p1| 
 	
 	p1 := Portfolio withId: 'p1'.
 
-	self assert: OrderedCollection new equals: (p1 transactions).
+	self assert: 0 equals: (p1 numberOfTransactions).
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/16/2021 22:47:50'!
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:40:22'!
 test27PortfolioWithNewAccountDoesNotContainTransactions
 	
 	|p1 a1| 
@@ -350,10 +350,10 @@ test27PortfolioWithNewAccountDoesNotContainTransactions
 	
 	p1 add: a1.
 
-	self assert: OrderedCollection new equals: (p1 transactions).
+	self assert: 0 equals: (p1 numberOfTransactions ).
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:16:56'!
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:40:53'!
 test28PortfolioAccountWithTransactionsAreRegistered
 	
 	|p1 a1| 
@@ -363,10 +363,10 @@ test28PortfolioAccountWithTransactionsAreRegistered
 	self withdraw50From: a1.
 	p1 add: a1.
 
-	self assert: a1 transactions size equals: p1 transactions size.
+	self assert: a1 numberOfTransactions equals: p1 numberOfTransactions.
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:18:26'!
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:41:11'!
 test29PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
 	
 	|p1 a1 a2| 
@@ -379,10 +379,10 @@ test29PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
 	p1 add: a2.
 	self withdraw50From: a1.
 
-	self assert: (a1 transactions size) + (a2 transactions size) equals: p1 transactions size.
+	self assert: (a1 numberOfTransactions ) + (a2 numberOfTransactions ) equals: p1 numberOfTransactions .
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:19:55'!
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/17/2021 10:41:27'!
 test30TransactionsAreCollectedFromAccountsInChildPortfolios
 	
 	|p1 p2 a1 | 
@@ -396,7 +396,7 @@ test30TransactionsAreCollectedFromAccountsInChildPortfolios
 	p1 add: p2.
 	self withdraw50From: a1.
 
-	self assert: (a1 transactions size) + (p2 transactions size) equals: p1 transactions size.
+	self assert: (a1 numberOfTransactions ) + (p2 numberOfTransactions ) equals: p1 numberOfTransactions.
 	! !
 
 !PortfolioTest methodsFor: 'tests' stamp: 'PhG 10/17/2021 00:21:21'!
@@ -708,6 +708,10 @@ balance
 contains: aHolding
 	self subclassResponsibility .! !
 
+!Holding methodsFor: 'testing' stamp: 'PhG 10/16/2021 21:43:32'!
+hasRegistered: aTransaction
+	self subclassResponsibility .! !
+
 
 !Holding methodsFor: 'initialization' stamp: 'wb 10/16/2021 20:58:44'!
 initialize
@@ -722,12 +726,6 @@ initializeWith: anId
 printOn: aStream
 		
 	aStream nextPutAll: self class name withArticle, '-', id.! !
-
-
-!Holding methodsFor: 'testing' stamp: 'PhG 10/16/2021 21:43:32'!
-hasRegistered: aTransaction
-	self subclassResponsibility .! !
-
 
 
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
@@ -790,12 +788,12 @@ holdingCanBeAdded: holdingToBeAdded
 	
 	^parents allSatisfy: [:holdingParent | holdingParent holdingCanBeAdded: holdingToBeAdded forChild: self].! !
 
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 15:50:51'!
+!Portfolio methodsFor: 'assertions' stamp: 'wb 10/17/2021 11:23:54'!
 holdingCanBeAdded: holdingToBeAdded forChild: aChildHolding
 
 	|holdingPresentInParentTree holdingPresentInChildren|
 	
-	(self holdingIsSelf: holdingToBeAdded) ifTrue: [^false].
+	(holdingToBeAdded = self) ifTrue: [^false].
 	
 	holdingPresentInParentTree := (parents allSatisfy: [:holdingParent | holdingParent holdingCanBeAdded: holdingToBeAdded forChild: self]) not.
 	holdingPresentInParentTree ifTrue: [^false].
@@ -804,10 +802,14 @@ holdingCanBeAdded: holdingToBeAdded forChild: aChildHolding
 	holdingPresentInChildren ifTrue: [^false].
 	^true.! !
 
-!Portfolio methodsFor: 'assertions' stamp: 'PhG 10/16/2021 14:53:12'!
-holdingIsSelf: holdingToBeAdded
-	^self = holdingToBeAdded.! !
+!Portfolio methodsFor: 'assertions' stamp: 'wb 10/17/2021 12:38:27'!
+holdingIsSelf: aHolding
+	^self = aHolding.! !
 
+
+!Portfolio methodsFor: 'transactions' stamp: 'wb 10/17/2021 10:29:46'!
+numberOfTransactions
+	^self transactions size.! !
 
 !Portfolio methodsFor: 'transactions' stamp: 'PhG 10/16/2021 23:26:22'!
 transactions
@@ -880,6 +882,11 @@ initializeWith: anId
 	id := anId.! !
 
 
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'wb 10/17/2021 10:43:52'!
+numberOfTransactions 
+
+	^ self transactions size.! !
+
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'PhG 10/7/2021 21:04:56'!
 register: aTransaction
 
@@ -918,10 +925,6 @@ withdrawalTransactions
 	^ transactions select: [:aTransaction | aTransaction isDeposit not]! !
 
 
-!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/16/2021 11:41:16'!
-contains: aHolding
-	^self = aHolding! !
-
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
 
@@ -932,6 +935,7 @@ hasRegistered: aTransaction
 !ReceptiveAccount methodsFor: 'operations' stamp: 'wb 10/16/2021 20:31:49'!
 addParent: aHolding
 	^nil.! !
+
 
 
 !ReceptiveAccount methodsFor: 'private' stamp: 'PhG 10/16/2021 11:41:16'!
