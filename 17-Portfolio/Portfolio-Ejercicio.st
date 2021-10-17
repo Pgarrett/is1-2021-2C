@@ -341,8 +341,8 @@ test21xxx
 	self assert: (a1 balance) equals: p1 balance.		
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:24:02'!
-test22xxx
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 21:07:13'!
+test22AccountWithDepositShouldHaveDepositRegistered
 	
 	|p1 a1 deposit| 
 	
@@ -355,8 +355,8 @@ test22xxx
 	self assert: (p1 hasRegistered: deposit) equals: true.
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:23:49'!
-test23xxx
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 21:07:40'!
+test23AccountWithouADepositShouldNotHaveItRegistered
 	
 	|p1 a1 p2 a2 deposit1 deposit2| 
 	
@@ -373,22 +373,18 @@ test23xxx
 	self assert: (p1 hasRegistered: deposit2) equals: false.
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 20:20:44'!
-test24xxx
+!PortfolioTest methodsFor: 'tests' stamp: 'wb 10/16/2021 21:08:42'!
+test24AccountShouldGiveTransactions
 	
-	|p1 a1 p2 a2 deposit1 deposit2| 
+	|p1 a1| 
 	
 	p1 := Portfolio withId: 'p1'.
 	a1 := ReceptiveAccount withId: 'a1'.
 	p1 add: a1.
 
-	p2 := Portfolio withId: 'p2'.
-	a2 := ReceptiveAccount withId: 'a2'.
-	p2 add: a2. 	
-	deposit1 _ Deposit register: 100 on: a1.
-	deposit2 _ Deposit register: 100 on: a2.
+	Deposit register: 100 on: a1.
 
-	self assert: (a1 hasRegistered: deposit2) equals: false.
+	self assert: (a1 transactions size ) equals: 1.
 	! !
 
 
@@ -584,18 +580,52 @@ for: aValue
 
 !classDefinition: #Holding category: 'Portfolio-Ejercicio'!
 Object subclass: #Holding
-	instanceVariableNames: ''
+	instanceVariableNames: 'id'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
+!Holding methodsFor: 'operations' stamp: 'wb 10/16/2021 20:44:27'!
+addParent: aHolding
+	self subclassResponsibility .! !
+
+!Holding methodsFor: 'operations' stamp: 'wb 10/16/2021 20:44:59'!
+balance
+	self subclassResponsibility .! !
+
+
+!Holding methodsFor: 'testing' stamp: 'wb 10/16/2021 20:49:45'!
+contains: aHolding
+	self subclassResponsibility .! !
+
+
+!Holding methodsFor: 'initialization' stamp: 'wb 10/16/2021 20:58:44'!
+initialize
+	self subclassResponsibility .! !
+
+!Holding methodsFor: 'initialization' stamp: 'wb 10/16/2021 20:59:11'!
+initializeWith: anId
+	self subclassResponsibility .! !
+
+
+!Holding methodsFor: 'debugging' stamp: 'wb 10/16/2021 21:02:12'!
+printOn: aStream
+		
+	aStream nextPutAll: self class name withArticle, '-', id.! !
+
 
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
 Holding subclass: #Portfolio
-	instanceVariableNames: 'holdings id parents'
+	instanceVariableNames: 'holdings parents'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
+
+!Portfolio methodsFor: 'testing' stamp: 'wb 10/16/2021 20:34:20'!
+hasRegistered: aTransaction
+
+	^ holdings anySatisfy: [:aHolding| aHolding hasRegistered: aTransaction].
+! !
 
 !Portfolio methodsFor: 'testing' stamp: 'PhG 10/16/2021 11:30:51'!
 isEmpty
@@ -678,17 +708,6 @@ holdingIsSelf: holdingToBeAdded
 	^self = holdingToBeAdded.! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:34:20'!
-hasRegistered: aTransaction
-
-	^ holdings anySatisfy: [:aHolding| aHolding hasRegistered: aTransaction].
-! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
-printOn: aStream
-		
-	aStream nextPutAll: self class name withArticle, '-', id! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'Portfolio-Ejercicio'!
@@ -717,7 +736,7 @@ withId: id
 
 !classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
 Holding subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions id'
+	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
@@ -756,10 +775,10 @@ balance
 
 	^totalDeposited - totalWithdrawn.! !
 
-!ReceptiveAccount methodsFor: 'balance' stamp: 'PhG 10/7/2021 20:37:28'!
+!ReceptiveAccount methodsFor: 'balance' stamp: 'wb 10/16/2021 20:46:23'!
 balanceOf: someTransactions
 
-	^ someTransactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ]! !
+	^ someTransactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ].! !
 
 !ReceptiveAccount methodsFor: 'balance' stamp: 'PhG 10/7/2021 20:34:20'!
 depositTransactions
@@ -772,6 +791,10 @@ withdrawalTransactions
 	^ transactions select: [:aTransaction | aTransaction isDeposit not]! !
 
 
+!ReceptiveAccount methodsFor: 'testing' stamp: 'PhG 10/16/2021 11:41:16'!
+contains: aHolding
+	^self = aHolding! !
+
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
 
@@ -779,22 +802,10 @@ hasRegistered: aTransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:31:49'!
+!ReceptiveAccount methodsFor: 'operations' stamp: 'wb 10/16/2021 20:31:49'!
 addParent: aHolding
 	^nil.! !
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 11:41:16'!
-contains: aHolding
-	^self = aHolding! !
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'wb 10/16/2021 20:30:41'!
-holdingToBeAdded: aHolding
-	^nil.! !
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'PhG 10/16/2021 15:27:23'!
-printOn: aStream
-		
-	aStream nextPutAll: self class name withArticle, '-', id! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
