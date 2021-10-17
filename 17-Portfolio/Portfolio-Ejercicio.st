@@ -308,31 +308,31 @@ test19CheckAccountIsNotPresentInHigherParentTree
 	
 	self assertAddSameHoldingFailureOnAdding: anAccountToBeAddedTwice to: childPortfolioWhereAddingShouldBeRejected.! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test20xxx
-	
+!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 17:41:56'!
+test20DepositsMadeToSharedAccountsShouldCountTowardsEveryParentPortfolioBalance
+
 	|p1 p2 p3 p4 a1| 
-	
+
 	p1 := Portfolio withId: 'p1'.
 	p2 := Portfolio withId: 'p2'.
 	p3 := Portfolio withId: 'p3'.
 	p4 := Portfolio withId: 'p4'.
 	a1 := Account withId: 'a1'.
-	
-	Deposit register: 100 on: a1.
+
 	p1 add: p2.
+	p2 add: a1.
 	p1 add: p3.
+	
 	p4 add: p3.
 	p4 add: a1.
-	
-	p2 add: a1.
-		
+	Deposit register: 100 on: a1.
+
 	self assert: (a1 balance) equals: p4 balance.
 	self assert: (a1 balance) equals: p1 balance.		
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
-test21xxx
+!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 18:10:44'!
+test21DepositsMadeToSharedPortfoliosShouldCountTowardsEveryParentPortfolioBalance
 	
 	|p1 p2 p3 p4 a1| 
 	
@@ -342,14 +342,12 @@ test21xxx
 	p4 := Portfolio withId: 'p4'.
 	a1 := Account withId: 'a1'.
 	
-	Deposit register: 100 on: a1.
 	p1 add: p2.
 	p1 add: p3.
-	p4 add: p2.
+	p4 add: p2.	p4 add: p3.
 	p3 add: a1.
-	
-	p4 add: p3.
-		
+
+	Deposit register: 100 on: a1.		
 	self assert: (a1 balance) equals: p4 balance.
 	self assert: (a1 balance) equals: p1 balance.		
 	! !
@@ -401,8 +399,8 @@ test24AccountShouldGiveTransactions
 	self assert: (a1 transactions size ) equals: 1.
 	! !
 
-!PortfoliosTest methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
-test25xxx
+!PortfoliosTest methodsFor: 'tests' stamp: 'asd 10/17/2021 17:38:14'!
+test25DepositsMadeToNestedAccountsShouldBeRegisteredForTheRootPortfolio
 	
 	|p1 a1 p2 a2 deposit1| 
 	
@@ -698,6 +696,11 @@ printOn: aStream
 		
 	aStream nextPutAll: self class name withArticle, '-', id.! !
 
+
+!Holding methodsFor: 'assertions' stamp: 'asd 10/17/2021 17:33:49'!
+assertAllChildrenCanBeAddedTo: aHolding
+	^self subclassResponsibility.! !
+
 
 !classDefinition: #Account category: 'Portfolio-Ejercicio'!
 Holding subclass: #Account
@@ -898,10 +901,10 @@ transactions
 	^collectedTransactions.! !
 
 
-!Portfolio methodsFor: 'balance' stamp: 'PhG 10/16/2021 11:30:51'!
+!Portfolio methodsFor: 'balance' stamp: 'asd 10/17/2021 16:43:12'!
 balance
 
-	^holdings sum: [:anAccount | anAccount balance] ifEmpty: [ 0 ].! !
+	^holdings sum: [:aHolding | aHolding balance] ifEmpty: [ 0 ].! !
 
 
 !Portfolio methodsFor: 'error signals' stamp: 'wb 10/17/2021 12:59:45'!
