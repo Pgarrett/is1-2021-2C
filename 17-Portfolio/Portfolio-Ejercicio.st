@@ -1,108 +1,3 @@
-!classDefinition: #AccountTests category: 'Portfolio-Ejercicio'!
-TestCase subclass: #AccountTests
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
-test01ReceptiveAccountHaveZeroAsBalanceWhenCreated 
-
-	| account |
-	
-	account := Account new.
-
-	self assert: 0 equals: account balance.
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test02DepositIncreasesBalanceOnTransactionValue 
-
-	| account |
-	
-	account := Account  new.
-	Deposit register: 100 on: account.
-		
-	self assert: 100 equals: account balance.
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:02'!
-test03WithdrawDecreasesBalanceOnTransactionValue 
-
-	| account |
-	
-	account := Account new.
-	Deposit register: 100 on: account.
-	Withdraw register: 50 on: account.
-		
-	self assert: 50 equals: account balance.
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 22:27:12'!
-test04WithdrawValueMustBePositive 
-
-	| account withdrawValue |
-	
-	account := Account new.
-	withdrawValue := 50.
-	
-	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: account) value.
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test05ReceptiveAccountKnowsRegisteredTransactions 
-
-	| account deposit withdraw |
-	
-	account := Account new.
-	deposit := Deposit register: 100 on: account.
-	withdraw := Withdraw register: 50 on: account.
-		
-	self assert: (account hasRegistered: deposit).
-	self assert: (account hasRegistered: withdraw).
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test06ReceptiveAccountDoNotKnowNotRegisteredTransactions
-
-	| deposit withdraw account |
-	
-	account := Account new.
-	deposit :=  Deposit for: 200.
-	withdraw := Withdraw for: 50.
-		
-	self deny: (account hasRegistered: deposit).
-	self deny: (account hasRegistered:withdraw).
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 14:55:03'!
-test07AccountKnowsItsTransactions 
-
-	| account1 deposit1 |
-	
-	account1 := Account new.
-	
-	deposit1 := Deposit register: 50 on: account1.
-		
-	self assert: 1 equals: account1 transactions size.
-	self assert: (account1 transactions includes: deposit1).
-! !
-
-!AccountTests methodsFor: 'tests' stamp: 'wb 10/17/2021 22:31:28'!
-test08AccountKnowsItsTransactions 
-
-	| account1 |
-	
-	account1 := Account new.
-	
-	Deposit register: 50 on: account1.
-	Withdraw register: 100 on: account1.
-		
-	self assert: 2 equals: account1 numberOfTransactions .
-	self assert: -50 equals: account1 balance.
-! !
-
-
 !classDefinition: #PortfolioTests category: 'Portfolio-Ejercicio'!
 TestCase subclass: #PortfolioTests
 	instanceVariableNames: ''
@@ -118,19 +13,19 @@ assertAddSameHoldingFailureOnAdding: aHolding to: aPortfolio
 		withExceptionDo: [ :anError | self assert: anError messageText equals: Portfolio repeatedHoldingError ].! !
 
 
-!PortfolioTests methodsFor: 'creation helpers' stamp: 'PhG 10/17/2021 19:37:44'!
+!PortfolioTests methodsFor: 'creation helpers' stamp: 'PhG 10/18/2021 08:18:48'!
 createAccountWith: aTransaction of: anAmount
 	|account|
 	
-	account := Account new.
+	account := ReceptiveAccount new.
 	aTransaction register: anAmount on: account.
 	
 	^account! !
 
-!PortfolioTests methodsFor: 'creation helpers' stamp: 'PhG 10/17/2021 19:38:58'!
+!PortfolioTests methodsFor: 'creation helpers' stamp: 'PhG 10/18/2021 08:18:48'!
 createEmptyAccount
 	
-	^Account new.! !
+	^ReceptiveAccount new.! !
 
 !PortfolioTests methodsFor: 'creation helpers' stamp: 'PhG 10/17/2021 19:38:43'!
 createEmptyPortfolio
@@ -493,27 +388,27 @@ test24DepositsMadeToNestedAccountsShouldBeRegisteredForTheRootPortfolio
 	self assert: (rootPortfolio hasRegistered: deposit) equals: true.
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:05'!
 test25NewPortfolioDoesNotContainTransactions
 	
 	|portfolio| 
 	
 	portfolio := self createEmptyPortfolio.
 
-	self assert: 0 equals: (portfolio numberOfTransactions).
+	self assert: 0 equals: (portfolio transactions size).
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:09'!
 test26PortfolioWithNewAccountDoesNotContainTransactions
 	
 	|portfolio| 
 	
 	portfolio := self createPortfolioWith: (self createEmptyAccount).
 
-	self assert: 0 equals: (portfolio numberOfTransactions).
+	self assert: 0 equals: (portfolio transactions size).
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:12'!
 test27PortfolioAccountWithTransactionsAreRegistered
 	
 	|portfolio account| 
@@ -524,9 +419,9 @@ test27PortfolioAccountWithTransactionsAreRegistered
 	self withdraw50From: account.
 	portfolio add: account.
 
-	self assert: account numberOfTransactions equals: portfolio numberOfTransactions.	! !
+	self assert: account transactions size equals: portfolio transactions size.	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:18'!
 test28PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
 	
 	|portfolio twoTransactionsAccount oneTransactionAccount| 
@@ -537,10 +432,10 @@ test28PortfolioWithTwoAccountsReturnsTransactionsOfBothAccounts
 	portfolio := self createPortfolioWith: twoTransactionsAccount with: oneTransactionAccount.
 	self withdraw50From: twoTransactionsAccount.
 
-	self assert: (twoTransactionsAccount numberOfTransactions) + (oneTransactionAccount numberOfTransactions) equals: portfolio numberOfTransactions.
+	self assert: (twoTransactionsAccount transactions size) + (oneTransactionAccount transactions size) equals: portfolio transactions size.
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:24'!
 test29TransactionsAreCollectedFromAccountsInChildPortfolios
 	
 	|rootPortfolio childPortfolio accountWithTwoTransactions | 
@@ -553,10 +448,10 @@ test29TransactionsAreCollectedFromAccountsInChildPortfolios
 	rootPortfolio add: childPortfolio.
 	self withdraw50From: accountWithTwoTransactions.
 
-	self assert: (accountWithTwoTransactions numberOfTransactions) + (childPortfolio numberOfTransactions) equals: rootPortfolio numberOfTransactions.
+	self assert: (accountWithTwoTransactions transactions size) + (childPortfolio transactions size) equals: rootPortfolio transactions size.
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:31'!
 test30TransactionsAreCollectedFromManyAccountsInChildPortfolios
 	
 	|rootPortfolio accountWithTwoTransactions accountWithAWithdraw accountWithOneDeposit| 
@@ -570,10 +465,10 @@ test30TransactionsAreCollectedFromManyAccountsInChildPortfolios
 	rootPortfolio add: (self createPortfolioWith: accountWithAWithdraw).
 	rootPortfolio add: (self createPortfolioWith: accountWithOneDeposit).
 	
-	self assert: (accountWithTwoTransactions numberOfTransactions) + (accountWithAWithdraw numberOfTransactions) + (accountWithOneDeposit numberOfTransactions) equals: rootPortfolio numberOfTransactions.
+	self assert: (accountWithTwoTransactions transactions size) + (accountWithAWithdraw transactions size) + (accountWithOneDeposit transactions size) equals: rootPortfolio transactions size.
 	! !
 
-!PortfolioTests methodsFor: 'transactions tests' stamp: 'wb 10/17/2021 22:26:38'!
+!PortfolioTests methodsFor: 'transactions tests' stamp: 'PhG 10/18/2021 08:16:34'!
 test31TransactionsOfChildPortfolioDoNotIncludeSiblingTransactions
 	
 	|rootPortfolio childPortfolio firstLevelAccount| 
@@ -585,7 +480,98 @@ test31TransactionsOfChildPortfolioDoNotIncludeSiblingTransactions
 	childPortfolio := self createPortfolioWith: (self createAccountWith: Withdraw of: 50).
 	rootPortfolio add: childPortfolio.
 	
-	self deny: (rootPortfolio numberOfTransactions = childPortfolio numberOfTransactions).! !
+	self deny: (rootPortfolio transactions size = childPortfolio transactions size).! !
+
+
+!classDefinition: #ReceptiveAccountTest category: 'Portfolio-Ejercicio'!
+TestCase subclass: #ReceptiveAccountTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test01ReceptiveAccountHaveZeroAsBalanceWhenCreated 
+
+	| account |
+	
+	account := ReceptiveAccount new.
+
+	self assert: 0 equals: account balance.
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test02DepositIncreasesBalanceOnTransactionValue 
+
+	| account |
+	
+	account := ReceptiveAccount  new.
+	Deposit register: 100 on: account.
+		
+	self assert: 100 equals: account balance.
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test03WithdrawDecreasesBalanceOnTransactionValue 
+
+	| account |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	Withdraw register: 50 on: account.
+		
+	self assert: 50 equals: account balance.
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test04WithdrawValueMustBePositive 
+
+	| account withdrawValue |
+	
+	account := ReceptiveAccount new.
+	withdrawValue := 50.
+	
+	self assert: withdrawValue equals: (Withdraw register: withdrawValue on: account) value.
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test05ReceptiveAccountKnowsRegisteredTransactions 
+
+	| account deposit withdraw |
+	
+	account := ReceptiveAccount new.
+	deposit := Deposit register: 100 on: account.
+	withdraw := Withdraw register: 50 on: account.
+		
+	self assert: (account hasRegistered: deposit).
+	self assert: (account hasRegistered: withdraw).
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:18:48'!
+test06ReceptiveAccountDoNotKnowNotRegisteredTransactions
+
+	| deposit withdraw account |
+	
+	account := ReceptiveAccount new.
+	deposit :=  Deposit for: 200.
+	withdraw := Withdraw for: 50.
+		
+	self deny: (account hasRegistered: deposit).
+	self deny: (account hasRegistered:withdraw).
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 08:30:11'!
+test07AccountKnowsItsTransactions 
+
+	| account deposit |
+	
+	account := ReceptiveAccount new.
+	
+	deposit := Deposit register: 50 on: account.
+		
+	self assert: 1 equals: account transactions size.
+	self assert: (account transactions includes: deposit).
+! !
 
 
 !classDefinition: #Holding category: 'Portfolio-Ejercicio'!
@@ -610,10 +596,6 @@ balance
 	self subclassResponsibility .! !
 
 
-!Holding methodsFor: 'testing' stamp: 'wb 10/16/2021 20:49:45'!
-contains: aHolding
-	self subclassResponsibility .! !
-
 !Holding methodsFor: 'testing' stamp: 'PhG 10/16/2021 21:43:32'!
 hasRegistered: aTransaction
 	self subclassResponsibility .! !
@@ -628,81 +610,10 @@ initialize
 assertAllChildrenCanBeAddedTo: aHolding
 	^self subclassResponsibility.! !
 
-
-!classDefinition: #Account category: 'Portfolio-Ejercicio'!
-Holding subclass: #Account
-	instanceVariableNames: 'transactions'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Ejercicio'!
 
-!Account methodsFor: 'initialization' stamp: 'NR 10/17/2019 15:06:56'!
-initialize
-
-	transactions := OrderedCollection new.! !
-
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:53:28'!
-depositTransactions
-
-	^ transactions select: [:aTransaction | aTransaction isDeposit].! !
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 22:26:38'!
-numberOfTransactions 
-
-	^ transactions size.! !
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:01'!
-register: aTransaction
-
-	transactions add: aTransaction.! !
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:10'!
-transactions 
-
-	^ transactions copy.! !
-
-!Account methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:17'!
-withdrawalTransactions
-
-	^ transactions select: [:aTransaction | aTransaction isDeposit not].! !
-
-
-!Account methodsFor: 'balance' stamp: 'wb 10/17/2021 22:43:17'!
-balance
-
-	|totalDeposited totalWithdrawn|
-	totalDeposited := self balanceOf: (self depositTransactions).
-	totalWithdrawn := self balanceOf: (self withdrawalTransactions).
-
-	^totalDeposited - totalWithdrawn.! !
-
-!Account methodsFor: 'balance' stamp: 'wb 10/16/2021 20:46:23'!
-balanceOf: someTransactions
-
-	^ someTransactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ].! !
-
-
-!Account methodsFor: 'testing' stamp: 'wb 10/17/2021 21:53:44'!
-hasRegistered: aTransaction
-
-	^ transactions includes: aTransaction.
-! !
-
-
-!Account methodsFor: 'operations' stamp: 'wb 10/16/2021 20:31:49'!
-addParent: aHolding
-	^nil.! !
-
-
-!Account methodsFor: 'assertions' stamp: 'wb 10/17/2021 14:57:31'!
-assertAllChildrenCanBeAddedTo: aHolding
-	^true.! !
-
-
-!Account methodsFor: 'private' stamp: 'wb 10/17/2021 21:53:20'!
+!Holding methodsFor: 'private' stamp: 'wb 10/16/2021 20:49:45'!
 contains: aHolding
-	^self = aHolding.! !
+	self subclassResponsibility .! !
 
 
 !classDefinition: #Portfolio category: 'Portfolio-Ejercicio'!
@@ -782,10 +693,6 @@ assertNoChildrenContains: aHolding
 	(self anyChildContains: aHolding) ifTrue: [self signalRepeatedHoldingError].! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'wb 10/17/2021 22:26:38'!
-numberOfTransactions
-	^self transactions size.! !
-
 !Portfolio methodsFor: 'transactions' stamp: 'PhG 10/17/2021 18:32:15'!
 transactions
 	|collectedTransactions|
@@ -820,6 +727,77 @@ Portfolio class
 !Portfolio class methodsFor: 'error descriptions' stamp: 'wb 10/17/2021 22:07:38'!
 repeatedHoldingError
 	^'You can not add the same holding more than once'! !
+
+
+!classDefinition: #ReceptiveAccount category: 'Portfolio-Ejercicio'!
+Holding subclass: #ReceptiveAccount
+	instanceVariableNames: 'transactions'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Ejercicio'!
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'NR 10/17/2019 15:06:56'!
+initialize
+
+	transactions := OrderedCollection new.! !
+
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:53:28'!
+depositTransactions
+
+	^ transactions select: [:aTransaction | aTransaction isDeposit].! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:01'!
+register: aTransaction
+
+	transactions add: aTransaction.! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:10'!
+transactions 
+
+	^ transactions copy.! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'wb 10/17/2021 21:54:17'!
+withdrawalTransactions
+
+	^ transactions select: [:aTransaction | aTransaction isDeposit not].! !
+
+
+!ReceptiveAccount methodsFor: 'balance' stamp: 'wb 10/17/2021 22:43:17'!
+balance
+
+	|totalDeposited totalWithdrawn|
+	totalDeposited := self balanceOf: (self depositTransactions).
+	totalWithdrawn := self balanceOf: (self withdrawalTransactions).
+
+	^totalDeposited - totalWithdrawn.! !
+
+!ReceptiveAccount methodsFor: 'balance' stamp: 'wb 10/16/2021 20:46:23'!
+balanceOf: someTransactions
+
+	^ someTransactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ].! !
+
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'wb 10/17/2021 21:53:44'!
+hasRegistered: aTransaction
+
+	^ transactions includes: aTransaction.
+! !
+
+
+!ReceptiveAccount methodsFor: 'operations' stamp: 'wb 10/16/2021 20:31:49'!
+addParent: aHolding
+	^nil.! !
+
+
+!ReceptiveAccount methodsFor: 'assertions' stamp: 'wb 10/17/2021 14:57:31'!
+assertAllChildrenCanBeAddedTo: aHolding
+	^true.! !
+
+
+!ReceptiveAccount methodsFor: 'private' stamp: 'wb 10/17/2021 21:53:20'!
+contains: aHolding
+	^self = aHolding.! !
 
 
 !classDefinition: #Transaction category: 'Portfolio-Ejercicio'!
