@@ -407,88 +407,203 @@ TestCase subclass: #ReportsTest
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:08:46'!
-test01PrintAccountSummaryOnNewAccountPrintsBalanceZero
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 19:47:18'!
+test01AccountSummaryOnNewAccountPrintsBalanceZero
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	
-	self assert: (OrderedCollection with: 'Balance = 0.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Balance = 0.') equals: (self accountSummaryFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:08:56'!
-test02PrintAccountSummaryOnAccountWithDepositPrintsDepositInformation
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:01:18'!
+test02AccountSummaryOnAccountWithDepositPrintsDepositInformation
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	Deposit register: 100 on: anAccount.
 	
-	self assert: (OrderedCollection with: 'Depósito por 100.' with: 'Balance = 100.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Depósito por 100.' with: 'Balance = 100.') equals: (self accountSummaryFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:09:00'!
-test03PrintAccountSummaryOnAccountWithWithdrawPrintsWithdrawInformation
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:01:23'!
+test03AccountSummaryOnAccountWithWithdrawPrintsWithdrawInformation
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	Withdraw register: 100 on: anAccount.
 	
-	self assert: (OrderedCollection with: 'Extracción por 100.' with: 'Balance = -100.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Extracción por 100.' with: 'Balance = -100.') equals: (self accountSummaryFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:09:06'!
-test04PrintAccountSummaryOnAccountWithOriginWirePrintsOriginWireInformation
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:01:28'!
+test04AccountSummaryOnAccountWithOriginWirePrintsOriginWireInformation
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	Wire register: 100 from: anAccount to: self createEmptyAccount.
 	
-	self assert: (OrderedCollection with: 'Salida por transferencia de 100.' with: 'Balance = -100.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Salida por transferencia de 100.' with: 'Balance = -100.') equals: (self accountSummaryFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:11:33'!
-test05PrintAccountSummaryOnAccountWithDestinationWirePrintsDestinationWireInformation
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:01:31'!
+test05AccountSummaryOnAccountWithDestinationWirePrintsDestinationWireInformation
 
 	| anAccount |
 	
 	anAccount := ReceptiveAccount new.
 	Wire register: 100 from: ReceptiveAccount new to: anAccount.
 	
-	self assert: (OrderedCollection with: 'Entrada por transferencia de 100.' with: 'Balance = 100.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Entrada por transferencia de 100.' with: 'Balance = 100.') equals: (self accountSummaryFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:11:29'!
-test06PrintTransferNetOnNewAccountPrintsZero
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:01:45'!
+test09AccountSummaryOnNewPortfolioPrintsBalanceZero
+
+	| aPortfolio |
+	
+	aPortfolio := self createEmptyPortfolio.
+	
+	self assert: (OrderedCollection with: 'Balance = 0.') equals: (self accountSummaryFor: aPortfolio).! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:02:02'!
+test10AccountSummaryOnPortfolioWithAccountIsAccountReport
+
+	| aPortfolio anAccount expectedPortfolioAccountSummary |
+	
+	aPortfolio := self createEmptyPortfolio.
+	anAccount := self createEmptyAccount.
+	
+	Deposit register: 100 on: anAccount.
+	aPortfolio add: anAccount.
+	
+	expectedPortfolioAccountSummary := (OrderedCollection new) addAll: (self accountSummaryFor: anAccount).
+	expectedPortfolioAccountSummary add: 'Balance = 100.'.
+	
+	self assert: expectedPortfolioAccountSummary equals: (self accountSummaryFor: aPortfolio).! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:02:47'!
+test11AccountSummaryOnPortfolioWithManyAccountsIncludesBothAccountsReport
+
+	| aPortfolio accountWithDeposit accountWithWithdraw expectedPortfolioAccountSummary |
+	
+	aPortfolio := self createEmptyPortfolio.
+	accountWithDeposit := self createEmptyAccount.
+	accountWithWithdraw := self createEmptyAccount.
+	
+	Deposit register: 100 on: accountWithDeposit.
+	aPortfolio add: accountWithDeposit.
+	Withdraw register: 50 on: accountWithWithdraw.
+	aPortfolio add: accountWithWithdraw.
+	
+	expectedPortfolioAccountSummary := (OrderedCollection new) addAll: (self accountSummaryFor: accountWithDeposit).
+	expectedPortfolioAccountSummary addAll: (self accountSummaryFor: accountWithWithdraw).
+	expectedPortfolioAccountSummary add: 'Balance = 50.'.
+	
+	self assert: expectedPortfolioAccountSummary equals: (self accountSummaryFor: aPortfolio).! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 20:02:23'!
+test12AccountSummaryOnPortfolioWithAccountInNestedPortfolioShowsPortfoliosBalance
+
+	| rootPortfolio nestedPortfolio accountWithWithdraw expectedPortfolioAccountSummary |
+	
+	rootPortfolio := self createEmptyPortfolio.
+	nestedPortfolio := self createEmptyPortfolio.
+	accountWithWithdraw := self createEmptyAccount.
+	
+	Withdraw register: 50 on: accountWithWithdraw.
+	nestedPortfolio add: accountWithWithdraw.
+	rootPortfolio add: nestedPortfolio.
+	
+	expectedPortfolioAccountSummary := (OrderedCollection new) addAll: (self accountSummaryFor: nestedPortfolio).
+	expectedPortfolioAccountSummary add: 'Balance = -50.'.
+	
+	self assert: expectedPortfolioAccountSummary equals: (self accountSummaryFor: rootPortfolio).! !
+
+
+!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 19:47:25'!
+accountSummaryFor: anAccount
+	^AccountSummary new report: anAccount! !
+
+!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 09:08:46'!
+createEmptyAccount
+	^ReceptiveAccount new.! !
+
+!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 18:34:45'!
+createEmptyPortfolio
+	^Portfolio new.! !
+
+!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 20:23:22'!
+transferNetFor: anAccount
+	^TransferNet new report: anAccount! !
+
+
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:23:47'!
+test06TransferNetOnNewAccountPrintsZero
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	
-	self assert: 0 equals: anAccount printTransferNet.! !
+	self assert: 0 equals: (self transferNetFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:13:18'!
-test07PrintTransferNetForAccountWithOriginWirePrintsNegativeNet
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:23:58'!
+test07TransferNetForAccountWithOriginWirePrintsNegativeNet
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	Wire register: 100 from: anAccount to: self createEmptyAccount.
 	
-	self assert: -100 equals: anAccount printTransferNet.! !
+	self assert: -100 equals: (self transferNetFor: anAccount).! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:25:19'!
-test08PrintTransferNetForAccountWithDestinationWirePrintsPositiveNet
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:24:05'!
+test08TransferNetForAccountWithDestinationWirePrintsPositiveNet
 
 	| anAccount |
 	
 	anAccount := self createEmptyAccount.
 	Wire register: 100 from: self createEmptyAccount to: anAccount.
 	
-	self assert: 100 equals: anAccount printTransferNet.! !
+	self assert: 100 equals: (self transferNetFor: anAccount).! !
 
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:24:15'!
+test13TransferNetOnNewPortfolioPrintsZero
 
-!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 09:08:46'!
-createEmptyAccount
-	^ReceptiveAccount new.! !
+	| aPortfolio |
+	
+	aPortfolio := self createEmptyPortfolio.
+	
+	self assert: 0 equals: (self transferNetFor: aPortfolio).! !
+
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:25:27'!
+test14TransferNetForPortfolioWithAccountWithWiresIsAccountTransferNet
+
+	| anAccount aPortfolio |
+	
+	aPortfolio := self createEmptyPortfolio.
+	anAccount := self createEmptyAccount.
+	
+	Wire register: 100 from: anAccount to: self createEmptyAccount.
+	aPortfolio add: anAccount.
+	
+	self assert: (self transferNetFor: anAccount) equals: (self transferNetFor: aPortfolio).! !
+
+!ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:25:00'!
+test15TransferNetForPortfolioWithManyAccountsWithWiresIsTotalTransferNet
+
+	| accountWithOriginWire accountWithTwoWires aPortfolio |
+	
+	aPortfolio := self createEmptyPortfolio.
+	accountWithOriginWire := self createEmptyAccount.
+	accountWithTwoWires := self createEmptyAccount.
+	
+	Wire register: 100 from: accountWithOriginWire to: self createEmptyAccount.
+	Wire register: 200 from: self createEmptyAccount to: accountWithTwoWires.
+	Wire register: 25 from: accountWithTwoWires to: self createEmptyAccount.
+	aPortfolio add: accountWithOriginWire.
+	aPortfolio add: accountWithTwoWires.
+	
+	self assert: ((self transferNetFor: accountWithOriginWire) + (self transferNetFor: accountWithTwoWires)) equals: (self transferNetFor: aPortfolio).! !
 
 
 !classDefinition: #Account category: 'Portfolio-Solucion'!
@@ -530,6 +645,11 @@ transactions
 addedTo: aPortfolio
 
 	self subclassResponsibility ! !
+
+
+!Account methodsFor: 'report' stamp: 'PhG 10/20/2021 20:26:25'!
+report: aReportable
+	self subclassResponsibility.! !
 
 
 !classDefinition: #Portfolio category: 'Portfolio-Solucion'!
@@ -643,6 +763,12 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'report' stamp: 'PhG 10/20/2021 19:38:29'!
+report: aReport
+	accounts do: [:account| aReport report: account].
+	aReport reportPortfolio: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'Portfolio-Solucion'!
@@ -727,35 +853,10 @@ addedTo: aPortfolio
 	! !
 
 
-!ReceptiveAccount methodsFor: 'reports' stamp: 'PhG 10/19/2021 22:42:51'!
-printAccountSummary
-	
-	| accountSummary |
-	
-	accountSummary := OrderedCollection new.
-	
-	transactions do: [:transaction | 
-		(transaction isKindOf: Deposit) ifTrue: [accountSummary add: 'Depósito por ', (transaction value asString), '.'].
-		(transaction isKindOf: Withdraw) ifTrue: [accountSummary add: 'Extracción por ', (transaction value asString), '.'].
-		(transaction isKindOf: OriginWire) ifTrue: [accountSummary add: 'Salida por transferencia de ', (transaction value asString), '.'].
-		(transaction isKindOf: DestinationWire) ifTrue: [accountSummary add: 'Entrada por transferencia de ', (transaction value asString), '.'].
-	].
-
-	accountSummary add: 'Balance = ', (self balance value asString), '.'.
-
-	^accountSummary .! !
-
-!ReceptiveAccount methodsFor: 'reports' stamp: 'PhG 10/20/2021 09:25:40'!
-printTransferNet
-
-	|transferNet|
-	transferNet := 0.
-	transactions do: [:transaction | 
-		(transaction isKindOf: OriginWire) ifTrue: [transferNet := transferNet - transaction value].
-		(transaction isKindOf: DestinationWire) ifTrue: [transferNet := transferNet + transaction value].
-	].
-
-	^transferNet.! !
+!ReceptiveAccount methodsFor: 'report' stamp: 'PhG 10/20/2021 19:39:35'!
+report: aReport
+	transactions do: [:transaction| aReport report: transaction].
+	aReport reportReceptiveAccount: self.! !
 
 
 !classDefinition: #AccountTransaction category: 'Portfolio-Solucion'!
@@ -775,6 +876,11 @@ value
 affectBalance: aBalance
 
 	self subclassResponsibility ! !
+
+
+!AccountTransaction methodsFor: 'reports' stamp: 'PhG 10/20/2021 19:40:22'!
+report: aReport
+	self subclassResponsibility.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -817,6 +923,11 @@ affectBalance: aBalance
 
 	^aBalance + value ! !
 
+
+!Deposit methodsFor: 'reports' stamp: 'PhG 10/20/2021 19:40:40'!
+report: aReport
+	aReport reportDeposit: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Deposit class' category: 'Portfolio-Solucion'!
@@ -829,44 +940,8 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Withdraw category: 'Portfolio-Solucion'!
-AccountTransaction subclass: #Withdraw
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Solucion'!
-
-!Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
-initializeFor: aValue
-
-	value := aValue ! !
-
-
-!Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
-value
-
-	^ value! !
-
-
-!Withdraw methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:15'!
-affectBalance: aBalance
-
-	^aBalance - value! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'Withdraw class' category: 'Portfolio-Solucion'!
-Withdraw class
-	instanceVariableNames: ''!
-
-!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:33'!
-for: aValue
-
-	^ self new initializeFor: aValue ! !
-
-
 !classDefinition: #DestinationWire category: 'Portfolio-Solucion'!
-Object subclass: #DestinationWire
+AccountTransaction subclass: #DestinationWire
 	instanceVariableNames: 'wire'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -893,6 +968,11 @@ otherEndOfWire
 value
 	^wire value.! !
 
+
+!DestinationWire methodsFor: 'reports' stamp: 'PhG 10/20/2021 19:41:19'!
+report: aReport
+	aReport reportDestinationWire: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'DestinationWire class' category: 'Portfolio-Solucion'!
@@ -916,7 +996,7 @@ registerTransaction: aTransaction on: account
 
 
 !classDefinition: #OriginWire category: 'Portfolio-Solucion'!
-Object subclass: #OriginWire
+AccountTransaction subclass: #OriginWire
 	instanceVariableNames: 'wire'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -943,6 +1023,11 @@ otherEndOfWire
 value
 	^wire value.! !
 
+
+!OriginWire methodsFor: 'reports' stamp: 'PhG 10/20/2021 19:41:35'!
+report: aReport
+	aReport reportOriginWire: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'OriginWire class' category: 'Portfolio-Solucion'!
@@ -963,6 +1048,175 @@ registerTransaction: aTransaction on: account
 	account register: transaction.
 		
 	^ transaction! !
+
+
+!classDefinition: #Withdraw category: 'Portfolio-Solucion'!
+AccountTransaction subclass: #Withdraw
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!Withdraw methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:46'!
+initializeFor: aValue
+
+	value := aValue ! !
+
+
+!Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+value
+
+	^ value! !
+
+
+!Withdraw methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:15'!
+affectBalance: aBalance
+
+	^aBalance - value! !
+
+
+!Withdraw methodsFor: 'reports' stamp: 'PhG 10/20/2021 19:40:54'!
+report: aReport
+	aReport reportWithdraw: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Withdraw class' category: 'Portfolio-Solucion'!
+Withdraw class
+	instanceVariableNames: ''!
+
+!Withdraw class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:33'!
+for: aValue
+
+	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #Report category: 'Portfolio-Solucion'!
+Object subclass: #Report
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!Report methodsFor: 'initialization' stamp: 'PhG 10/20/2021 20:27:53'!
+initialize
+	self subclassResponsibility.! !
+
+
+!Report methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:28:54'!
+reportDeposit: aDeposit
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:29:29'!
+reportDestinationWire: aDestinationWire
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:29:15'!
+reportOriginWire: anOriginWire
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:29:03'!
+reportWithdraw: aWithdraw
+	self subclassResponsibility.! !
+
+
+!Report methodsFor: 'entrypoint' stamp: 'PhG 10/20/2021 20:28:24'!
+report: aReportable
+	self subclassResponsibility.! !
+
+
+!Report methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:28:48'!
+reportPortfolio: aPortfolio
+	self subclassResponsibility.! !
+
+!Report methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:28:36'!
+reportReceptiveAccount: aReceptiveAccount
+	self subclassResponsibility.! !
+
+
+!classDefinition: #AccountSummary category: 'Portfolio-Solucion'!
+Report subclass: #AccountSummary
+	instanceVariableNames: 'accountSummary'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!AccountSummary methodsFor: 'initialization' stamp: 'PhG 10/20/2021 19:43:40'!
+initialize
+	accountSummary := OrderedCollection new.! !
+
+
+!AccountSummary methodsFor: 'accounts' stamp: 'PhG 10/20/2021 19:43:19'!
+reportPortfolio: aPortfolio
+	accountSummary add: 'Balance = ', (aPortfolio balance asString), '.'.! !
+
+!AccountSummary methodsFor: 'accounts' stamp: 'PhG 10/20/2021 19:46:23'!
+reportReceptiveAccount: anAccount
+	accountSummary add: 'Balance = ', (anAccount balance asString), '.'.! !
+
+
+!AccountSummary methodsFor: 'transactions' stamp: 'PhG 10/20/2021 19:23:40'!
+reportDeposit: aDeposit
+	accountSummary add: 'Depósito por ', aDeposit value asString, '.'.! !
+
+!AccountSummary methodsFor: 'transactions' stamp: 'PhG 10/20/2021 19:28:54'!
+reportDestinationWire: aDestinationWire
+	accountSummary add: 'Entrada por transferencia de ', aDestinationWire value asString, '.'.! !
+
+!AccountSummary methodsFor: 'transactions' stamp: 'PhG 10/20/2021 19:24:33'!
+reportOriginWire: anOriginWire
+	accountSummary add: 'Salida por transferencia de ', anOriginWire value asString, '.'.! !
+
+!AccountSummary methodsFor: 'transactions' stamp: 'PhG 10/20/2021 19:24:07'!
+reportWithdraw: aWithdraw
+	accountSummary add: 'Extracción por ', aWithdraw value asString, '.'.! !
+
+
+!AccountSummary methodsFor: 'entrypoint' stamp: 'PhG 10/20/2021 19:32:43'!
+report: aReportable
+	aReportable report: self.
+	^accountSummary.! !
+
+
+!classDefinition: #TransferNet category: 'Portfolio-Solucion'!
+Report subclass: #TransferNet
+	instanceVariableNames: 'transferNet'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TransferNet methodsFor: 'initialization' stamp: 'PhG 10/20/2021 20:17:15'!
+initialize
+	transferNet := 0! !
+
+
+!TransferNet methodsFor: 'entrypoint' stamp: 'PhG 10/20/2021 20:17:15'!
+report: aReportable
+	aReportable report: self.
+	^transferNet.! !
+
+
+!TransferNet methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:17:35'!
+reportPortfolio: aPortfolio
+	! !
+
+!TransferNet methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:10:33'!
+reportReceptiveAccount: aReceptiveAccount! !
+
+
+!TransferNet methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:10:44'!
+reportDeposit: aDeposit! !
+
+!TransferNet methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:21:56'!
+reportDestinationWire: aDestinationWire
+	transferNet := transferNet + aDestinationWire value.! !
+
+!TransferNet methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:21:44'!
+reportOriginWire: anOriginWire
+	transferNet := transferNet - anOriginWire value.! !
+
+!TransferNet methodsFor: 'transactions' stamp: 'PhG 10/20/2021 20:10:54'!
+reportWithdraw: aWithdraw! !
 
 
 !classDefinition: #Wire category: 'Portfolio-Solucion'!
@@ -1007,21 +1261,21 @@ destinationWire: aDestinationWire
 Wire class
 	instanceVariableNames: ''!
 
-!Wire class methodsFor: 'instance creation' stamp: 'PhG 10/19/2021 21:40:26'!
+!Wire class methodsFor: 'instance creation' stamp: 'PhG 10/20/2021 18:44:10'!
 register: aValue from: originAccount to: destinationAccount 
-	| transaction originWire destinationWire |
+	| wire originWire destinationWire |
 	
 	(0 >= aValue) ifTrue: [self error: Wire wireValueCanNotBeZeroOrNegative ].
 	(originAccount = destinationAccount) ifTrue: [self error: Wire wireCanNotBePerformedBetweenTheSameAccount].
 	
-	transaction := self new initializeFor: aValue.
-	originWire := OriginWire registerTransaction: transaction on: originAccount.
-	destinationWire := DestinationWire registerTransaction: transaction on: destinationAccount.
+	wire := self new initializeFor: aValue.
+	originWire := OriginWire registerTransaction: wire on: originAccount.
+	destinationWire := DestinationWire registerTransaction: wire on: destinationAccount.
 	
-	transaction originWire: originWire.
-	transaction destinationWire: destinationWire.		
+	wire originWire: originWire.
+	wire destinationWire: destinationWire.		
 	
-	^ transaction! !
+	^wire! !
 
 
 !Wire class methodsFor: 'error descriptions' stamp: 'PhG 10/18/2021 21:39:06'!

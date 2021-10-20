@@ -4,8 +4,7 @@ Lo primero a hacer es un reporte naive haciendo TDD sobre las cuentas (no portfo
 
 
 ## Preguntar:
-* Que entendemos por navegar de una pata a la otra, que a nivel codigo podamos ver que hay una conexion entre un objeto y el otro? O que podamos pedirle a una punta de la transaccion la otra cuenta de la transaccion? En este ultimo caso, eso no romperia encapsulamiento?
-	* Como lo testeamos?
+* En el caso del resumen de cuentas de un portfolio, se imprime el balance de cada cuenta y al final el balance del portfolio? Como separamos una cuenta de otra?
 
 
 
