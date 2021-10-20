@@ -304,7 +304,7 @@ test07AccountKnowsItsTransactions
 	self assert: (account1 transactions includes: deposit1).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 21:40:04'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/19/2021 22:30:21'!
 test08WiresCanBePerformedBetweenAccounts
 
 	| account1 account2 wire |
@@ -314,29 +314,14 @@ test08WiresCanBePerformedBetweenAccounts
 	
 	wire := Wire register: 100 from: account1 to: account2.
 		
-	self assert: (account1 hasRegistered: wire).
-	self assert: (account2 hasRegistered: wire).
+	self assert: (account1 hasRegistered: wire origin).
+	self assert: (account2 hasRegistered: wire destination).
 	self assert: -100 equals: account1 balance.
 	self assert: 100 equals: account2 balance.
 	
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 22:13:50'!
-test09AccountsCanNavigateToTheOtherEndOfTheWire
-
-	| account1 account2 wire |
-	
-	account1 := ReceptiveAccount new.
-	account2 := ReceptiveAccount new.
-	
-	wire := Wire register: 100 from: account1 to: account2.
-		
-	self assert: account2 equals: (account1 transactions at: 1) otherEndOfWire.
-	self assert: account1 equals: (account2 transactions at: 1) otherEndOfWire.
-	
-! !
-
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 22:15:27'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/19/2021 21:42:08'!
 test09WireCanNavigateToTheOtherEndOfTheWire
 
 	| account1 account2 wire |
@@ -347,7 +332,7 @@ test09WireCanNavigateToTheOtherEndOfTheWire
 	wire := Wire register: 100 from: account1 to: account2.
 		
 	self assert: (wire origin otherEndOfWire) equals: wire destination.
-	
+	self assert: (wire destination otherEndOfWire) equals: wire origin.
 ! !
 
 !ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/18/2021 21:40:16'!
@@ -397,6 +382,23 @@ test12WireCanNotBePerformedBetweenTheSameAccount
 	
 ! !
 
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'PhG 10/19/2021 22:33:16'!
+test12WiresKnowTheirValues
+
+	| account1 account2 wire wireValue |
+	
+	account1 := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	wireValue := 100.
+	
+	wire := Wire register: wireValue from: account1 to: account2.
+		
+	self assert: wireValue equals: wire value.
+	self assert: wireValue equals: wire origin value.
+	self assert: wireValue equals: wire destination value.
+	
+! !
+
 
 !classDefinition: #ReportsTest category: 'Portfolio-Solucion'!
 TestCase subclass: #ReportsTest
@@ -405,24 +407,88 @@ TestCase subclass: #ReportsTest
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/18/2021 21:57:34'!
-test01PrintAccountSummaryOnNewAccountPrintsEmpty
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:08:46'!
+test01PrintAccountSummaryOnNewAccountPrintsBalanceZero
 
 	| anAccount |
 	
-	anAccount := ReceptiveAccount new.
+	anAccount := self createEmptyAccount.
 	
 	self assert: (OrderedCollection with: 'Balance = 0.') equals: anAccount printAccountSummary.! !
 
-!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/18/2021 21:58:46'!
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:08:56'!
 test02PrintAccountSummaryOnAccountWithDepositPrintsDepositInformation
 
 	| anAccount |
 	
-	anAccount := ReceptiveAccount new.
+	anAccount := self createEmptyAccount.
 	Deposit register: 100 on: anAccount.
 	
-	self assert: (OrderedCollection with: 'Depósito por 100.' with: 'Balance = 0.') equals: anAccount printAccountSummary.! !
+	self assert: (OrderedCollection with: 'Depósito por 100.' with: 'Balance = 100.') equals: anAccount printAccountSummary.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:09:00'!
+test03PrintAccountSummaryOnAccountWithWithdrawPrintsWithdrawInformation
+
+	| anAccount |
+	
+	anAccount := self createEmptyAccount.
+	Withdraw register: 100 on: anAccount.
+	
+	self assert: (OrderedCollection with: 'Extracción por 100.' with: 'Balance = -100.') equals: anAccount printAccountSummary.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:09:06'!
+test04PrintAccountSummaryOnAccountWithOriginWirePrintsOriginWireInformation
+
+	| anAccount |
+	
+	anAccount := self createEmptyAccount.
+	Wire register: 100 from: anAccount to: self createEmptyAccount.
+	
+	self assert: (OrderedCollection with: 'Salida por transferencia de 100.' with: 'Balance = -100.') equals: anAccount printAccountSummary.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:11:33'!
+test05PrintAccountSummaryOnAccountWithDestinationWirePrintsDestinationWireInformation
+
+	| anAccount |
+	
+	anAccount := ReceptiveAccount new.
+	Wire register: 100 from: ReceptiveAccount new to: anAccount.
+	
+	self assert: (OrderedCollection with: 'Entrada por transferencia de 100.' with: 'Balance = 100.') equals: anAccount printAccountSummary.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:11:29'!
+test06PrintTransferNetOnNewAccountPrintsZero
+
+	| anAccount |
+	
+	anAccount := self createEmptyAccount.
+	
+	self assert: 0 equals: anAccount printTransferNet.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:13:18'!
+test07PrintTransferNetForAccountWithOriginWirePrintsNegativeNet
+
+	| anAccount |
+	
+	anAccount := self createEmptyAccount.
+	Wire register: 100 from: anAccount to: self createEmptyAccount.
+	
+	self assert: -100 equals: anAccount printTransferNet.! !
+
+!ReportsTest methodsFor: 'account summary tests' stamp: 'PhG 10/20/2021 09:25:19'!
+test08PrintTransferNetForAccountWithDestinationWirePrintsPositiveNet
+
+	| anAccount |
+	
+	anAccount := self createEmptyAccount.
+	Wire register: 100 from: self createEmptyAccount to: anAccount.
+	
+	self assert: 100 equals: anAccount printTransferNet.! !
+
+
+!ReportsTest methodsFor: 'setUp' stamp: 'PhG 10/20/2021 09:08:46'!
+createEmptyAccount
+	^ReceptiveAccount new.! !
 
 
 !classDefinition: #Account category: 'Portfolio-Solucion'!
@@ -661,7 +727,7 @@ addedTo: aPortfolio
 	! !
 
 
-!ReceptiveAccount methodsFor: 'reports' stamp: 'PhG 10/18/2021 22:06:36'!
+!ReceptiveAccount methodsFor: 'reports' stamp: 'PhG 10/19/2021 22:42:51'!
 printAccountSummary
 	
 	| accountSummary |
@@ -669,12 +735,27 @@ printAccountSummary
 	accountSummary := OrderedCollection new.
 	
 	transactions do: [:transaction | 
-		(transaction isKindOf: Deposit) ifTrue: [accountSummary add: 'Depósito por ', (transaction value asString), '.']
+		(transaction isKindOf: Deposit) ifTrue: [accountSummary add: 'Depósito por ', (transaction value asString), '.'].
+		(transaction isKindOf: Withdraw) ifTrue: [accountSummary add: 'Extracción por ', (transaction value asString), '.'].
+		(transaction isKindOf: OriginWire) ifTrue: [accountSummary add: 'Salida por transferencia de ', (transaction value asString), '.'].
+		(transaction isKindOf: DestinationWire) ifTrue: [accountSummary add: 'Entrada por transferencia de ', (transaction value asString), '.'].
 	].
 
-	accountSummary add: 'Balance = 0.'.
+	accountSummary add: 'Balance = ', (self balance value asString), '.'.
 
 	^accountSummary .! !
+
+!ReceptiveAccount methodsFor: 'reports' stamp: 'PhG 10/20/2021 09:25:40'!
+printTransferNet
+
+	|transferNet|
+	transferNet := 0.
+	transactions do: [:transaction | 
+		(transaction isKindOf: OriginWire) ifTrue: [transferNet := transferNet - transaction value].
+		(transaction isKindOf: DestinationWire) ifTrue: [transferNet := transferNet + transaction value].
+	].
+
+	^transferNet.! !
 
 
 !classDefinition: #AccountTransaction category: 'Portfolio-Solucion'!
@@ -803,10 +884,14 @@ initializeFor: aWire
 	wire := aWire.! !
 
 
-
-!DestinationWire methodsFor: 'as yet unclassified' stamp: 'PhG 10/18/2021 20:43:02'!
+!DestinationWire methodsFor: 'navigation' stamp: 'PhG 10/19/2021 21:34:08'!
 otherEndOfWire
-	^wire originAccount.! !
+	^wire origin.! !
+
+
+!DestinationWire methodsFor: 'value' stamp: 'PhG 10/19/2021 22:33:53'!
+value
+	^wire value.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -818,6 +903,16 @@ DestinationWire class
 for: aWire
 
 	^ self new initializeFor: aWire ! !
+
+!DestinationWire class methodsFor: 'instance creation' stamp: 'PhG 10/19/2021 21:28:51'!
+registerTransaction: aTransaction on: account
+
+	| transaction |
+	
+	transaction := self for: aTransaction.
+	account register: transaction.
+		
+	^ transaction! !
 
 
 !classDefinition: #OriginWire category: 'Portfolio-Solucion'!
@@ -839,10 +934,14 @@ initializeFor: aWire
 	wire := aWire.! !
 
 
-
-!OriginWire methodsFor: 'as yet unclassified' stamp: 'PhG 10/18/2021 20:43:12'!
+!OriginWire methodsFor: 'navigation' stamp: 'PhG 10/19/2021 21:32:55'!
 otherEndOfWire
-	^wire destinationAccount.! !
+	^wire destination.! !
+
+
+!OriginWire methodsFor: 'value' stamp: 'PhG 10/19/2021 22:33:40'!
+value
+	^wire value.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -855,25 +954,28 @@ for: aWire
 
 	^ self new initializeFor: aWire ! !
 
+!OriginWire class methodsFor: 'instance creation' stamp: 'PhG 10/19/2021 21:28:57'!
+registerTransaction: aTransaction on: account
+
+	| transaction |
+	
+	transaction := self for: aTransaction.
+	account register: transaction.
+		
+	^ transaction! !
+
 
 !classDefinition: #Wire category: 'Portfolio-Solucion'!
 Object subclass: #Wire
-	instanceVariableNames: 'value originAccount destinationAccount'
+	instanceVariableNames: 'value originWire destinationWire'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!Wire methodsFor: 'initialization' stamp: 'PhG 10/18/2021 20:44:08'!
-initializeFor: aValue from: anOriginAccount to: aDestinationAccount
+!Wire methodsFor: 'initialization' stamp: 'PhG 10/19/2021 21:31:05'!
+initializeFor: aValue
 	
-	value := aValue.
-	originAccount := anOriginAccount.
-	destinationAccount := aDestinationAccount.! !
-
-
-!Wire methodsFor: 'balance' stamp: 'PhG 10/18/2021 20:07:20'!
-affectBalance: aBalance
-	self subclassResponsibility.! !
+	value := aValue.! !
 
 
 !Wire methodsFor: 'value' stamp: 'PhG 10/18/2021 20:30:42'!
@@ -882,13 +984,22 @@ value
 	^ value! !
 
 
-!Wire methodsFor: 'accounts' stamp: 'PhG 10/18/2021 20:48:01'!
-destinationAccount
-	^destinationAccount.! !
+!Wire methodsFor: 'origin' stamp: 'PhG 10/19/2021 21:30:13'!
+origin
+	^originWire! !
 
-!Wire methodsFor: 'accounts' stamp: 'PhG 10/18/2021 20:48:10'!
-originAccount
-	^originAccount.! !
+!Wire methodsFor: 'origin' stamp: 'PhG 10/19/2021 21:40:48'!
+originWire: anOriginWire
+	originWire := anOriginWire.! !
+
+
+!Wire methodsFor: 'destination' stamp: 'PhG 10/19/2021 21:41:36'!
+destination
+	^destinationWire.! !
+
+!Wire methodsFor: 'destination' stamp: 'PhG 10/19/2021 22:30:01'!
+destinationWire: aDestinationWire
+	destinationWire := aDestinationWire.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -896,27 +1007,20 @@ originAccount
 Wire class
 	instanceVariableNames: ''!
 
-!Wire class methodsFor: 'instance creation' stamp: 'PhG 10/18/2021 21:38:27'!
+!Wire class methodsFor: 'instance creation' stamp: 'PhG 10/19/2021 21:40:26'!
 register: aValue from: originAccount to: destinationAccount 
-	| transaction |
+	| transaction originWire destinationWire |
 	
 	(0 >= aValue) ifTrue: [self error: Wire wireValueCanNotBeZeroOrNegative ].
 	(originAccount = destinationAccount) ifTrue: [self error: Wire wireCanNotBePerformedBetweenTheSameAccount].
 	
-	transaction := self new initializeFor: aValue from: originAccount to: destinationAccount.
-	OriginWire registerTransaction: transaction on: originAccount.
-	DestinationWire registerTransaction: transaction on: destinationAccount.
-		
-	^ transaction! !
-
-!Wire class methodsFor: 'instance creation' stamp: 'PhG 10/18/2021 20:26:38'!
-registerTransaction: aTransaction on: account
-
-	| transaction |
+	transaction := self new initializeFor: aValue.
+	originWire := OriginWire registerTransaction: transaction on: originAccount.
+	destinationWire := DestinationWire registerTransaction: transaction on: destinationAccount.
 	
-	transaction := self for: aTransaction.
-	account register: transaction.
-		
+	transaction originWire: originWire.
+	transaction destinationWire: destinationWire.		
+	
 	^ transaction! !
 
 
