@@ -536,6 +536,56 @@ createEmptyPortfolio
 transferNetFor: anAccount
 	^TransferNet new report: anAccount! !
 
+!ReportsTest methodsFor: 'setUp' stamp: 'wb 10/24/2021 20:56:41'!
+treeStructureFor: anAccount
+	^TreeStructure new report: anAccount! !
+
+
+!ReportsTest methodsFor: 'tree structure tests' stamp: 'wb 10/24/2021 22:31:12'!
+test16TreeStructureEmptyPortfolio
+
+	| aPortfolio |
+	
+	aPortfolio _ Portfolio named: 'Portfolio de la familia'.
+	
+	self assert: (OrderedCollection with: 'Portfolio de la familia') equals: (self treeStructureFor: aPortfolio).
+! !
+
+!ReportsTest methodsFor: 'tree structure tests' stamp: 'wb 10/25/2021 00:21:06'!
+test17TreeStructurePortfolioWithAnAccount
+
+	| aPortfolio anAccount|
+	
+	aPortfolio _ Portfolio named: 'Portfolio de la familia'.
+	anAccount _ ReceptiveAccount named: 'Cuenta mia'.
+	aPortfolio add: anAccount.
+	
+	self assert: (OrderedCollection with: 'Portfolio de la familia'
+							   with: '    Cuenta mia') equals: (self treeStructureFor: aPortfolio).
+! !
+
+!ReportsTest methodsFor: 'tree structure tests' stamp: 'wb 10/25/2021 00:27:45'!
+test18TreeStructurePortfolioWithComplexStructure
+
+	| familyPortfolio myAccount aPortfolioDeHijos juanAccount angelesAccount|
+	
+	familyPortfolio _ Portfolio named: 'Portfolio de la familia'.
+	myAccount _ ReceptiveAccount named: 'Cuenta mia'.
+	aPortfolioDeHijos _ Portfolio named: 'Portfolio de hijos'.
+	juanAccount _ ReceptiveAccount named: 'Cuenta de Juan'.
+	angelesAccount _ ReceptiveAccount named: 'Cuenta de Angeles'.
+	familyPortfolio add: myAccount.
+	aPortfolioDeHijos add: juanAccount .
+	aPortfolioDeHijos add: angelesAccount .
+	familyPortfolio add: aPortfolioDeHijos .
+	
+	self assert: (OrderedCollection with: 'Portfolio de la familia'
+							   with: '    Cuenta mia'
+							   with: '    Portfolio de hijos'
+							   with: '        Cuenta de Juan'
+							   with: '        Cuenta de Angeles') equals: (self treeStructureFor: familyPortfolio).
+! !
+
 
 !ReportsTest methodsFor: 'transfer net tests' stamp: 'PhG 10/20/2021 20:23:47'!
 test06TransferNetOnNewAccountPrintsZero
@@ -651,13 +701,27 @@ addedTo: aPortfolio
 report: aReportable
 	self subclassResponsibility.! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Account class' category: 'Portfolio-Solucion'!
+Account class
+	instanceVariableNames: ''!
+
+!Account class methodsFor: 'as yet unclassified' stamp: 'wb 10/24/2021 20:58:31'!
+named: aName
+	self subclassResponsibility .! !
+
 
 !classDefinition: #Portfolio category: 'Portfolio-Solucion'!
 Account subclass: #Portfolio
-	instanceVariableNames: 'accounts parents'
+	instanceVariableNames: 'accounts parents name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
+
+!Portfolio methodsFor: 'accounts management' stamp: 'wb 10/24/2021 23:25:57'!
+accounts
+	^accounts.! !
 
 !Portfolio methodsFor: 'accounts management' stamp: 'HAW 5/25/2019 11:49:20'!
 accountsIncludes: anAccount
@@ -699,6 +763,12 @@ initialize
 
 	accounts := OrderedCollection new.
 	parents := OrderedCollection new.! !
+
+!Portfolio methodsFor: 'initialization' stamp: 'wb 10/24/2021 21:10:10'!
+initializeNamed: aName
+
+	self initialize.
+	name _ aName.! !
 
 
 !Portfolio methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:19:36'!
@@ -764,10 +834,14 @@ signalCanNotAddAccount
 	self error: self class canNotAddAccountErrorMessage! !
 
 
-!Portfolio methodsFor: 'report' stamp: 'PhG 10/20/2021 19:38:29'!
+!Portfolio methodsFor: 'report' stamp: 'wb 10/24/2021 22:16:43'!
+name
+
+	^name.! !
+
+!Portfolio methodsFor: 'report' stamp: 'wb 10/25/2021 00:00:14'!
 report: aReport
-	accounts do: [:account| aReport report: account].
-	aReport reportPortfolio: self.! !
+	^aReport reportPortfolio: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -779,6 +853,10 @@ Portfolio class
 canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'wb 10/24/2021 21:07:57'!
+named: aName
+	^self new initializeNamed: aName. ! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
 with: anAccount
@@ -798,7 +876,7 @@ with: anAccount with: anotherAccount
 
 !classDefinition: #ReceptiveAccount category: 'Portfolio-Solucion'!
 Account subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
+	instanceVariableNames: 'transactions name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
@@ -808,6 +886,12 @@ initialize
 
 	super initialize.
 	transactions := OrderedCollection new.! !
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'wb 10/24/2021 21:00:56'!
+initializeNamed: aName
+
+	self initialize.
+	name _ aName.! !
 
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HAW 5/25/2019 11:38:52'!
@@ -853,15 +937,29 @@ addedTo: aPortfolio
 	! !
 
 
-!ReceptiveAccount methodsFor: 'report' stamp: 'PhG 10/21/2021 21:20:20'!
+!ReceptiveAccount methodsFor: 'report' stamp: 'wb 10/24/2021 22:16:37'!
+name
+	
+	^name.! !
+
+!ReceptiveAccount methodsFor: 'report' stamp: 'wb 10/25/2021 00:00:21'!
 report: aReport
-	transactions do: [:transaction| aReport report: transaction].
-	aReport reportReceptiveAccount: self.! !
+	^aReport reportReceptiveAccount: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: 'Portfolio-Solucion'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'wb 10/24/2021 21:06:37'!
+named: aName
+	^self new initializeNamed: aName. ! !
 
 
 !classDefinition: #AccountTransaction category: 'Portfolio-Solucion'!
 Object subclass: #AccountTransaction
-	instanceVariableNames: ''
+	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
@@ -1146,13 +1244,15 @@ initialize
 	accountSummary := OrderedCollection new.! !
 
 
-!AccountSummary methodsFor: 'accounts' stamp: 'PhG 10/21/2021 21:21:07'!
+!AccountSummary methodsFor: 'accounts' stamp: 'wb 10/24/2021 23:25:41'!
 reportPortfolio: aPortfolio
+	(aPortfolio accounts) do: [:account| self report: account].
 	accountSummary add: 'Balance = ', (aPortfolio balance asString), '.'.! !
 
-!AccountSummary methodsFor: 'accounts' stamp: 'PhG 10/21/2021 21:20:44'!
-reportReceptiveAccount: anAccount
-	accountSummary add: 'Balance = ', (anAccount balance asString), '.'.! !
+!AccountSummary methodsFor: 'accounts' stamp: 'wb 10/24/2021 23:26:33'!
+reportReceptiveAccount: aReceptiveAccount
+	aReceptiveAccount transactions do: [:transaction| self report: transaction].
+	accountSummary add: 'Balance = ', (aReceptiveAccount balance asString), '.'.! !
 
 
 !AccountSummary methodsFor: 'transactions' stamp: 'PhG 10/21/2021 21:23:05'!
@@ -1196,12 +1296,13 @@ report: aReportable
 	^transferNet.! !
 
 
-!TransferNet methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:17:35'!
+!TransferNet methodsFor: 'accounts' stamp: 'wb 10/24/2021 23:26:20'!
 reportPortfolio: aPortfolio
-	! !
+	(aPortfolio accounts) do: [:account| self report: account].! !
 
-!TransferNet methodsFor: 'accounts' stamp: 'PhG 10/20/2021 20:10:33'!
-reportReceptiveAccount: aReceptiveAccount! !
+!TransferNet methodsFor: 'accounts' stamp: 'wb 10/24/2021 23:24:50'!
+reportReceptiveAccount: aReceptiveAccount
+	aReceptiveAccount transactions do: [:transaction| self report: transaction].! !
 
 
 !TransferNet methodsFor: 'transactions' stamp: 'PhG 10/21/2021 21:23:54'!
@@ -1215,8 +1316,93 @@ reportDestinationWire: aDestinationWire
 reportOriginWire: anOriginWire
 	transferNet := transferNet - anOriginWire value.! !
 
-!TransferNet methodsFor: 'transactions' stamp: 'PhG 10/21/2021 21:24:18'!
+!TransferNet methodsFor: 'transactions' stamp: 'wb 10/24/2021 20:41:43'!
 reportWithdraw: aWithdraw! !
+
+
+!classDefinition: #TreeStructure category: 'Portfolio-Solucion'!
+Report subclass: #TreeStructure
+	instanceVariableNames: 'treeStructure mapStructure'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TreeStructure methodsFor: 'styling the report' stamp: 'wb 10/25/2021 00:26:55'!
+flattenDictionary: aDictionary
+	|aCollection reportInOrderedCollectionForm aHeight|
+	aHeight _ 0.
+	aCollection  _ OrderedCollection new.
+	reportInOrderedCollectionForm _ self flattenDictionary: aDictionary withCollection: aCollection withHeight: aHeight.
+	^reportInOrderedCollectionForm. ! !
+
+!TreeStructure methodsFor: 'styling the report' stamp: 'wb 10/25/2021 00:16:14'!
+flattenDictionary: aDictionary withCollection: aCollection
+	|children|
+	aCollection add: ((aDictionary keys) at: 1).
+	children _ aDictionary at: ((aDictionary keys) at: 1).
+	children do: [:aChild| (self flattenDictionary: aChild withCollection: aCollection )].
+	^aCollection 
+	! !
+
+!TreeStructure methodsFor: 'styling the report' stamp: 'wb 10/25/2021 00:20:43'!
+flattenDictionary: aDictionary withCollection: aCollection withHeight: aHeight
+	|children trailingSpace|
+	trailingSpace _''.
+	1 to: aHeight do:[:i |trailingSpace _ trailingSpace , '    '].
+	aCollection add: trailingSpace,((aDictionary keys) at: 1).
+	children _ aDictionary at: ((aDictionary keys) at: 1).
+	children do: [:aChild| (self flattenDictionary: aChild withCollection: aCollection withHeight:(aHeight +1) )].
+	^aCollection 
+	! !
+
+
+!TreeStructure methodsFor: 'transactions' stamp: 'wb 10/24/2021 20:40:41'!
+reportDeposit: aDeposit! !
+
+!TreeStructure methodsFor: 'transactions' stamp: 'wb 10/24/2021 20:40:53'!
+reportDestinationWire: aDestinationWire! !
+
+!TreeStructure methodsFor: 'transactions' stamp: 'wb 10/24/2021 20:41:04'!
+reportOriginWire: anOriginWire! !
+
+!TreeStructure methodsFor: 'transactions' stamp: 'wb 10/24/2021 20:41:48'!
+reportWithdraw: aWithdraw! !
+
+
+!TreeStructure methodsFor: 'accounts' stamp: 'wb 10/25/2021 00:26:08'!
+reportPortfolio: aPortfolio
+	|accountsTreeForAPortfolio|
+	accountsTreeForAPortfolio _ Dictionary new.
+	accountsTreeForAPortfolio at: (aPortfolio name asString ) put: (self reportMultiples: (aPortfolio accounts) ).
+	^accountsTreeForAPortfolio .! !
+
+!TreeStructure methodsFor: 'accounts' stamp: 'wb 10/25/2021 00:25:47'!
+reportReceptiveAccount: aReceptiveAccount
+	|accountsTreeForAReceptiveAccount|
+	accountsTreeForAReceptiveAccount _ Dictionary new.
+	accountsTreeForAReceptiveAccount at: (aReceptiveAccount name asString) put: OrderedCollection new.
+	^accountsTreeForAReceptiveAccount.! !
+
+
+!TreeStructure methodsFor: 'initialization' stamp: 'wb 10/24/2021 23:35:24'!
+initialize
+	treeStructure := OrderedCollection new.
+	mapStructure _ Dictionary new.! !
+
+
+!TreeStructure methodsFor: 'entry point' stamp: 'wb 10/25/2021 00:02:16'!
+report: aReportable
+	|dictionary response|
+	dictionary _ (aReportable report: self).
+	response _ self flattenDictionary: dictionary.
+	^response .! !
+
+!TreeStructure methodsFor: 'entry point' stamp: 'wb 10/24/2021 23:34:47'!
+reportMultiples: orderedCollectionOfReportables
+	|x| 
+	x _ OrderedCollection new.
+	orderedCollectionOfReportables do: [:aReportable| x add: (aReportable report: self).].
+	^x.! !
 
 
 !classDefinition: #Wire category: 'Portfolio-Solucion'!
