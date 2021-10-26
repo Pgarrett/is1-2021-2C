@@ -1,3 +1,93 @@
+!classDefinition: #MarsRoverReportTest category: 'MarsRover-WithHeading'!
+TestCase subclass: #MarsRoverReportTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:56:06'!
+test01PositionLogIsEmptyWhenRoverDidNotMove
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+	
+	self assert: OrderedCollection new equals: 	marsRover positionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:56:48'!
+test02DirectionLogIsEmptyWhenRoverDidNotMove
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+	
+	self assert: OrderedCollection new equals: 	marsRover directionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:57:24'!
+test03FullLogIsEmptyWhenRoverDidNotMove
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+	
+	self assert: OrderedCollection new equals: 	marsRover fullLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:07:37'!
+test04PositionLogContainsForwardEntryWhenRoverMovesForwardOnce
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	marsRover process: 'f'.
+	
+	self assert: (OrderedCollection with: 1@2) equals: 	marsRover positionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:09:54'!
+test05PositionLogContainsForwardAndBackwardEntriesWhenRoverMovedForwardAndBackwards
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	marsRover process: 'fb'.
+	
+	self assert: (OrderedCollection with: 1@2 with: 1@1) equals: 	marsRover positionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:21:47'!
+test06DirectionLogContainsEastEntryWhenRoverRotatedRight
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	marsRover process: 'r'.
+	
+	self assert: (OrderedCollection with: MarsRoverHeadingEast) equals: marsRover directionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:22:21'!
+test07DirectionLogContainsEastAndNorthEntriesWhenRoverRotatedRightAndLeft
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	marsRover process: 'rl'.
+	
+	self assert: (OrderedCollection with: MarsRoverHeadingEast with: MarsRoverHeadingNorth) equals: marsRover directionLog.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:24:21'!
+test08FullLogContainsNewForwardPositionAndRotatedEastEntriesWhenRoverMovedForwardAndRotatedRight
+
+	| marsRover |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	marsRover process: 'fr'.
+	
+	self assert: (OrderedCollection with: 1@2 with: MarsRoverHeadingEast) equals: marsRover fullLog.! !
+
+
 !classDefinition: #MarsRoverTest category: 'MarsRover-WithHeading'!
 TestCase subclass: #MarsRoverTest
 	instanceVariableNames: ''
@@ -205,7 +295,7 @@ assertIsAt: newPosition heading: newHeadingType afterProcessing: commands whenSt
 
 !classDefinition: #MarsRover category: 'MarsRover-WithHeading'!
 Object subclass: #MarsRover
-	instanceVariableNames: 'position head'
+	instanceVariableNames: 'position head positionCommandsExecuted directionCommandsExecuted allComandsExecuted'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
@@ -221,32 +311,43 @@ signalInvalidCommand
 	self error: self invalidCommandErrorDescription ! !
 
 
-!MarsRover methodsFor: 'initialization' stamp: 'HAW 10/7/2021 20:10:49'!
+!MarsRover methodsFor: 'initialization' stamp: 'PhG 10/25/2021 21:24:44'!
 initializeAt: aPosition heading: aHeadingType
 
 	position := aPosition.
-	head := aHeadingType for: self ! !
+	head := aHeadingType for: self.
+	positionCommandsExecuted := OrderedCollection new.
+	directionCommandsExecuted := OrderedCollection new.
+	allComandsExecuted := OrderedCollection new.! !
 
 
-!MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:17:02'!
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:45:06'!
 headEast
 	
-	head := MarsRoverHeadingEast for: self! !
+	self nowHead: (MarsRoverHeadingEast for: self)! !
 
-!MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:17:12'!
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:44:59'!
 headNorth
 	
-	head := MarsRoverHeadingNorth for: self ! !
+	self nowHead: (MarsRoverHeadingNorth for: self)! !
 
-!MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:17:17'!
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:44:50'!
 headSouth
 	
-	head := MarsRoverHeadingSouth for: self! !
+	self nowHead: (MarsRoverHeadingSouth for: self)! !
 
-!MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:17:24'!
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:44:42'!
 headWest
 	
-	head := MarsRoverHeadingWest for: self ! !
+	self nowHead: (MarsRoverHeadingWest for: self)! !
+
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:48:11'!
+nowHead: newDirection
+	
+	head := newDirection.
+	"aca van a venir los push"
+	directionCommandsExecuted add: (head class).
+	allComandsExecuted add: (head class).! !
 
 !MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:14:20'!
 rotateLeft
@@ -290,30 +391,37 @@ moveBackward
 	
 	head moveBackward! !
 
-!MarsRover methodsFor: 'moving' stamp: 'HAW 8/22/2019 12:15:01'!
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:43:52'!
 moveEast
 	
-	position := position + (1@0)! !
+	self moveTowards: 1@0! !
 
 !MarsRover methodsFor: 'moving' stamp: 'HAW 10/7/2021 20:13:53'!
 moveForward
 	
 	head moveForward! !
 
-!MarsRover methodsFor: 'moving' stamp: 'HAW 8/22/2019 12:13:12'!
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:43:47'!
 moveNorth
 	
-	position := position + (0@1)! !
+	self moveTowards: 0@1! !
 
-!MarsRover methodsFor: 'moving' stamp: 'HAW 8/22/2019 12:13:34'!
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:43:38'!
 moveSouth
 	
-	position := position + (0@-1)! !
+	self moveTowards: 0@-1! !
 
-!MarsRover methodsFor: 'moving' stamp: 'HAW 8/22/2019 12:15:32'!
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:46:26'!
+moveTowards: anOffset
+	
+	position := position + anOffset.
+	positionCommandsExecuted add: position.
+	allComandsExecuted add: position.! !
+
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:43:31'!
 moveWest
 	
-	position := position + (-1@0)! !
+	self moveTowards: -1@0.! !
 
 
 !MarsRover methodsFor: 'command processing' stamp: 'HAW 6/30/2018 19:48:26'!
@@ -322,15 +430,28 @@ process: aSequenceOfCommands
 	aSequenceOfCommands do: [:aCommand | self processCommand: aCommand ]
 ! !
 
-!MarsRover methodsFor: 'command processing' stamp: 'HAW 8/22/2019 12:08:50'!
+!MarsRover methodsFor: 'command processing' stamp: 'PhG 10/26/2021 08:47:32'!
 processCommand: aCommand
 
 	(self isForwardCommand: aCommand) ifTrue: [ ^ self moveForward ].
-	(self isBackwardCommand: aCommand) ifTrue: [ ^ self moveBackward ].
-	(self isRotateRightCommand: aCommand) ifTrue: [ ^ self rotateRight ].
-	(self isRotateLeftCommand: aCommand) ifTrue: [ ^ self rotateLeft ].
+	(self isBackwardCommand: aCommand) ifTrue: [ ^		self moveBackward ].
+	(self isRotateRightCommand: aCommand) ifTrue: [ ^		self rotateRight ].
+	(self isRotateLeftCommand: aCommand) ifTrue: [ ^		self rotateLeft ].
 
 	self signalInvalidCommand.! !
+
+
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:12:37'!
+directionLog
+	^directionCommandsExecuted.! !
+
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:25:29'!
+fullLog
+	^allComandsExecuted.! !
+
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:08:15'!
+positionLog
+	^positionCommandsExecuted.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
