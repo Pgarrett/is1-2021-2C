@@ -5,7 +5,7 @@ TestCase subclass: #MarsRoverReportTest
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:02'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:02'!
 test01PositionLogIsEmptyWhenRoverDidNotMove
 
 	| marsRover positionLogger |
@@ -17,7 +17,7 @@ test01PositionLogIsEmptyWhenRoverDidNotMove
 	
 	self assert: OrderedCollection new equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:08'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:08'!
 test02DirectionLogIsEmptyWhenRoverDidNotMove
 
 	| marsRover directionLogger |
@@ -29,7 +29,7 @@ test02DirectionLogIsEmptyWhenRoverDidNotMove
 	
 	self assert: OrderedCollection new equals: 	directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:12'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:12'!
 test03FullLogIsEmptyWhenRoverDidNotMove
 
 	| marsRover allChangesLogger |
@@ -41,7 +41,7 @@ test03FullLogIsEmptyWhenRoverDidNotMove
 	
 	self assert: OrderedCollection new equals: 	allChangesLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:16'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:16'!
 test04PositionLogContainsForwardEntryWhenRoverMovesForwardOnce
 
 	| marsRover positionLogger |
@@ -54,7 +54,7 @@ test04PositionLogContainsForwardEntryWhenRoverMovesForwardOnce
 	
 	self assert: (OrderedCollection with: 1@2) equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:21'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:21'!
 test05PositionLogContainsForwardAndBackwardEntriesWhenRoverMovedForwardAndBackwards
 
 	| marsRover positionLogger |
@@ -67,7 +67,7 @@ test05PositionLogContainsForwardAndBackwardEntriesWhenRoverMovedForwardAndBackwa
 	
 	self assert: (OrderedCollection with: 1@2 with: 1@1) equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:28'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:28'!
 test06DirectionLogContainsEastEntryWhenRoverRotatedRight
 
 	| marsRover directionLogger |
@@ -80,7 +80,7 @@ test06DirectionLogContainsEastEntryWhenRoverRotatedRight
 	
 	self assert: (OrderedCollection with: MarsRoverHeadingEast) equals: directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:35'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:35'!
 test07DirectionLogContainsEastAndNorthEntriesWhenRoverRotatedRightAndLeft
 
 	| marsRover directionLogger |
@@ -93,7 +93,7 @@ test07DirectionLogContainsEastAndNorthEntriesWhenRoverRotatedRightAndLeft
 	
 	self assert: (OrderedCollection with: MarsRoverHeadingEast with: MarsRoverHeadingNorth) equals: directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:44'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:22:44'!
 test08FullLogContainsNewForwardPositionAndRotatedEastEntriesWhenRoverMovedForwardAndRotatedRight
 
 	| marsRover allChangesLogger |
@@ -106,7 +106,7 @@ test08FullLogContainsNewForwardPositionAndRotatedEastEntriesWhenRoverMovedForwar
 	
 	self assert: (OrderedCollection with: 1@2 with: MarsRoverHeadingEast) equals: allChangesLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:14:00'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:14:00'!
 test09PositionStatusContainsNewForwardPositionWhenRoverMovedForward
 
 	| marsRover positionStatus |
@@ -119,7 +119,7 @@ test09PositionStatusContainsNewForwardPositionWhenRoverMovedForward
 	
 	self assert: 1@2 equals: positionStatus printPosition.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:12:14'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:12:14'!
 test10DirectionStatusContainsEastAsNewDirectionPositionWhenRoverRotatedRight
 
 	| marsRover directionStatus |
@@ -132,7 +132,7 @@ test10DirectionStatusContainsEastAsNewDirectionPositionWhenRoverRotatedRight
 	
 	self assert: MarsRoverHeadingEast equals: directionStatus printDirection.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:13:49'!
+!MarsRoverReportTest methodsFor: 'tests' stamp: 'PhG 10/26/2021 20:13:49'!
 test11FullStatusContainsEastAsNewDirectionAndNewForwardPositionWhenRoverRotatedRightAndMovedForward
 
 	| marsRover allStatus |
