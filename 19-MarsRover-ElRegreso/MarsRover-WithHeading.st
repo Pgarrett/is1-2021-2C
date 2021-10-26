@@ -5,87 +5,145 @@ TestCase subclass: #MarsRoverReportTest
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:56:06'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:02'!
 test01PositionLogIsEmptyWhenRoverDidNotMove
 
-	| marsRover |
+	| marsRover positionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 	
-	self assert: OrderedCollection new equals: 	marsRover positionLog.! !
+	positionLogger := Log new.
+	marsRover notifyPositionsChangesTo: positionLogger.
+	
+	self assert: OrderedCollection new equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:56:48'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:08'!
 test02DirectionLogIsEmptyWhenRoverDidNotMove
 
-	| marsRover |
+	| marsRover directionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 	
-	self assert: OrderedCollection new equals: 	marsRover directionLog.! !
+	directionLogger := Log new.
+	marsRover notifyDirectionChangesTo: directionLogger.
+	
+	self assert: OrderedCollection new equals: 	directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 20:57:24'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:12'!
 test03FullLogIsEmptyWhenRoverDidNotMove
 
-	| marsRover |
+	| marsRover allChangesLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 	
-	self assert: OrderedCollection new equals: 	marsRover fullLog.! !
+	allChangesLogger := Log new.
+	marsRover notifyAllChangesTo: allChangesLogger.
+	
+	self assert: OrderedCollection new equals: 	allChangesLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:07:37'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:16'!
 test04PositionLogContainsForwardEntryWhenRoverMovesForwardOnce
 
-	| marsRover |
+	| marsRover positionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
-
+	
+	positionLogger := Log new.
+	marsRover notifyPositionsChangesTo: positionLogger.
 	marsRover process: 'f'.
 	
-	self assert: (OrderedCollection with: 1@2) equals: 	marsRover positionLog.! !
+	self assert: (OrderedCollection with: 1@2) equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:09:54'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:21'!
 test05PositionLogContainsForwardAndBackwardEntriesWhenRoverMovedForwardAndBackwards
 
-	| marsRover |
+	| marsRover positionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 
+	positionLogger := Log new.
+	marsRover notifyPositionsChangesTo: positionLogger.
 	marsRover process: 'fb'.
 	
-	self assert: (OrderedCollection with: 1@2 with: 1@1) equals: 	marsRover positionLog.! !
+	self assert: (OrderedCollection with: 1@2 with: 1@1) equals: 	positionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:21:47'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:28'!
 test06DirectionLogContainsEastEntryWhenRoverRotatedRight
 
-	| marsRover |
+	| marsRover directionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 
+	directionLogger := Log new.
+	marsRover notifyDirectionChangesTo: directionLogger.
 	marsRover process: 'r'.
 	
-	self assert: (OrderedCollection with: MarsRoverHeadingEast) equals: marsRover directionLog.! !
+	self assert: (OrderedCollection with: MarsRoverHeadingEast) equals: directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:22:21'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:35'!
 test07DirectionLogContainsEastAndNorthEntriesWhenRoverRotatedRightAndLeft
 
-	| marsRover |
+	| marsRover directionLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 
+	directionLogger := Log new.
+	marsRover notifyDirectionChangesTo: directionLogger.
 	marsRover process: 'rl'.
 	
-	self assert: (OrderedCollection with: MarsRoverHeadingEast with: MarsRoverHeadingNorth) equals: marsRover directionLog.! !
+	self assert: (OrderedCollection with: MarsRoverHeadingEast with: MarsRoverHeadingNorth) equals: directionLogger print.! !
 
-!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/25/2021 21:24:21'!
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:22:44'!
 test08FullLogContainsNewForwardPositionAndRotatedEastEntriesWhenRoverMovedForwardAndRotatedRight
 
-	| marsRover |
+	| marsRover allChangesLogger |
 	
 	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
 
+	allChangesLogger := Log new.
+	marsRover notifyAllChangesTo: allChangesLogger.
 	marsRover process: 'fr'.
 	
-	self assert: (OrderedCollection with: 1@2 with: MarsRoverHeadingEast) equals: marsRover fullLog.! !
+	self assert: (OrderedCollection with: 1@2 with: MarsRoverHeadingEast) equals: allChangesLogger print.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:14:00'!
+test09PositionStatusContainsNewForwardPositionWhenRoverMovedForward
+
+	| marsRover positionStatus |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	positionStatus := Status new.
+	marsRover notifyPositionsChangesTo: positionStatus.
+	marsRover process: 'f'.
+	
+	self assert: 1@2 equals: positionStatus printPosition.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:12:14'!
+test10DirectionStatusContainsEastAsNewDirectionPositionWhenRoverRotatedRight
+
+	| marsRover directionStatus |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	directionStatus := Status new.
+	marsRover notifyDirectionChangesTo: directionStatus.
+	marsRover process: 'r'.
+	
+	self assert: MarsRoverHeadingEast equals: directionStatus printDirection.! !
+
+!MarsRoverReportTest methodsFor: 'as yet unclassified' stamp: 'PhG 10/26/2021 20:13:49'!
+test11FullStatusContainsEastAsNewDirectionAndNewForwardPositionWhenRoverRotatedRightAndMovedForward
+
+	| marsRover allStatus |
+	
+	marsRover := MarsRover at: 1@1 heading: MarsRoverHeadingNorth.
+
+	allStatus := Status new.
+	marsRover notifyAllChangesTo: allStatus.
+	marsRover process: 'fr'.
+	
+	self assert: (OrderedCollection with: 1@2 with: MarsRoverHeadingEast) equals: allStatus printAll.! !
 
 
 !classDefinition: #MarsRoverTest category: 'MarsRover-WithHeading'!
@@ -293,9 +351,36 @@ assertIsAt: newPosition heading: newHeadingType afterProcessing: commands whenSt
 	self assert: (marsRover isAt: newPosition heading: newHeadingType)! !
 
 
+!classDefinition: #Log category: 'MarsRover-WithHeading'!
+Object subclass: #Log
+	instanceVariableNames: 'updates positionUpdates'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!Log methodsFor: 'print' stamp: 'PhG 10/26/2021 20:20:12'!
+print
+	"Usamos esto para no tener que assertear sobre los streams"
+	^updates copy.! !
+
+
+!Log methodsFor: 'initialization' stamp: 'PhG 10/26/2021 20:20:21'!
+initialize
+	updates := OrderedCollection new.! !
+
+
+!Log methodsFor: 'update' stamp: 'PhG 10/26/2021 20:21:05'!
+updateDirection: aDirectionUpdate
+	updates add: aDirectionUpdate.! !
+
+!Log methodsFor: 'update' stamp: 'PhG 10/26/2021 20:20:58'!
+updatePosition: aPositionUpdate
+	updates add: aPositionUpdate.! !
+
+
 !classDefinition: #MarsRover category: 'MarsRover-WithHeading'!
 Object subclass: #MarsRover
-	instanceVariableNames: 'position head positionCommandsExecuted directionCommandsExecuted allComandsExecuted'
+	instanceVariableNames: 'position head positionSubscribers directionSubscribers'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
@@ -311,14 +396,13 @@ signalInvalidCommand
 	self error: self invalidCommandErrorDescription ! !
 
 
-!MarsRover methodsFor: 'initialization' stamp: 'PhG 10/25/2021 21:24:44'!
+!MarsRover methodsFor: 'initialization' stamp: 'PhG 10/26/2021 19:58:02'!
 initializeAt: aPosition heading: aHeadingType
 
 	position := aPosition.
 	head := aHeadingType for: self.
-	positionCommandsExecuted := OrderedCollection new.
-	directionCommandsExecuted := OrderedCollection new.
-	allComandsExecuted := OrderedCollection new.! !
+	positionSubscribers := OrderedCollection new.
+	directionSubscribers := OrderedCollection new.! !
 
 
 !MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:45:06'!
@@ -341,13 +425,11 @@ headWest
 	
 	self nowHead: (MarsRoverHeadingWest for: self)! !
 
-!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 08:48:11'!
+!MarsRover methodsFor: 'heading' stamp: 'PhG 10/26/2021 20:16:42'!
 nowHead: newDirection
 	
 	head := newDirection.
-	"aca van a venir los push"
-	directionCommandsExecuted add: (head class).
-	allComandsExecuted add: (head class).! !
+	directionSubscribers do: [:aDirectionSusbscriber | aDirectionSusbscriber updateDirection: (head class)].! !
 
 !MarsRover methodsFor: 'heading' stamp: 'HAW 10/7/2021 20:14:20'!
 rotateLeft
@@ -411,12 +493,11 @@ moveSouth
 	
 	self moveTowards: 0@-1! !
 
-!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:46:26'!
+!MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 20:16:34'!
 moveTowards: anOffset
 	
 	position := position + anOffset.
-	positionCommandsExecuted add: position.
-	allComandsExecuted add: position.! !
+	positionSubscribers do: [:aPositionSusbscriber | aPositionSusbscriber updatePosition: position].! !
 
 !MarsRover methodsFor: 'moving' stamp: 'PhG 10/26/2021 08:43:31'!
 moveWest
@@ -441,17 +522,18 @@ processCommand: aCommand
 	self signalInvalidCommand.! !
 
 
-!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:12:37'!
-directionLog
-	^directionCommandsExecuted.! !
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/26/2021 20:02:11'!
+notifyAllChangesTo: aSubscriber 
+	self notifyPositionsChangesTo: aSubscriber.
+	self notifyDirectionChangesTo: aSubscriber.! !
 
-!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:25:29'!
-fullLog
-	^allComandsExecuted.! !
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/26/2021 19:57:39'!
+notifyDirectionChangesTo: aDirectionSubscriber 
+	directionSubscribers add: aDirectionSubscriber! !
 
-!MarsRover methodsFor: 'report' stamp: 'PhG 10/25/2021 21:08:15'!
-positionLog
-	^positionCommandsExecuted.! !
+!MarsRover methodsFor: 'report' stamp: 'PhG 10/26/2021 19:49:22'!
+notifyPositionsChangesTo: aPositionSubscriber
+	positionSubscribers add: aPositionSubscriber.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -631,3 +713,32 @@ rotateLeft
 rotateRight
 	
 	^marsRover headNorth! !
+
+
+!classDefinition: #Status category: 'MarsRover-WithHeading'!
+Object subclass: #Status
+	instanceVariableNames: 'directionUpdate positionUpdate'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!Status methodsFor: 'update' stamp: 'PhG 10/26/2021 20:24:00'!
+updateDirection: aDirectionUpdate
+	directionUpdate := aDirectionUpdate.! !
+
+!Status methodsFor: 'update' stamp: 'PhG 10/26/2021 20:09:59'!
+updatePosition: aPositionUpdate
+	positionUpdate := aPositionUpdate.! !
+
+
+!Status methodsFor: 'print' stamp: 'PhG 10/26/2021 20:13:25'!
+printAll
+	^OrderedCollection with: positionUpdate with: directionUpdate.! !
+
+!Status methodsFor: 'print' stamp: 'PhG 10/26/2021 20:24:19'!
+printDirection
+	^directionUpdate! !
+
+!Status methodsFor: 'print' stamp: 'PhG 10/26/2021 20:13:03'!
+printPosition
+	^positionUpdate copy! !
