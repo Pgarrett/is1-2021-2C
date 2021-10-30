@@ -6,11 +6,11 @@ https://www.google.com/url?q=https://drive.google.com/file/d/1WytOS3c5_PlNFXnV_7
 
 1. El paper original sugiere utilizar un Singleton para implementar el null object. ¿Qué ventajas y desventajas le ven?
 
-* PG: Como ventaja, el NullObject no va a cambiar su comportamiento, así que nos ahorramos tener varias instancias del mismo que hacen lo mismo y nunca van a cambiar. Como desventaja
-
+* PG: Como ventaja, el NullObject no va a cambiar su comportamiento, así que nos ahorramos tener varias instancias del mismo que hacen lo mismo y nunca van a cambiar. La desventaja es que al ser justamente un singleton, su manera de "no hacer nada" no es modificable, y como aclara el paper, los distintos clientes del null object pueden requerir diferente comportamiento al "no hacer nada".
+ 
 2. En un lenguaje dinámicamente tipado ¿Cuál es la condición más débil para que el real object y el null object sean intercambiables?
 
-* PG: que tengan un ancestro común.
+* PG: Que implementen los mismos métodos.
 
 
 ## Object Recursion
