@@ -2,6 +2,8 @@
 
 ## Null Object Pattern
 
+https://www.google.com/url?q=https://drive.google.com/file/d/1WytOS3c5_PlNFXnV_7fOn0715w0Pl5FL/view&sa=D&source=editors&ust=1635631520791000&usg=AOvVaw2Bbap7o9VxP2muEvYVm55A
+
 1. El paper original sugiere utilizar un Singleton para implementar el null object. ¿Qué ventajas y desventajas le ven?
 
 * PG: Como ventaja, el NullObject no va a cambiar su comportamiento, así que nos ahorramos tener varias instancias del mismo que hacen lo mismo y nunca van a cambiar. Como desventaja
@@ -12,6 +14,8 @@
 
 
 ## Object Recursion
+
+https://www.google.com/url?q=http://www.industriallogic.com/patterns/P21.pdf&sa=D&source=editors&ust=1635631545454000&usg=AOvVaw2xOc6mgTRZdVTKw1zXnuv2
 
 1. ¿Qué es necesario para llevar a cabo la recursión a nivel de objetos? (Marque la opcion correcta)
 
@@ -24,6 +28,8 @@
 
 ## Method Object
 
+Pág 34 del libro Smalltalk Best Practices Patterns - Kent Beck
+
 1. ¿Qué problema intenta resolver el patrón Method Object? (máximo 3 líneas).
 
 * PG: El Method Object intenta proveer una abstracción para un método de un sistema que fue creciendo y complejizandose. No siempre que un sistema crece, el contenido puede lograr generalizarse en una abstracción, un objeto, que "mapee" con el mundo que queremos modelar, en esos casos sirve el Method Object.
@@ -34,6 +40,8 @@
 
 
 ## State Pattern
+
+Capítulo de State de Design Patterns - Lo visto en clase
 
 1. ¿Por qué es preferible que las transiciones de estados las haga el objeto context?
 
@@ -46,6 +54,8 @@
 
 ## Decorator Pattern
 
+Capítulo de Decorator de Design Patterns - Lo visto en clase
+
 1. ¿Qué patrón se puede utilizar cuando la cadena de decoraciones es compleja de construir? (Solo el nombre del patrón)
 
 * PG: Strategy
@@ -57,6 +67,8 @@
 
 ## Proxy Pattern
 
+Capítulo de Proxy de Design Patterns - Lo visto en clase
+
 1. Describa una similitud y una diferencia con el Decorator. (Solo UNA similitud y UNA diferencia)
 
 * PG: Similitud: ambos son polimórficos con respecto al objeto que decoran/proxean. Diferencia: El proxy controla el acceso a un objeto, mientras que el decorator agrega una o más responsabilidades a un objeto.
@@ -67,6 +79,8 @@
 
 
 ## Adapter Pattern
+
+Capítulo de Adapter de Design Patterns - Lo visto en clase
 
 1. ¿Nombre UNA similitud y UNA diferencia entre Adapter y Decorator?
 
