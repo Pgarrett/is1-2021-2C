@@ -70,34 +70,52 @@ test05ACartCanHaveMultipleCopiesOfTheSameBook
 
 !classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
-	instanceVariableNames: 'books catalogue'
+	instanceVariableNames: 'booksInCart catalogue'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cart methodsFor: 'initialization' stamp: 'wb 10/28/2021 22:33:35'!
-initializeWithCatalogue: aCatalogo
-	catalogue _ aCatalogo.
-	books _ OrderedCollection new.! !
+!Cart methodsFor: 'initialization' stamp: 'PhG 10/30/2021 09:15:09'!
+initializeWithCatalogue: aCatalogue
+
+	catalogue _ aCatalogue.
+	booksInCart _ OrderedCollection new.! !
 
 
-!Cart methodsFor: 'operation' stamp: 'wb 10/28/2021 22:33:00'!
+!Cart methodsFor: 'operation' stamp: 'PhG 10/30/2021 09:14:55'!
 addBook: aBook 
-	(catalogue contains: aBook) ifFalse: [ ^self error: self class canNotAddBookNotInCatalogue.].
-	books add: aBook.! !
+	
+	self assertBookIsInCatalogue: aBook.
+	
+	booksInCart add: aBook.! !
 
 
-!Cart methodsFor: 'testing' stamp: 'wb 10/28/2021 22:23:16'!
+!Cart methodsFor: 'testing' stamp: 'PhG 10/30/2021 09:14:55'!
 contains: aBookToSearch 
-	^(books select: [:bookInCart | bookInCart = aBookToSearch] ) notEmpty .! !
 
-!Cart methodsFor: 'testing' stamp: 'wb 10/28/2021 22:22:49'!
+	^booksInCart includes: aBookToSearch.! !
+
+!Cart methodsFor: 'testing' stamp: 'PhG 10/30/2021 09:14:55'!
 isEmpty
-	^books isEmpty .! !
 
-!Cart methodsFor: 'testing' stamp: 'wb 10/28/2021 22:39:21'!
+	^booksInCart isEmpty .! !
+
+!Cart methodsFor: 'testing' stamp: 'PhG 10/30/2021 09:14:55'!
 quantityOfBook: aBook
-	^(books select: [ :aBookInCart | aBookInCart = aBook]) size .! !
+
+	^booksInCart occurrencesOf: aBook.! !
+
+
+!Cart methodsFor: 'assertions' stamp: 'PhG 10/30/2021 09:12:11'!
+assertBookIsInCatalogue: aBook
+	
+	(catalogue contains: aBook) ifFalse: [ self signalBookNotInCatalogue ].! !
+
+
+!Cart methodsFor: 'exceptions' stamp: 'PhG 10/30/2021 09:11:17'!
+signalBookNotInCatalogue
+	
+	self error: self class canNotAddBookNotInCatalogue! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -117,28 +135,28 @@ canNotAddBookNotInCatalogue
 
 !classDefinition: #Catalogue category: 'TusLibros'!
 Object subclass: #Catalogue
-	instanceVariableNames: 'listOfBooksInCatalogue'
+	instanceVariableNames: 'books'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Catalogue methodsFor: 'initialization' stamp: 'wb 10/28/2021 22:04:47'!
+!Catalogue methodsFor: 'initialization' stamp: 'PhG 10/30/2021 09:05:26'!
 initialize
-	listOfBooksInCatalogue _ OrderedCollection new.! !
+	books _ OrderedCollection new.! !
 
-!Catalogue methodsFor: 'initialization' stamp: 'wb 10/28/2021 22:23:53'!
+!Catalogue methodsFor: 'initialization' stamp: 'PhG 10/30/2021 09:05:40'!
 initializeWithBook: aBook
-	self initialize .
-	listOfBooksInCatalogue add: aBook .! !
+	self initialize.
+	books add: aBook.! !
 
-!Catalogue methodsFor: 'initialization' stamp: 'wb 10/28/2021 22:15:45'!
+!Catalogue methodsFor: 'initialization' stamp: 'PhG 10/30/2021 09:05:53'!
 with: aBook
-	listOfBooksInCatalogue add: aBook .! !
+	books add: aBook.! !
 
 
-!Catalogue methodsFor: 'testing' stamp: 'wb 10/28/2021 22:04:47'!
+!Catalogue methodsFor: 'testing' stamp: 'PhG 10/30/2021 09:05:26'!
 contains: aBookToSearch
-	^ (listOfBooksInCatalogue select: [:aBook| aBook = aBookToSearch ]) notEmpty .! !
+	^books includes: aBookToSearch.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
