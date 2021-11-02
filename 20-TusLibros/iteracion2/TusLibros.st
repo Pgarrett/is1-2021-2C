@@ -91,6 +91,35 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSoldByTheStore.
 	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:57:28'!
+test09TotalPriceOfEmptyCartIsZero
+
+	| cart |
+	
+	cart := self createCart.
+	
+	self assert: (cart totalPrice ) = 0.! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:58:21'!
+test10TotalPriceOfCartWithItemIsItemPrice
+
+	| cart |
+	
+	cart := self createCart.
+	
+	cart add: 1 of: self itemSoldByTheStore.
+	self assert: (cart totalPrice ) = 100.! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 18:00:17'!
+test11TotalPriceOfCartWithItemsIsAddedItemsPrice
+
+	| cart |
+	
+	cart := self createCart.
+	
+	cart add: 2 of: self itemSoldByTheStore.
+	self assert: (cart totalPrice ) = 200.! !
+
 
 !CartTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:06:57'!
 createCart
@@ -183,26 +212,26 @@ test01checkoutOnEmptyCartThrowsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cashier cartCanNotBeEmpty. ]! !
 
-!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:09:09'!
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/2/2021 17:53:32'!
 test02checkoutTotalOnCartWithOneProductIsProductPrice
 
 	| cart cashier |
 	
 	cart := self createCart.
-	cashier := Cashier acceptingItemsOf: self defaultPriceList.
+	cashier := Cashier new.
 	
 	cart add: self itemSoldByTheStore.
 	
 	self assert: 100 equals: (cashier checkout: cart)
 	! !
 
-!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:10:38'!
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/2/2021 17:53:38'!
 test03checkoutTotalOnCartWithManyProductsIsProductsPriceSum
 
 	| cart cashier |
 	
 	cart := self createCartWith: self priceListwithTwoItems.
-	cashier := Cashier acceptingItemsOf: self priceListwithTwoItems.
+	cashier := Cashier new.
 	
 	cart add: self itemSoldByTheStore.
 	cart add: self otherItemSoldByTheStore.
@@ -210,13 +239,13 @@ test03checkoutTotalOnCartWithManyProductsIsProductsPriceSum
 	self assert: 160 equals: (cashier checkout: cart)
 	! !
 
-!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:31:41'!
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/2/2021 17:53:44'!
 test04checkoutWithExpiredCreditCardIsRejected
 
 	| cart cashier today expiredDate |
 	
 	cart := self createCartWith: self priceListwithTwoItems.
-	cashier := Cashier acceptingItemsOf: self priceListwithTwoItems.
+	cashier := Cashier new.
 	
 	cart add: self itemSoldByTheStore.
 	cart add: self otherItemSoldByTheStore.
@@ -227,6 +256,97 @@ test04checkoutWithExpiredCreditCardIsRejected
 	
 	self assert: 160 equals: (cashier checkout: cart withCardExpirationDate: expiredDate)
 	! !
+
+
+!classDefinition: #CreditCardTest category: 'TusLibros'!
+TestCase subclass: #CreditCardTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!CreditCardTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:50:42'!
+test01CreditCardWithLessThan16DigitsCanNotBeInstantiated
+
+	| cardNumber |
+	
+	cardNumber := '0123456789'	.
+
+	self assertCreditCardMustContain16DigitsForCardNumber: cardNumber.! !
+
+!CreditCardTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:51:11'!
+test02CreditCardWithMoreThan16DigitsCanNotBeInstantiated
+	
+	| cardNumber |
+	
+	cardNumber := '01234567890123456789'	.
+
+	self assertCreditCardMustContain16DigitsForCardNumber: cardNumber.! !
+
+!CreditCardTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:52:16'!
+test03CreditCardWithExpirationDateInTheFutureIsNotExpired
+
+	| creditCard currentMonthOfYear twoMonthsToTheFuture |
+	
+	currentMonthOfYear := self currentMonthOfYear.
+	twoMonthsToTheFuture := self twoMonthsFrom: currentMonthOfYear.
+
+	creditCard := CreditCard withNumber: '0123456789123456'	 withExpirationDate: twoMonthsToTheFuture.
+	
+	self deny: (creditCard isExpiredOn: currentMonthOfYear).! !
+
+!CreditCardTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:46:08'!
+test04CreditCardWithExpirationDateInThePastIsExpired
+
+	| creditCard currentMonthOfYear twoMonthsToThePast |
+	
+	currentMonthOfYear := self currentMonthOfYear.
+	twoMonthsToThePast := self twoMonthsSince: currentMonthOfYear.
+
+	creditCard := CreditCard withNumber: '0123456789123456'	 withExpirationDate: twoMonthsToThePast.
+	
+	self assert: (creditCard isExpiredOn: currentMonthOfYear).! !
+
+!CreditCardTest methodsFor: 'tests' stamp: 'PhG 11/2/2021 17:45:48'!
+test05CreditCardWithExpirationDateInThePresentIsNotExpired
+
+	| creditCard currentMonthOfYear |
+	
+	currentMonthOfYear := self currentMonthOfYear.
+
+	creditCard := CreditCard withNumber: '0123456789123456'	 withExpirationDate: currentMonthOfYear.
+	
+	self assert: (creditCard isExpiredOn: currentMonthOfYear).! !
+
+
+!CreditCardTest methodsFor: 'dates' stamp: 'PhG 11/2/2021 17:44:19'!
+currentMonthOfYear
+
+	^GregorianMonthOfYear current.! !
+
+!CreditCardTest methodsFor: 'dates' stamp: 'PhG 11/2/2021 17:45:33'!
+twoMonthsFrom: aMonthOfYear
+
+	^aMonthOfYear next: (TimeUnits month with: 2).! !
+
+!CreditCardTest methodsFor: 'dates' stamp: 'PhG 11/2/2021 17:45:22'!
+twoMonthsSince: aMonthOfYear
+
+	^aMonthOfYear previous: (TimeUnits month with: 2).! !
+
+
+!CreditCardTest methodsFor: 'assertions' stamp: 'PhG 11/2/2021 17:50:20'!
+assertCreditCardMustContain16DigitsForCardNumber: aCardNumber
+
+	| twoMonthsToTheFuture |
+
+	twoMonthsToTheFuture := self twoMonthsSince: self currentMonthOfYear.
+	
+	self 
+		should: [CreditCard withNumber: aCardNumber withExpirationDate: twoMonthsToTheFuture ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = CreditCard creditCardMustContain16Digits. ]! !
 
 
 !classDefinition: #Cart category: 'TusLibros'!
@@ -299,6 +419,12 @@ add: aQuantity of: anItem
 
 	1 to: aQuantity do: [ :aNumber | items add: anItem ]! !
 
+
+!Cart methodsFor: 'total price' stamp: 'PhG 11/2/2021 18:02:36'!
+totalPrice
+
+	^items sum: [:anItem | priceList at: anItem] ifEmpty: [0].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cart class' category: 'TusLibros'!
@@ -324,34 +450,64 @@ cartCanNotBeEmpty
 	^'Cart can not be empty'! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'PhG 11/1/2021 19:50:15'!
+!Cashier methodsFor: 'checkout' stamp: 'PhG 11/2/2021 17:55:43'!
 checkout: aCart
 
-	| total |
-	
-	total := 0.
-	
 	(aCart isEmpty) ifTrue: [self error: self cartCanNotBeEmpty].
 	
-	total := aCart items sum: [:anItem | priceList at: anItem].
+	^aCart totalPrice.! !
+
+!Cashier methodsFor: 'checkout' stamp: 'PhG 11/2/2021 18:03:45'!
+checkout: aCart withCardExpirationDate: anExpirationDate
+
+	(aCart isEmpty) ifTrue: [self error: self cartCanNotBeEmpty].
 	
-	^total! !
+	^aCart totalPrice.! !
+
+
+!classDefinition: #CreditCard category: 'TusLibros'!
+Object subclass: #CreditCard
+	instanceVariableNames: 'cardNumber expirationDate'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!CreditCard methodsFor: 'initialization' stamp: 'PhG 11/2/2021 17:26:57'!
+initializeWith: aCardNumber withExpirationDate: anExpirationDate 
+	
+	cardNumber := aCardNumber.
+	expirationDate := anExpirationDate.! !
 
 
-!Cashier methodsFor: 'initialization' stamp: 'PhG 11/1/2021 19:47:28'!
-initializeAcceptingItemsOf: aPriceList
-
-	priceList := aPriceList.! !
+!CreditCard methodsFor: 'testing' stamp: 'PhG 11/2/2021 17:43:27'!
+isExpiredOn: aDate 
+	^((aDate < expirationDate) and: (expirationDate ~= aDate)) not.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: 'TusLibros'!
-Cashier class
+!classDefinition: 'CreditCard class' category: 'TusLibros'!
+CreditCard class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'instance creation' stamp: 'PhG 11/1/2021 19:48:26'!
-acceptingItemsOf: aPriceList
+!CreditCard class methodsFor: 'error messages' stamp: 'PhG 11/2/2021 17:11:20'!
+creditCardMustContain16Digits
+	^'A credit card must contain 16 digits'! !
 
-	"testear que todo precio sea positivo"
 
-	^self new initializeAcceptingItemsOf: aPriceList ! !
+!CreditCard class methodsFor: 'instance creation' stamp: 'PhG 11/2/2021 17:13:45'!
+withNumber: aCardNumber
+
+	aCardNumber size ~= 16 ifTrue: [self error: CreditCard creditCardMustContain16Digits].! !
+
+!CreditCard class methodsFor: 'instance creation' stamp: 'PhG 11/2/2021 17:26:09'!
+withNumber: aCardNumber withExpirationDate: anExpirationDate 
+
+	self assertCardNumberIs16DigitsLong: aCardNumber.
+	
+	^self basicNew initializeWith: aCardNumber withExpirationDate: anExpirationDate.! !
+
+
+!CreditCard class methodsFor: 'private' stamp: 'PhG 11/2/2021 17:26:09'!
+assertCardNumberIs16DigitsLong: aCardNumber
+
+	^ aCardNumber size ~= 16 ifTrue: [self error: CreditCard creditCardMustContain16Digits]! !
