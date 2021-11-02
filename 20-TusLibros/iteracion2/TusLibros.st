@@ -24,17 +24,17 @@ test02CanNotAddItemsThatDoNotBelongToStore
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test03AfterAddingAnItemTheCartIsNotEmptyAnymore
 
 	| cart |
 	
 	cart := self createCart.
 	
-	cart add: self itemSellByTheStore.
+	cart add: self itemSoldByTheStore.
 	self deny: cart isEmpty ! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test04CanNotAddNonPositiveNumberOfItems
 
 	| cart |
@@ -42,7 +42,7 @@ test04CanNotAddNonPositiveNumberOfItems
 	cart := self createCart.
 	
 	self 
-		should: [cart add: 0 of: self itemSellByTheStore ]
+		should: [cart add: 0 of: self itemSoldByTheStore ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cart invalidQuantityErrorMessage.
@@ -62,53 +62,62 @@ test05CanNotAddMoreThanOneItemNotSellByTheStore
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test06CartRemembersAddedItems
 
 	| cart |
 	
 	cart := self createCart.
 	
-	cart add: self itemSellByTheStore.
-	self assert: (cart includes: self itemSellByTheStore)! !
+	cart add: self itemSoldByTheStore.
+	self assert: (cart includes: self itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test07CartDoesNotHoldNotAddedItems
 
 	| cart |
 	
 	cart := self createCart.
 	
-	self deny: (cart includes: self itemSellByTheStore)! !
+	self deny: (cart includes: self itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:45'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test08CartRemembersTheNumberOfAddedItems
 
 	| cart |
 	
 	cart := self createCart.
 	
-	cart add: 2 of: self itemSellByTheStore.
-	self assert: (cart occurrencesOf: self itemSellByTheStore) = 2! !
+	cart add: 2 of: self itemSoldByTheStore.
+	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
 
-!CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+!CartTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:06:57'!
 createCart
 	
-	^Cart acceptingItemsOf: self defaultCatalog! !
+	^Cart acceptingItemsOf: self defaultPriceList! !
 
-!CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:43'!
+!CartTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:09'!
 defaultCatalog
 	
-	^ Array with: self itemSellByTheStore! !
+	^ Array with: self itemSoldByTheStore! !
+
+!CartTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:09'!
+defaultPriceList
+
+	| priceList |
+	
+	priceList := Dictionary new.
+	priceList add: (self itemSoldByTheStore)-> 100.
+	^priceList.! !
 
 !CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:44'!
 itemNotSellByTheStore
 	
 	^'invalidBook'! !
 
-!CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:43'!
-itemSellByTheStore
+!CartTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:09'!
+itemSoldByTheStore
 	
 	^ 'validBook'! !
 
@@ -125,24 +134,39 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultPriceList! !
 
-!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 19:27:23'!
-defaultCatalog
+!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:10:07'!
+createCartWith: aPriceList
 	
-	^ Array with: self itemSellByTheStore! !
+	^Cart acceptingItemsOf: aPriceList! !
 
-!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 19:35:27'!
+!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:09'!
 defaultPriceList
 
 	| priceList |
 	
 	priceList := Dictionary new.
-	priceList add: (self itemSellByTheStore)-> 100.
+	priceList add: (self itemSoldByTheStore)-> 100.
 	^priceList.! !
 
-!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 19:27:31'!
-itemSellByTheStore
+!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:09'!
+itemSoldByTheStore
 	
 	^ 'validBook'! !
+
+!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:20'!
+otherItemSoldByTheStore
+	
+	^ 'otherValidBook'! !
+
+!CashierTest methodsFor: 'support' stamp: 'PhG 11/1/2021 20:09:25'!
+priceListwithTwoItems
+
+	| priceList |
+	
+	priceList := Dictionary new.
+	priceList add: (self itemSoldByTheStore)-> 100.
+	priceList add: (self otherItemSoldByTheStore)-> 60.
+	^priceList.! !
 
 
 !CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 19:26:55'!
@@ -159,7 +183,7 @@ test01checkoutOnEmptyCartThrowsError
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cashier cartCanNotBeEmpty. ]! !
 
-!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 19:48:53'!
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:09:09'!
 test02checkoutTotalOnCartWithOneProductIsProductPrice
 
 	| cart cashier |
@@ -167,9 +191,41 @@ test02checkoutTotalOnCartWithOneProductIsProductPrice
 	cart := self createCart.
 	cashier := Cashier acceptingItemsOf: self defaultPriceList.
 	
-	cart add: self itemSellByTheStore.
+	cart add: self itemSoldByTheStore.
 	
 	self assert: 100 equals: (cashier checkout: cart)
+	! !
+
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:10:38'!
+test03checkoutTotalOnCartWithManyProductsIsProductsPriceSum
+
+	| cart cashier |
+	
+	cart := self createCartWith: self priceListwithTwoItems.
+	cashier := Cashier acceptingItemsOf: self priceListwithTwoItems.
+	
+	cart add: self itemSoldByTheStore.
+	cart add: self otherItemSoldByTheStore.
+	
+	self assert: 160 equals: (cashier checkout: cart)
+	! !
+
+!CashierTest methodsFor: 'checkout tests' stamp: 'PhG 11/1/2021 20:31:41'!
+test04checkoutWithExpiredCreditCardIsRejected
+
+	| cart cashier today expiredDate |
+	
+	cart := self createCartWith: self priceListwithTwoItems.
+	cashier := Cashier acceptingItemsOf: self priceListwithTwoItems.
+	
+	cart add: self itemSoldByTheStore.
+	cart add: self otherItemSoldByTheStore.
+	
+	today := FixedGregorianDate today.
+	
+	expiredDate := today previous: (TimeUnits month with: 1).
+	
+	self assert: 160 equals: (cashier checkout: cart withCardExpirationDate: expiredDate)
 	! !
 
 
