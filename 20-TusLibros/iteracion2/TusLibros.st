@@ -194,6 +194,60 @@ test04checkoutWithExpiredCreditCardIsRejected
 	self assertCheckingOut: expiredCreditCard payingWith: today onDate: cart willFailWith: (Cashier creditCardCanNotBeExpiredErrorDescription).
 	! !
 
+!CashierTest methodsFor: 'checkout tests' stamp: 'asd 11/3/2021 16:45:11'!
+test05theCardBilledIsTheOneUsedByTheClient
+	| cart creditCard today cashier merchantProcessor billedCreditCard |
+
+	cart := factory createCartWithDefaultPriceListAndAnItem.
+	today := factory currentMonthOfYear.
+	creditCard := factory createCreditCardExpiringTwoMonthsFrom: today.
+	merchantProcessor := MerchantProcessorDouble new.
+	merchantProcessor whenBillingDo: [:aCreditCard :amount | billedCreditCard := aCreditCard. true ].
+
+	cashier := Cashier prepareCheckoutFor: cart payingWith: creditCard on: today with: merchantProcessor.
+	cashier checkout.
+	
+	self assert: (creditCard ) equals: (billedCreditCard ).
+	! !
+
+!CashierTest methodsFor: 'checkout tests' stamp: 'asd 11/3/2021 16:45:22'!
+test06theAmountBilledIsTheCartTotal
+	| cart item creditCard today cashier merchantProcessor billedAmount |
+	cart := factory createCartWithDefaultPriceList.
+	item := factory itemSoldByTheStore.
+	cart add: item.
+	
+	today := factory currentMonthOfYear.
+	creditCard := factory createCreditCardExpiringTwoMonthsFrom: today.
+	merchantProcessor := MerchantProcessorDouble new.
+	merchantProcessor whenBillingDo: [:aCreditCard :amount | billedAmount := amount. true ].
+
+	cashier := Cashier prepareCheckoutFor: cart payingWith: creditCard on: today with: merchantProcessor.
+	cashier checkout.
+	
+	self assert: (factory priceOf: item ) equals: (billedAmount ).
+	! !
+
+!CashierTest methodsFor: 'checkout tests' stamp: 'asd 11/3/2021 16:42:13'!
+test07theCheckoutShouldFailForCreditCardsRejectedByTheMerchantProcessor
+
+	| cart creditCard today cashier merchantProcessor |
+	cart := factory createCartWithDefaultPriceListAndAnItem.
+	
+	today := factory currentMonthOfYear.
+	creditCard := factory createCreditCardExpiringTwoMonthsFrom: today.
+	merchantProcessor := MerchantProcessorDouble new.
+	merchantProcessor whenBillingDo: [:aCreditCard :amount | false ].
+
+	cashier := Cashier prepareCheckoutFor: cart payingWith: creditCard on: today with: merchantProcessor.
+	
+	 self should: [ cashier checkout ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Cashier creditCardRejectedByMerchantProcessorDescription. ]
+	
+	! !
+
 
 !CashierTest methodsFor: 'initialization' stamp: 'PhG 11/3/2021 08:27:35'!
 initialize
@@ -201,22 +255,27 @@ initialize
 	factory := TestObjectsFactory new.! !
 
 
-!CashierTest methodsFor: 'support' stamp: 'PhG 11/3/2021 08:43:48'!
+!CashierTest methodsFor: 'support' stamp: 'asd 11/3/2021 16:34:15'!
 cashierCheckingOutWithValidCardFor: aCart
 
-	| creditCard today |
-	
+	| creditCard today merchantProcessor |
+
 	today := factory currentMonthOfYear.
 	creditCard := factory createCreditCardExpiringTwoMonthsFrom: today.
 	
-	^Cashier prepareCheckoutFor: aCart payingWith: creditCard on: today.! !
+	merchantProcessor := factory createMerchantProcessorWithSuccesfulBillingResponse.
+	
+	^Cashier prepareCheckoutFor: aCart payingWith: creditCard on: today with: merchantProcessor.! !
 
 
-!CashierTest methodsFor: 'assertions' stamp: 'PhG 11/3/2021 08:47:07'!
+!CashierTest methodsFor: 'assertions' stamp: 'asd 11/3/2021 16:33:52'!
 assertCheckingOut: creditCard payingWith: today onDate: cart willFailWith: anErrorDescription
+	| merchantProcessor |
 
+	merchantProcessor := factory createMerchantProcessorWithSuccesfulBillingResponse.
+	
 	^ self 
-		should: [ Cashier prepareCheckoutFor: cart payingWith: creditCard on: today ]
+		should: [ Cashier prepareCheckoutFor: cart payingWith: creditCard on: today with: merchantProcessor]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = anErrorDescription. ]! !
@@ -392,22 +451,29 @@ acceptingItemsOf: aCatalog
 
 !classDefinition: #Cashier category: 'TusLibros'!
 Object subclass: #Cashier
-	instanceVariableNames: 'priceList cart creditCard date'
+	instanceVariableNames: 'priceList cart creditCard date merchantProcessor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Cashier methodsFor: 'checkout' stamp: 'PhG 11/3/2021 08:11:33'!
-checkout
+!Cashier methodsFor: 'checkout' stamp: 'asd 11/3/2021 16:44:31'!
+checkout	
+	| transactionSuccessful |
+	
+	transactionSuccessful := merchantProcessor bill: creditCard for: (cart totalPrice).
+	transactionSuccessful ifFalse: [self error: Cashier creditCardRejectedByMerchantProcessorDescription ].
+	
 	^cart totalPrice.! !
 
 
-!Cashier methodsFor: 'initialization' stamp: 'PhG 11/3/2021 07:55:51'!
-initializeCheckingOutFor: aCart payingWith: aCreditCard on: aDate 
+!Cashier methodsFor: 'initialization' stamp: 'asd 11/3/2021 16:14:43'!
+initializeCheckingOutFor: aCart payingWith: aCreditCard on: aDate with: aMerchantProcessor 
 	
 	cart := aCart.
 	creditCard := aCreditCard.
-	date := aDate.! !
+	date := aDate.
+	
+	merchantProcessor := aMerchantProcessor.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -415,13 +481,13 @@ initializeCheckingOutFor: aCart payingWith: aCreditCard on: aDate
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'instance creation' stamp: 'PhG 11/3/2021 08:17:04'!
-prepareCheckoutFor: aCart payingWith: aCreditCard on: aDate 
+!Cashier class methodsFor: 'instance creation' stamp: 'asd 11/3/2021 16:15:08'!
+prepareCheckoutFor: aCart payingWith: aCreditCard on: aDate with: aMerchantProcessor 
 
 	self assertCartCanNotBeEmpty: aCart.
 	self assertCreditCard: aCreditCard isNotExpiredOn: aDate.
 
-	^self basicNew initializeCheckingOutFor: aCart payingWith: aCreditCard on: aDate ! !
+	^self basicNew initializeCheckingOutFor: aCart payingWith: aCreditCard on: aDate with: aMerchantProcessor! !
 
 
 !Cashier class methodsFor: 'error descriptions' stamp: 'PhG 11/3/2021 07:58:35'!
@@ -433,6 +499,11 @@ cartCanNotBeEmptyErrorDescription
 creditCardCanNotBeExpiredErrorDescription
 
 	^'Credit card can not be expired'! !
+
+!Cashier class methodsFor: 'error descriptions' stamp: 'asd 11/3/2021 16:41:59'!
+creditCardRejectedByMerchantProcessorDescription
+
+	^'Credit card was rejected by the merchant processor'.! !
 
 
 !Cashier class methodsFor: 'assertions' stamp: 'PhG 11/3/2021 08:04:06'!
@@ -494,6 +565,23 @@ assertCardNumberIs16DigitsLong: aCardNumber
 	^ aCardNumber size ~= 16 ifTrue: [self error: CreditCard creditCardMustContain16Digits]! !
 
 
+!classDefinition: #MerchantProcessorDouble category: 'TusLibros'!
+Object subclass: #MerchantProcessorDouble
+	instanceVariableNames: 'whenBilling'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!MerchantProcessorDouble methodsFor: 'mocking' stamp: 'asd 11/3/2021 16:21:48'!
+whenBillingDo: billingBehaviour
+	^ whenBilling := billingBehaviour.! !
+
+
+!MerchantProcessorDouble methodsFor: 'mocked' stamp: 'asd 11/3/2021 16:26:37'!
+bill: aCreditCard for: amount
+	^ whenBilling value: aCreditCard value: amount.! !
+
+
 !classDefinition: #TestObjectsFactory category: 'TusLibros'!
 Object subclass: #TestObjectsFactory
 	instanceVariableNames: ''
@@ -533,6 +621,14 @@ createCreditCardExpiringTwoMonthsSince: anExpirationDate
 	^self createCreditCardExpiring: (self twoMonthsSince: anExpirationDate).! !
 
 
+!TestObjectsFactory methodsFor: 'item' stamp: 'asd 11/3/2021 16:32:51'!
+createMerchantProcessorWithSuccesfulBillingResponse
+	| merchantProcessor |
+
+	merchantProcessor := MerchantProcessorDouble new.
+	merchantProcessor whenBillingDo: [:aCreditCard :amount | true ].
+	^merchantProcessor .! !
+
 !TestObjectsFactory methodsFor: 'item' stamp: 'PhG 11/3/2021 08:51:19'!
 itemNotSoldByTheStore
 	
@@ -554,10 +650,18 @@ createCartWith: aPriceList
 	
 	^Cart acceptingItemsOf: aPriceList! !
 
-!TestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/3/2021 08:36:13'!
+!TestObjectsFactory methodsFor: 'cart' stamp: 'asd 11/3/2021 16:17:48'!
 createCartWithDefaultPriceList
-	
+
 	^self createCartWith: self defaultPriceList! !
+
+!TestObjectsFactory methodsFor: 'cart' stamp: 'asd 11/3/2021 16:17:39'!
+createCartWithDefaultPriceListAndAnItem
+	| cart |
+	
+	cart := self createCartWith: self defaultPriceList.
+	cart add: self itemSoldByTheStore.
+	^ cart.! !
 
 !TestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/3/2021 08:38:04'!
 createCartWithPriceListWithTwoItems
