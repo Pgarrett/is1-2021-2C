@@ -368,7 +368,7 @@ test05AddBookNotSoldErrorIsInvalidBookError
 
 !classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
-	instanceVariableNames: 'catalog items id'
+	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -385,12 +385,11 @@ assertIsValidQuantity: aQuantity
 	aQuantity strictlyPositive ifFalse: [ self error: Cart invalidQuantityErrorMessage. ]! !
 
 
-!Cart methodsFor: 'initialization' stamp: 'wb 11/6/2021 15:05:13'!
-initializeAcceptingItemsOf: aCatalog withId: anId
+!Cart methodsFor: 'initialization' stamp: 'wb 11/6/2021 16:44:12'!
+initializeAcceptingItemsOf: aCatalog
 
 	catalog := aCatalog.
-	items := OrderedCollection new.
-	id := anId.! !
+	items := OrderedCollection new.! !
 
 
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
@@ -435,10 +434,10 @@ add: aQuantity of: anItem
 Cart class
 	instanceVariableNames: ''!
 
-!Cart class methodsFor: 'instance creation' stamp: 'wb 11/6/2021 15:04:46'!
-acceptingItemsOf: aCatalog withId: anId
+!Cart class methodsFor: 'instance creation' stamp: 'wb 11/6/2021 16:44:39'!
+acceptingItemsOf: aCatalog
 
-	^self new initializeAcceptingItemsOf: aCatalog withId: anId.! !
+	^self new initializeAcceptingItemsOf: aCatalog.! !
 
 
 !Cart class methodsFor: 'error descriptions' stamp: 'wb 11/6/2021 16:04:34'!
@@ -618,12 +617,12 @@ addToCart: aCartId quantity: aQuantity of: anItem
 	cart := carts at: aCartId .
 	cart add: aQuantity of: anItem.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 15:27:49'!
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 16:45:00'!
 createCartFor: aUsername with: aPassword
 		
 	authenticationService authenticate: aUsername with: aPassword.
 	latestCartId := latestCartId + 1.
-	carts at: latestCartId put: (Cart acceptingItemsOf: catalogue withId: latestCartId).
+	carts at: latestCartId put: (Cart acceptingItemsOf: catalogue).
 	^latestCartId.! !
 
 !StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 15:50:46'!
@@ -704,10 +703,10 @@ itemSoldByTheStorePrice
 	^10.! !
 
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'wb 11/6/2021 15:11:15'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'wb 11/6/2021 16:45:06'!
 createCart
 	
-	^Cart acceptingItemsOf: self defaultCatalogue withId: 0.! !
+	^Cart acceptingItemsOf: self defaultCatalogue.! !
 
 !StoreTestObjectsFactory methodsFor: 'cart' stamp: 'wb 11/6/2021 16:28:27'!
 defaultCatalogue
