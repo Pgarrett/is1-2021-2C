@@ -333,6 +333,23 @@ test06ListCartsShouldWorkWithDifferentCarts
 	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).
 	self assert: (storeService listCart: anotherCartId) equals: (Dictionary with: anotherItemToBeAdded->2).! !
 
+!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/6/2021 16:50:42'!
+test07ListCartsShouldFailWithInvalidCart
+
+	| storeService cartId |
+
+	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	
+	authenticationBehaviour := [:aUsername :aPassword | true ].
+	
+	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+		
+	storeService addToCart: cartId quantity: 1 of: (testObjectsFactory itemSoldByTheStore).
+	
+	self should: [ storeService listCart: (cartId+1)]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription.]! !
+
 
 !StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/6/2021 15:36:19'!
 test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
@@ -625,10 +642,12 @@ createCartFor: aUsername with: aPassword
 	carts at: latestCartId put: (Cart acceptingItemsOf: catalogue).
 	^latestCartId.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 15:50:46'!
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 16:53:10'!
 listCart: aCartId
 
 	|cart items|
+	
+	self assertCartExists: aCartId.
 	
 	cart := carts at: aCartId.
 	items := Dictionary new.
@@ -648,6 +667,11 @@ initializeWithAuthService: anAuthenticationService withCatalogue: aCatalogue
 	latestCartId := 0.! !
 
 
+!StoreService methodsFor: 'assertions' stamp: 'wb 11/6/2021 16:52:53'!
+assertCartExists: aCartId
+
+	(carts includesKey: aCartId) ifFalse: [ self error: StoreService invalidCartErrorDescription. ]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'StoreService class' category: 'TusLibros'!
@@ -657,6 +681,10 @@ StoreService class
 !StoreService class methodsFor: 'error descriptions' stamp: 'wb 11/6/2021 16:08:24'!
 invalidBookErrorDesciption
 	^'Trying to add an invalid book.'.! !
+
+!StoreService class methodsFor: 'error descriptions' stamp: 'wb 11/6/2021 16:50:25'!
+invalidCartErrorDescription
+	^'Trying to access an invalid cart.'.! !
 
 !StoreService class methodsFor: 'error descriptions' stamp: 'wb 11/6/2021 16:08:29'!
 invalidCredentialsErrorDesciption
