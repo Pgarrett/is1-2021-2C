@@ -253,7 +253,14 @@ TestCase subclass: #StoreServiceTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!StoreServiceTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 21:01:15'!
+
+!StoreServiceTest methodsFor: 'set up' stamp: 'PhG 11/4/2021 20:12:03'!
+setUp 
+
+	testObjectsFactory := StoreTestObjectsFactory new.! !
+
+
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'PhG 11/4/2021 21:01:15'!
 test01CreateCartWithInvalidCredentialsThrowsError
 
 	| storeService |
@@ -266,7 +273,7 @@ test01CreateCartWithInvalidCredentialsThrowsError
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCredentialsErrorDesciption.]! !
 
-!StoreServiceTest methodsFor: 'tests' stamp: 'wb 11/6/2021 15:15:25'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/6/2021 15:15:25'!
 test02WhenCreatingACartCredentialsAreValidated
 
 	| storeService userAuthenticated passwordAuthenticated |
@@ -284,7 +291,7 @@ test02WhenCreatingACartCredentialsAreValidated
 	self assert: passwordAuthenticated equals: testObjectsFactory validPassword.
 	! !
 
-!StoreServiceTest methodsFor: 'tests' stamp: 'wb 11/6/2021 15:46:18'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/6/2021 15:46:18'!
 test03CreateCartWithValidCredentialsCreatesEmptyCart
 
 	| storeService cartId |
@@ -297,7 +304,37 @@ test03CreateCartWithValidCredentialsCreatesEmptyCart
 	
 	self assert: Dictionary new equals: (storeService listCart: cartId).! !
 
-!StoreServiceTest methodsFor: 'tests' stamp: 'wb 11/6/2021 15:36:19'!
+
+!StoreServiceTest methodsFor: 'authentication protocol' stamp: 'PhG 11/4/2021 20:31:01'!
+authenticate: aUsername with: aPassword
+
+	^authenticationBehaviour value: aUsername value: aPassword.! !
+
+
+!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/6/2021 16:27:18'!
+test06ListCartsShouldWorkWithDifferentCarts
+
+	| storeService cartId anotherCartId itemToBeAdded anotherItemToBeAdded |
+
+	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	
+	authenticationBehaviour := [:aUsername :aPassword | true ].
+	
+	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+	anotherCartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+	
+	itemToBeAdded := (testObjectsFactory itemSoldByTheStore ).
+	anotherItemToBeAdded := (testObjectsFactory anotherItemSoldByTheStore).
+	
+	storeService addToCart: cartId quantity: 1 of: itemToBeAdded.
+	storeService addToCart: anotherCartId quantity: 1 of: anotherItemToBeAdded.
+	storeService addToCart: anotherCartId quantity: 1 of: anotherItemToBeAdded.
+	
+	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).
+	self assert: (storeService listCart: anotherCartId) equals: (Dictionary with: anotherItemToBeAdded->2).! !
+
+
+!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/6/2021 15:36:19'!
 test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
 
 	| storeService cartId itemToBeAdded |
@@ -312,7 +349,7 @@ test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
 	
 	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).! !
 
-!StoreServiceTest methodsFor: 'tests' stamp: 'wb 11/6/2021 16:09:23'!
+!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/6/2021 16:09:23'!
 test05AddBookNotSoldErrorIsInvalidBookError
 
 	| storeService cartId itemToBeAdded |
@@ -327,18 +364,6 @@ test05AddBookNotSoldErrorIsInvalidBookError
 	self should: [ storeService addToCart: cartId quantity: 1 of: itemToBeAdded.]
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = Cart invalidItemErrorMessage .]! !
-
-
-!StoreServiceTest methodsFor: 'set up' stamp: 'PhG 11/4/2021 20:12:03'!
-setUp 
-
-	testObjectsFactory := StoreTestObjectsFactory new.! !
-
-
-!StoreServiceTest methodsFor: 'authentication protocol' stamp: 'PhG 11/4/2021 20:31:01'!
-authenticate: aUsername with: aPassword
-
-	^authenticationBehaviour value: aUsername value: aPassword.! !
 
 
 !classDefinition: #Cart category: 'TusLibros'!
@@ -652,20 +677,31 @@ Object subclass: #StoreTestObjectsFactory
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/4/2021 20:52:18'!
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'wb 11/6/2021 16:28:54'!
+anotherItemSoldByTheStore
+
+	^ 'validBook2'.! !
+
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'wb 11/6/2021 16:28:47'!
+anotherItemSoldByTheStorePrice
+
+	^20.
+! !
+
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'wb 11/6/2021 16:29:00'!
 itemNotSoldByTheStore
 	
-	^'invalidBook'! !
+	^'invalidBook'.! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/4/2021 20:50:53'!
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'wb 11/6/2021 16:29:04'!
 itemSoldByTheStore
 	
-	^ 'validBook'! !
+	^ 'validBook'.! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/4/2021 20:52:29'!
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'wb 11/6/2021 16:29:08'!
 itemSoldByTheStorePrice
 	
-	^10! !
+	^10.! !
 
 
 !StoreTestObjectsFactory methodsFor: 'cart' stamp: 'wb 11/6/2021 15:11:15'!
@@ -673,11 +709,12 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalogue withId: 0.! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/4/2021 21:01:15'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'wb 11/6/2021 16:28:27'!
 defaultCatalogue
 	
 	^ Dictionary new
 		at: self itemSoldByTheStore put: self itemSoldByTheStorePrice;
+		at: self anotherItemSoldByTheStore put: self anotherItemSoldByTheStorePrice;
 		yourself ! !
 
 
