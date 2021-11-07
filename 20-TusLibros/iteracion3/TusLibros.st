@@ -382,36 +382,32 @@ test05AddBookNotSoldErrorIsInvalidBookError
 		withExceptionDo: [ :anError | self assert: anError messageText = Cart invalidItemErrorMessage .]! !
 
 
-!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 13:04:02'!
+!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 19:05:29'!
 test08CheckoutInvalidCartShouldFail
 
-	| storeService cartId creditCard debitedAmout debitedCreditCard|
+	| storeService cartId |
 
 	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
-	creditCard := testObjectsFactory creditCardNonExpired.
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
-	debitBehavior := [ :anAmount :aCreditCard | 
-		debitedAmout := anAmount.
-		debitedCreditCard := aCreditCard ].
+	debitBehavior := [ :anAmount :aCreditCard | true ].
 	
 	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
 	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
 	
 	self should: [ storeService checkoutCart: (cartId+1) 
-						 withCCN: creditCard ccn 
-						 withCCED: creditCard cced 
-						 withCCO: creditCard cco. ]
+						 withCCN: testObjectsFactory creditCardCCN 
+						 withCCED: testObjectsFactory creditCardCCED 
+						 withCCO: testObjectsFactory creditCardCCO. ]
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription .]! !
 
-!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 14:01:19'!
+!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 19:05:29'!
 test09CheckoutWithValidCartShouldReturnTransactionId
 
-	| storeService cartId creditCard transactionId|
+	| storeService cartId transactionId|
 
 	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
-	creditCard := testObjectsFactory creditCardNonExpired.
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	debitBehavior := [ :anAmount :aCreditCard | true ].
@@ -420,9 +416,9 @@ test09CheckoutWithValidCartShouldReturnTransactionId
 	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
 	
 	transactionId := storeService checkoutCart: cartId 
-							 withCCN: creditCard ccn 
-							 withCCED: creditCard cced 
-							 withCCO: creditCard cco.
+							 withCCN: testObjectsFactory creditCardCCN 
+							 withCCED: testObjectsFactory creditCardCCED 
+							 withCCO: testObjectsFactory creditCardCCO.
 
 	self assert: 1 equals: transactionId.! !
 
@@ -610,7 +606,7 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #CreditCard category: 'TusLibros'!
 Object subclass: #CreditCard
-	instanceVariableNames: 'ccn cced cco'
+	instanceVariableNames: 'cced ccn cco expiration'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -619,19 +615,6 @@ Object subclass: #CreditCard
 isExpiredOn: aDate 
 	
 	^cced start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
-
-
-!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:42'!
-cced	
-	^cced.! !
-
-!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:27'!
-ccn	
-	^ccn.! !
-
-!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:49'!
-cco
-	^cco.! !
 
 
 !CreditCard methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:50:16'!
@@ -645,7 +628,7 @@ initializeWithCCN: aCCN withCCED: aCCED withCCO: aCCO
 
 !classDefinition: 'CreditCard class' category: 'TusLibros'!
 CreditCard class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'expiration'!
 
 !CreditCard class methodsFor: 'instance creation' stamp: 'wb 11/7/2021 13:49:22'!
 withCCN: aCCN withCCED: aCCED withCCO: aCCO 
@@ -699,7 +682,7 @@ addToCart: aCartId quantity: aQuantity of: anItem
 	cart := carts at: aCartId .
 	cart add: aQuantity of: anItem.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'wb 11/7/2021 13:50:45'!
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/7/2021 19:02:16'!
 checkoutCart: aCartId withCCN: aCCN withCCED: aCCED withCCO: aCCO
 
 	| creditCard cashier cart |
@@ -832,6 +815,18 @@ defaultCatalogue
 		at: self anotherItemSoldByTheStore put: self anotherItemSoldByTheStorePrice;
 		yourself ! !
 
+
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 19:05:11'!
+creditCardCCED
+	^Month month: today monthIndex year: today yearNumber - 1.! !
+
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 19:05:19'!
+creditCardCCN
+	^'123456789123456'.! !
+
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 19:05:29'!
+creditCardCCO
+	^'pepito'.! !
 
 !StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 13:51:34'!
 creditCardExpired
