@@ -105,7 +105,7 @@ TestCase subclass: #CashierTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:50'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
 test01CanNotCheckoutAnEmptyCart
 
 	| salesBook |
@@ -114,7 +114,7 @@ test01CanNotCheckoutAnEmptyCart
 	self 
 		should: [ Cashier 
 			toCheckout: testObjectsFactory createCart 
-			charging: testObjectsFactory notExpiredCreditCard 
+			charging: testObjectsFactory creditCardNonExpired 
 			throught: self
 			on: testObjectsFactory today
 			registeringOn:  salesBook ]
@@ -123,7 +123,7 @@ test01CanNotCheckoutAnEmptyCart
 			self assert: anError messageText = Cashier cartCanNotBeEmptyErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 20:52:29'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
 test02CalculatedTotalIsCorrect
 
 	| cart cashier |
@@ -133,14 +133,14 @@ test02CalculatedTotalIsCorrect
 	
 	cashier :=  Cashier
 		toCheckout: cart 
-		charging: testObjectsFactory notExpiredCreditCard 
+		charging: testObjectsFactory creditCardNonExpired 
 		throught: self
 		on: testObjectsFactory today 
 		registeringOn: OrderedCollection new.
 		
 	self assert: cashier checkOut = (testObjectsFactory itemSoldByTheStorePrice * 2)! !
 
-!CashierTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 20:50:53'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:05:48'!
 test03CanNotCheckoutWithAnExpiredCreditCart
 
 	| cart salesBook |
@@ -152,7 +152,7 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 	self
 		should: [ Cashier 
 				toCheckout: cart 
-				charging: testObjectsFactory expiredCreditCard 
+				charging: testObjectsFactory creditCardExpired 
 				throught: self
 				on: testObjectsFactory today
 				registeringOn: salesBook ]
@@ -161,7 +161,7 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 20:50:53'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
 test04CheckoutRegistersASale
 
 	| cart cashier salesBook total |
@@ -172,7 +172,7 @@ test04CheckoutRegistersASale
  
 	cashier:= Cashier 
 		toCheckout: cart 
-		charging: testObjectsFactory notExpiredCreditCard
+		charging: testObjectsFactory creditCardNonExpired
 		throught: self
 		on: testObjectsFactory today
 		registeringOn: salesBook.
@@ -182,14 +182,14 @@ test04CheckoutRegistersASale
 	self assert: salesBook size = 1.
 	self assert: salesBook first total = total.! !
 
-!CashierTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 20:50:53'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
 test05CashierChargesCreditCardUsingMerchantProcessor
 
 	| cart cashier salesBook total creditCard debitedAmout debitedCreditCard  |
 
 	cart := testObjectsFactory createCart.
 	cart add: testObjectsFactory itemSoldByTheStore.
-	creditCard := testObjectsFactory notExpiredCreditCard.
+	creditCard := testObjectsFactory creditCardNonExpired.
 	salesBook := OrderedCollection new.
  
 	cashier:= Cashier 
@@ -207,14 +207,14 @@ test05CashierChargesCreditCardUsingMerchantProcessor
 	self assert: debitedCreditCard = creditCard.
 	self assert: debitedAmout = total.! !
 
-!CashierTest methodsFor: 'tests' stamp: 'PhG 11/4/2021 20:50:53'!
+!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
 test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit
 
 	| cart cashier salesBook creditCard |
 
 	cart := testObjectsFactory createCart.
 	cart add: testObjectsFactory itemSoldByTheStore.
-	creditCard := testObjectsFactory notExpiredCreditCard.
+	creditCard := testObjectsFactory creditCardNonExpired.
 	salesBook := OrderedCollection new.
  	debitBehavior := [ :anAmount :aCreditCard | self error: Cashier creditCardHasNoCreditErrorMessage].
 	
@@ -248,11 +248,10 @@ debit: anAmount from: aCreditCard
 
 !classDefinition: #StoreServiceTest category: 'TusLibros'!
 TestCase subclass: #StoreServiceTest
-	instanceVariableNames: 'testObjectsFactory authenticationBehaviour'
+	instanceVariableNames: 'testObjectsFactory authenticationBehaviour debitBehavior'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
-
 
 !StoreServiceTest methodsFor: 'set up' stamp: 'PhG 11/4/2021 20:12:03'!
 setUp 
@@ -260,12 +259,12 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!StoreServiceTest methodsFor: 'create cart tests' stamp: 'PhG 11/4/2021 21:01:15'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/7/2021 13:45:31'!
 test01CreateCartWithInvalidCredentialsThrowsError
 
 	| storeService |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | self error: StoreService invalidCredentialsErrorDesciption].
 	
@@ -273,12 +272,12 @@ test01CreateCartWithInvalidCredentialsThrowsError
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCredentialsErrorDesciption.]! !
 
-!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/6/2021 15:15:25'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/7/2021 13:45:21'!
 test02WhenCreatingACartCredentialsAreValidated
 
 	| storeService userAuthenticated passwordAuthenticated |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | 
 		userAuthenticated := aUsername.
@@ -291,12 +290,12 @@ test02WhenCreatingACartCredentialsAreValidated
 	self assert: passwordAuthenticated equals: testObjectsFactory validPassword.
 	! !
 
-!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/6/2021 15:46:18'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'wb 11/7/2021 13:45:59'!
 test03CreateCartWithValidCredentialsCreatesEmptyCart
 
 	| storeService cartId |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	
@@ -311,12 +310,12 @@ authenticate: aUsername with: aPassword
 	^authenticationBehaviour value: aUsername value: aPassword.! !
 
 
-!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/6/2021 16:27:18'!
+!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/7/2021 13:45:37'!
 test06ListCartsShouldWorkWithDifferentCarts
 
 	| storeService cartId anotherCartId itemToBeAdded anotherItemToBeAdded |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	
@@ -333,12 +332,12 @@ test06ListCartsShouldWorkWithDifferentCarts
 	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).
 	self assert: (storeService listCart: anotherCartId) equals: (Dictionary with: anotherItemToBeAdded->2).! !
 
-!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/6/2021 16:50:42'!
+!StoreServiceTest methodsFor: 'list carts tests' stamp: 'wb 11/7/2021 13:45:48'!
 test07ListCartsShouldFailWithInvalidCart
 
 	| storeService cartId |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	
@@ -351,12 +350,12 @@ test07ListCartsShouldFailWithInvalidCart
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription.]! !
 
 
-!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/6/2021 15:36:19'!
+!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/7/2021 13:45:43'!
 test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
 
 	| storeService cartId itemToBeAdded |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	
 	cartId := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
@@ -366,12 +365,12 @@ test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
 	
 	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).! !
 
-!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/6/2021 16:09:23'!
+!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'wb 11/7/2021 13:45:55'!
 test05AddBookNotSoldErrorIsInvalidBookError
 
 	| storeService cartId itemToBeAdded |
 
-	storeService := StoreService withAuthService: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
 	
@@ -382,6 +381,59 @@ test05AddBookNotSoldErrorIsInvalidBookError
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = Cart invalidItemErrorMessage .]! !
 
+
+!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 13:04:02'!
+test08CheckoutInvalidCartShouldFail
+
+	| storeService cartId creditCard debitedAmout debitedCreditCard|
+
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	creditCard := testObjectsFactory creditCardNonExpired.
+	
+	authenticationBehaviour := [:aUsername :aPassword | true ].
+	debitBehavior := [ :anAmount :aCreditCard | 
+		debitedAmout := anAmount.
+		debitedCreditCard := aCreditCard ].
+	
+	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
+	
+	self should: [ storeService checkoutCart: (cartId+1) 
+						 withCCN: creditCard ccn 
+						 withCCED: creditCard cced 
+						 withCCO: creditCard cco. ]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription .]! !
+
+!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 13:39:11'!
+test09CheckoutWithValidCartShouldReturnTransactionId
+
+	| storeService cartId creditCard debitedAmout debitedCreditCard transactionId|
+
+	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
+	creditCard := testObjectsFactory creditCardNonExpired.
+	
+	authenticationBehaviour := [:aUsername :aPassword | true ].
+	debitBehavior := [ :anAmount :aCreditCard | 
+		debitedAmout := anAmount.
+		debitedCreditCard := aCreditCard ].
+	
+	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
+	
+	transactionId := storeService checkoutCart: cartId 
+							 withCCN: creditCard ccn 
+							 withCCED: creditCard cced 
+							 withCCO: creditCard cco.
+
+	self assert: 1 equals: transactionId.! !
+
+
+!StoreServiceTest methodsFor: 'merchant processor protocol' stamp: 'wb 11/7/2021 13:02:47'!
+debit: anAmount from: aCreditCard 
+
+	^debitBehavior value: anAmount value: aCreditCard.! !
+
 
 !classDefinition: #Cart category: 'TusLibros'!
 Object subclass: #Cart
@@ -389,7 +441,6 @@ Object subclass: #Cart
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
-
 
 !Cart methodsFor: 'assertions' stamp: 'wb 11/6/2021 16:03:55'!
 assertIsValidItem: anItem
@@ -493,10 +544,10 @@ debitTotal
 	merchantProcessor debit: total from: creditCard.
 	! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
+!Cashier methodsFor: 'checkout - private' stamp: 'wb 11/7/2021 13:19:01'!
 registerSale
 
-	salesBook add: self createSale! !
+	salesBook add: (self createSale).! !
 
 
 !Cashier methodsFor: 'checkout' stamp: 'HernanWilkinson 6/17/2013 19:06'!
@@ -509,13 +560,13 @@ checkOut
 	^ total! !
 
 
-!Cashier methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:53'!
+!Cashier methodsFor: 'initialization' stamp: 'wb 11/7/2021 12:45:19'!
 initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor registeringOn: aSalesBook
 	
 	cart := aCart.
 	creditCard := aCreditCard.
 	merchantProcessor := aMerchantProcessor.
-	salesBook := aSalesBook! !
+	salesBook := aSalesBook.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -561,21 +612,36 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #CreditCard category: 'TusLibros'!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expiration'
+	instanceVariableNames: 'ccn cced cco'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 18:39'!
+!CreditCard methodsFor: 'testing' stamp: 'wb 11/7/2021 11:09:37'!
 isExpiredOn: aDate 
 	
-	^expiration start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
+	^cced start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
 
 
-!CreditCard methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-initializeExpiringOn: aMonth 
-	
-	expiration := aMonth ! !
+!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:42'!
+cced	
+	^cced.! !
+
+!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:27'!
+ccn	
+	^ccn.! !
+
+!CreditCard methodsFor: 'accessing' stamp: 'wb 11/7/2021 12:09:49'!
+cco
+	^cco.! !
+
+
+!CreditCard methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:50:16'!
+initializeWithCCN: aCCN withCCED: aCCED withCCO: aCCO 
+
+	ccn := aCCN.
+	cced := aCCED.
+	cco := aCCO.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -583,10 +649,10 @@ initializeExpiringOn: aMonth
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-expiringOn: aMonth 
+!CreditCard class methodsFor: 'instance creation' stamp: 'wb 11/7/2021 13:49:22'!
+withCCN: aCCN withCCED: aCCED withCCO: aCCO 
 	
-	^self new initializeExpiringOn: aMonth! !
+	^self new initializeWithCCN: aCCN withCCED: aCCED withCCO: aCCO.! !
 
 
 !classDefinition: #Sale category: 'TusLibros'!
@@ -596,16 +662,16 @@ Object subclass: #Sale
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!Sale methodsFor: 'total' stamp: 'HernanWilkinson 6/17/2013 18:48'!
+!Sale methodsFor: 'total' stamp: 'wb 11/7/2021 13:30:58'!
 total
 	
-	^ total! !
+	^ total.! !
 
 
-!Sale methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:47'!
+!Sale methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:30:52'!
 initializeTotal: aTotal
 
-	total := aTotal ! !
+	total := aTotal.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -613,28 +679,49 @@ initializeTotal: aTotal
 Sale class
 	instanceVariableNames: ''!
 
-!Sale class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:47'!
+!Sale class methodsFor: 'instance creation' stamp: 'wb 11/7/2021 13:27:07'!
 of: aTotal
 
 	"should assert total is not negative or 0!!"
-	^self new initializeTotal: aTotal ! !
+	^self new initializeTotal: aTotal.! !
 
 
 !classDefinition: #StoreService category: 'TusLibros'!
 Object subclass: #StoreService
-	instanceVariableNames: 'authenticationService carts latestCartId catalogue'
+	instanceVariableNames: 'authenticationService merchantProcessor carts latestCartId latestTransactionId catalogue salesBook'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 15:25:52'!
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/7/2021 13:40:15'!
 addToCart: aCartId quantity: aQuantity of: anItem 
 	
 	| cart |
+	
 	cart := carts at: aCartId .
 	cart add: aQuantity of: anItem.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'wb 11/6/2021 16:45:00'!
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/7/2021 13:50:45'!
+checkoutCart: aCartId withCCN: aCCN withCCED: aCCED withCCO: aCCO
+
+	| creditCard cashier cart |
+	
+	self assertCartExists: aCartId.
+	
+	creditCard := CreditCard withCCN: aCCN withCCED: aCCED withCCO: aCCO.
+	cart := carts at: aCartId.
+	
+	cashier := Cashier toCheckout: cart 
+					charging: creditCard 
+					throught: merchantProcessor 
+					on: (DateAndTime now) 
+					registeringOn: salesBook.
+	cashier checkOut.
+	
+	latestTransactionId := latestTransactionId +1.
+	^latestTransactionId.! !
+
+!StoreService methodsFor: 'rest interface' stamp: 'wb 11/7/2021 13:40:54'!
 createCartFor: aUsername with: aPassword
 		
 	authenticationService authenticate: aUsername with: aPassword.
@@ -658,13 +745,16 @@ listCart: aCartId
 	^items.! !
 
 
-!StoreService methodsFor: 'initialization' stamp: 'wb 11/6/2021 15:13:13'!
-initializeWithAuthService: anAuthenticationService withCatalogue: aCatalogue
+!StoreService methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:41:32'!
+initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue
 	
 	authenticationService := anAuthenticationService.
+	merchantProcessor := aMerchantProcessor.
 	catalogue := aCatalogue.
 	carts := Dictionary new.
-	latestCartId := 0.! !
+	latestCartId := 0.
+	latestTransactionId := 0.
+	salesBook := OrderedCollection new.! !
 
 
 !StoreService methodsFor: 'assertions' stamp: 'wb 11/6/2021 16:52:53'!
@@ -691,10 +781,10 @@ invalidCredentialsErrorDesciption
 	^'Username or password invalid.'.! !
 
 
-!StoreService class methodsFor: 'instance creation' stamp: 'PhG 11/4/2021 21:00:46'!
-withAuthService: anAuthenticationService withCatalogue: aCatalogue
+!StoreService class methodsFor: 'instance creation' stamp: 'wb 11/7/2021 12:59:45'!
+withAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue
 
-	^self new initializeWithAuthService: anAuthenticationService withCatalogue: aCatalogue! !
+	^self new initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
@@ -745,15 +835,19 @@ defaultCatalogue
 		yourself ! !
 
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:37'!
-expiredCreditCard
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 13:51:34'!
+creditCardExpired
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber - 1)! !
+	^CreditCard withCCN: '123456789123456'
+				withCCED: (Month month: today monthIndex year: today yearNumber - 1)
+			     	withCCO: 'pepito'.! !
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:36'!
-notExpiredCreditCard
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'wb 11/7/2021 13:51:16'!
+creditCardNonExpired
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1)! !
+	^CreditCard withCCN: '123456789123456'
+			     withCCED: (Month month: today monthIndex year: today yearNumber + 1)
+			     withCCO: 'pepito'.! !
 
 
 !StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:37'!
