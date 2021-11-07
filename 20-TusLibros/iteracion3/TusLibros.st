@@ -405,18 +405,16 @@ test08CheckoutInvalidCartShouldFail
 		raise: Error
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription .]! !
 
-!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 13:39:11'!
+!StoreServiceTest methodsFor: 'checkout cart tests' stamp: 'wb 11/7/2021 14:01:19'!
 test09CheckoutWithValidCartShouldReturnTransactionId
 
-	| storeService cartId creditCard debitedAmout debitedCreditCard transactionId|
+	| storeService cartId creditCard transactionId|
 
 	storeService := StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).
 	creditCard := testObjectsFactory creditCardNonExpired.
 	
 	authenticationBehaviour := [:aUsername :aPassword | true ].
-	debitBehavior := [ :anAmount :aCreditCard | 
-		debitedAmout := anAmount.
-		debitedCreditCard := aCreditCard ].
+	debitBehavior := [ :anAmount :aCreditCard | true ].
 	
 	cartId  := storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
 	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
