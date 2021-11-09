@@ -1,13 +1,19 @@
-# Preguntas Teóricas - Tanda 3
+﻿# Preguntas Teóricas - Tanda 3
 
-## Observer Pattern
+## **Observer Pattern**
 
 Capítulo de Observer de Design Patterns - Lo visto en clase
 
 1. Explique un motivo por el cual el objeto observado puede verse afectado por el observador cuando el primero notifica de un cambio
-
+    
+    
+    BT: Cuando el primer observer es notificado, el mismo puede interactuar con el objeto observado modificando el estado interno, por ejemplo, pidiendo ser removido de la lista de observadores.
+    
 2. ¿Qué sucedería si el observador modifica el objeto observado cuando el primero fue notificado que el segundo cambió? De un ejemplo
-
+    
+    
+    BT: Pueden haber muchos casos. Por dar un ejemplo, si al modificar el objeto observado se produce una nueva notificacion de cambio, en el peor caso se podria producir un ciclo. Otro caso posible es que al momento de que el proximo observador sea notificado, el primer observador haya "consumido" o modificado cierta informacion del objeto observado, dandole importancia al orden en el cual se notifican los observadores. 
+    Por ultimo, y viendo en mayor profundidad la implementacion, hay que tomar precauciones a la hora de iterar los observadores a notificar, ya que si un observador se desuscribe al ser notificado, podria llegar a haber problemas al estar modificando una lista que esta siendo recorrida.
 
 ## Composite Pattern
 
