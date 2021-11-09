@@ -248,7 +248,7 @@ debit: anAmount from: aCreditCard
 
 !classDefinition: #StoreServiceTest category: 'TusLibros'!
 TestCase subclass: #StoreServiceTest
-	instanceVariableNames: 'testObjectsFactory authenticationBehaviour debitBehavior'
+	instanceVariableNames: 'testObjectsFactory authenticationBehaviour debitBehavior timeoutBehaviour now'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -286,7 +286,7 @@ test02WhenCreatingACartCredentialsAreValidated
 	self assert: passwordAuthenticated equals: testObjectsFactory validPassword.
 	! !
 
-!StoreServiceTest methodsFor: 'create cart tests' stamp: 'PhG 11/7/2021 22:26:40'!
+!StoreServiceTest methodsFor: 'create cart tests' stamp: 'PhG 11/8/2021 17:21:58'!
 test03CreateCartWithValidCredentialsCreatesEmptyCart
 
 	| storeService cartId |
@@ -295,7 +295,7 @@ test03CreateCartWithValidCredentialsCreatesEmptyCart
 	
 	cartId  := self createCartForValidUserIn: storeService.
 	
-	self assert: Dictionary new equals: (storeService listCart: cartId).! !
+	self assert: (storeService listCart: cartId) isEmpty.! !
 
 
 !StoreServiceTest methodsFor: 'authentication protocol' stamp: 'PhG 11/4/2021 20:31:01'!
@@ -304,24 +304,29 @@ authenticate: aUsername with: aPassword
 	^authenticationBehaviour value: aUsername value: aPassword.! !
 
 
-!StoreServiceTest methodsFor: 'list carts tests' stamp: 'PhG 11/7/2021 22:27:55'!
+!StoreServiceTest methodsFor: 'list carts tests' stamp: 'PhG 11/8/2021 18:16:19'!
 test07ListCartsShouldWorkWithDifferentCarts
 
-	| storeService cartId anotherCartId itemToBeAdded anotherItemToBeAdded |
+	| storeService cartId anotherCartId itemToBeAdded anotherItemToBeAdded cartContent anotherCartContent |
 
 	storeService := self storeServiceAuthenticatingUsers.
 	
 	cartId  := self createCartForValidUserIn: storeService.
 	anotherCartId  := self createCartForValidUserIn: storeService.
 	
-	itemToBeAdded := (testObjectsFactory itemSoldByTheStore ).
-	anotherItemToBeAdded := (testObjectsFactory anotherItemSoldByTheStore).
+	itemToBeAdded := testObjectsFactory itemSoldByTheStore .
+	anotherItemToBeAdded := testObjectsFactory anotherItemSoldByTheStore.
 	
 	storeService addToCart: cartId quantity: 1 of: itemToBeAdded.
 	storeService addToCart: anotherCartId quantity: 2 of: anotherItemToBeAdded.
 	
-	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).
-	self assert: (storeService listCart: anotherCartId) equals: (Dictionary with: anotherItemToBeAdded->2).! !
+	cartContent := storeService listCart: cartId.
+	anotherCartContent := storeService listCart: anotherCartId.
+
+	self assert: cartContent size equals: 1.
+	self assert: (cartContent occurrencesOf: itemToBeAdded) equals: 1.
+	self assert: anotherCartContent size equals: 2.
+	self assert: (anotherCartContent occurrencesOf: anotherItemToBeAdded) equals: 2.! !
 
 !StoreServiceTest methodsFor: 'list carts tests' stamp: 'PhG 11/7/2021 22:36:50'!
 test08ListCartsShouldFailWithInvalidCart
@@ -337,19 +342,21 @@ test08ListCartsShouldFailWithInvalidCart
 		withExceptionDo: [ :anError | self assert: anError messageText = StoreService invalidCartErrorDescription.]! !
 
 
-!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'PhG 11/7/2021 22:26:52'!
+!StoreServiceTest methodsFor: 'add to cart tests' stamp: 'PhG 11/8/2021 18:14:23'!
 test04WhenAddingBookToCreatedCartBookIsReturnedInListCart
 
-	| storeService cartId itemToBeAdded |
+	| storeService cartId itemToBeAdded cartContent |
 
 	storeService := self storeServiceAuthenticatingUsers.
 	
 	cartId  := self createCartForValidUserIn: storeService.
-	itemToBeAdded := (testObjectsFactory itemSoldByTheStore).
+	itemToBeAdded := testObjectsFactory itemSoldByTheStore.
 	
 	storeService addToCart: cartId quantity: 1 of: itemToBeAdded.
-	
-	self assert: (storeService listCart: cartId) equals: (Dictionary with: itemToBeAdded->1).! !
+	cartContent := storeService listCart: cartId.
+
+	self assert: cartContent size equals: 1.
+	self assert: (cartContent occurrencesOf: itemToBeAdded) equals: 1.! !
 
 !StoreServiceTest methodsFor: 'add to cart tests' stamp: 'PhG 11/7/2021 22:34:11'!
 test05AddBookNotSoldErrorIsInvalidBookError
@@ -418,32 +425,81 @@ storeServiceAuthenticatingUsers
 
 	^self storeServiceWithAuthenticationBehaviour: [:aUsername :aPassword | true ].! !
 
-!StoreServiceTest methodsFor: 'store service creation' stamp: 'PhG 11/7/2021 22:20:38'!
+!StoreServiceTest methodsFor: 'store service creation' stamp: 'PhG 11/8/2021 20:37:22'!
 storeServiceWithAuthenticationBehaviour: anAuthenticationBehaviour
 
 	authenticationBehaviour := anAuthenticationBehaviour.
+	now := DateAndTime now.
 
-	^StoreService withAuthService: self withMerchantProcessor: self withCatalogue: (testObjectsFactory defaultCatalogue).! !
+	^StoreService 
+		withAuthService: self 
+		withMerchantProcessor: self 
+		withCatalogue: testObjectsFactory defaultCatalogue
+		withClock: self.! !
 
 
-!StoreServiceTest methodsFor: 'checkout cart' stamp: 'PhG 11/7/2021 22:31:34'!
+!StoreServiceTest methodsFor: 'checkout cart' stamp: 'PhG 11/8/2021 17:17:12'!
 checkoutCart: cartId usingValidCreditCardIn: storeService
 
 	^ storeService checkoutCart: cartId 
-							 payingWithCreditCard: testObjectsFactory validCardNumber 
-							 expiringOn: testObjectsFactory validCardExpirationDate 
-							 ownedBy: testObjectsFactory validCardOwner! !
+		 payingWithCreditCard: testObjectsFactory validCardNumber 
+		 expiringOn: testObjectsFactory validCardExpirationDate 
+		 ownedBy: testObjectsFactory validCardOwner! !
 
 
-!StoreServiceTest methodsFor: 'create cart' stamp: 'PhG 11/7/2021 22:26:40'!
+!StoreServiceTest methodsFor: 'create cart' stamp: 'PhG 11/8/2021 17:17:30'!
 createCartForValidUserIn: storeService
 
-	^ storeService createCartFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword)! !
+	^ storeService createCartFor: testObjectsFactory validUser 
+		with: testObjectsFactory validPassword! !
 
 !StoreServiceTest methodsFor: 'create cart' stamp: 'PhG 11/7/2021 22:36:34'!
 invalidCartIdIn: storeService
 
 	^ (self createCartForValidUserIn: storeService) + 1! !
+
+
+!StoreServiceTest methodsFor: 'timer tests' stamp: 'PhG 11/8/2021 20:37:40'!
+test11OperatingCartAfterExpirationTimeThrowsTimeoutError
+
+	| storeService cartId |
+
+	storeService := self storeServiceAuthenticatingUsers.
+	debitBehavior := [ :anAmount :aCreditCard | true ].
+	
+	cartId  := self createCartForValidUserIn: storeService.
+	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
+	
+	now := now + (Duration minutes: 31).
+
+	self should: [ self checkoutCart: cartId usingValidCreditCardIn: storeService.]
+		raise: Error
+		withExceptionDo: [ :anError | self assert: anError messageText = StoreService cartTimeoutErrorDescription. ]! !
+
+!StoreServiceTest methodsFor: 'timer tests' stamp: 'PhG 11/8/2021 21:37:16'!
+test12OperatingCartJustBeforeExpirationTimeRenewsExpirationTime
+
+	| storeService cartId |
+
+	storeService := self storeServiceAuthenticatingUsers.
+	debitBehavior := [ :anAmount :aCreditCard | true ].
+	
+	cartId  := self createCartForValidUserIn: storeService.
+	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
+	
+	now := now + (Duration minutes: 29).
+	
+	storeService listCart: cartId.
+	
+	now := now + (Duration minutes: 25).
+
+	self shouldnt: [ self checkoutCart: cartId usingValidCreditCardIn: storeService.]
+		raise: Error.! !
+
+
+!StoreServiceTest methodsFor: 'cart timeout protocol' stamp: 'PhG 11/8/2021 20:28:31'!
+now
+	^now! !
 
 
 !classDefinition: #Cart category: 'TusLibros'!
@@ -506,6 +562,14 @@ add: aQuantity of: anItem
 	self assertIsValidItem: anItem.
 
 	1 to: aQuantity do: [ :aNumber | items add: anItem ]! !
+
+
+!Cart methodsFor: 'content' stamp: 'PhG 11/8/2021 18:12:59'!
+content
+
+	^Bag new 
+		addAll: items;
+		yourself.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -686,27 +750,29 @@ of: aTotal
 
 !classDefinition: #StoreService category: 'TusLibros'!
 Object subclass: #StoreService
-	instanceVariableNames: 'authenticationService merchantProcessor carts latestCartId latestTransactionId catalogue salesBook'
+	instanceVariableNames: 'authenticationService merchantProcessor carts latestCartId latestTransactionId catalogue salesBook cartTimeout clock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/7/2021 22:42:33'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/8/2021 20:22:51'!
 addToCart: aCartId quantity: aQuantity of: anItem 
 	
 	| cart |
 	
 	self assertCartExists: aCartId.
+	self assertCartTimeout: aCartId.
 	
 	cart := carts at: aCartId.
 	cart add: aQuantity of: anItem.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/7/2021 22:45:11'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/8/2021 21:26:33'!
 checkoutCart: aCartId payingWithCreditCard: aCardNumber expiringOn: anExpirationDate ownedBy: aCardOwner
 
 	| creditCard cart |
 	
 	self assertCartExists: aCartId.
+	self assertCartTimeout: aCartId.
 	
 	creditCard := CreditCard withCardNumber: aCardNumber expiring: anExpirationDate cardOwner: aCardOwner.
 	cart := carts at: aCartId.
@@ -715,38 +781,36 @@ checkoutCart: aCartId payingWithCreditCard: aCardNumber expiringOn: anExpiration
 	
 	^self nextTransactionId.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/7/2021 22:42:11'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/8/2021 21:25:51'!
 createCartFor: aUsername with: aPassword
 		
+	| cartId |
 	self assertAuthenticationForUser: aUsername withPassword: aPassword.
 	
-	carts at: self nextCartId put: (Cart acceptingItemsOf: catalogue).
+	cartId := self nextCartId.
+	carts at: cartId put: (Cart acceptingItemsOf: catalogue).
+	cartTimeout at: cartId put: clock now.
 
 	^latestCartId.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/7/2021 22:49:50'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/8/2021 21:26:40'!
 listCart: aCartId
 
-	|cart items|
-	
 	self assertCartExists: aCartId.
+	self assertCartTimeout: aCartId.
 	
-	cart := carts at: aCartId.
-	items := Dictionary new.
-	catalogue 	keysDo: [:anItem | 
-		|occurences|
-		occurences := cart occurrencesOf: anItem.
-		(occurences >0) ifTrue: [items at: anItem put: occurences]].
-	^items.! !
+	^(carts at: aCartId) content copy.! !
 
 
-!StoreService methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:41:32'!
-initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue
+!StoreService methodsFor: 'initialization' stamp: 'PhG 11/8/2021 20:25:45'!
+initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue withClock: aClock
 	
 	authenticationService := anAuthenticationService.
 	merchantProcessor := aMerchantProcessor.
+	clock := aClock.
 	catalogue := aCatalogue.
 	carts := Dictionary new.
+	cartTimeout := Dictionary new.
 	latestCartId := 0.
 	latestTransactionId := 0.
 	salesBook := OrderedCollection new.! !
@@ -762,11 +826,23 @@ assertCartExists: aCartId
 
 	(carts includesKey: aCartId) ifFalse: [ self error: StoreService invalidCartErrorDescription. ]! !
 
+!StoreService methodsFor: 'assertions' stamp: 'PhG 11/8/2021 21:35:19'!
+assertCartTimeout: aCartId 
+	
+	| lastUsage now |
+	
+	lastUsage := cartTimeout at: aCartId.
+	now := clock now.
+	
+	((Duration minutes: 30) < (now - lastUsage)) ifTrue: [self error: StoreService cartTimeoutErrorDescription].
+	
+	cartTimeout at: aCartId put: now.! !
 
-!StoreService methodsFor: 'next id' stamp: 'PhG 11/7/2021 22:40:53'!
+
+!StoreService methodsFor: 'next id' stamp: 'PhG 11/8/2021 17:55:03'!
 nextCartId
-
-	^ latestCartId := latestCartId + 1! !
+	
+	^latestCartId := latestCartId + 1.! !
 
 !StoreService methodsFor: 'next id' stamp: 'PhG 11/7/2021 22:40:44'!
 nextTransactionId
@@ -792,6 +868,10 @@ checkout: aCart chargingOn: aCreditCard
 StoreService class
 	instanceVariableNames: ''!
 
+!StoreService class methodsFor: 'error descriptions' stamp: 'PhG 11/8/2021 21:22:08'!
+cartTimeoutErrorDescription
+	^'Timeout exceeded.'.! !
+
 !StoreService class methodsFor: 'error descriptions' stamp: 'wb 11/6/2021 16:08:24'!
 invalidBookErrorDesciption
 	^'Trying to add an invalid book.'.! !
@@ -805,10 +885,10 @@ invalidCredentialsErrorDesciption
 	^'Username or password invalid.'.! !
 
 
-!StoreService class methodsFor: 'instance creation' stamp: 'wb 11/7/2021 12:59:45'!
-withAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue
+!StoreService class methodsFor: 'instance creation' stamp: 'PhG 11/8/2021 20:26:18'!
+withAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue withClock: aClock
 
-	^self new initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue! !
+	^self new initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue withClock: aClock! !
 
 
 !classDefinition: #StoreTestObjectsFactory category: 'TusLibros'!
