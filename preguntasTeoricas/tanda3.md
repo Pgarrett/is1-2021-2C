@@ -5,15 +5,12 @@
 Capítulo de Observer de Design Patterns - Lo visto en clase
 
 1. Explique un motivo por el cual el objeto observado puede verse afectado por el observador cuando el primero notifica de un cambio
-    
-    
-    BT: Cuando el primer observer es notificado, el mismo puede interactuar con el objeto observado modificando el estado interno, por ejemplo, pidiendo ser removido de la lista de observadores.
+
+* BT: Cuando el primer observer es notificado, el mismo puede interactuar con el objeto observado modificando el estado interno, por ejemplo, pidiendo ser removido de la lista de observadores.
     
 2. ¿Qué sucedería si el observador modifica el objeto observado cuando el primero fue notificado que el segundo cambió? De un ejemplo
-    
-    
-    BT: Pueden haber muchos casos. Por dar un ejemplo, si al modificar el objeto observado se produce una nueva notificacion de cambio, en el peor caso se podria producir un ciclo. Otro caso posible es que al momento de que el proximo observador sea notificado, el primer observador haya "consumido" o modificado cierta informacion del objeto observado, dandole importancia al orden en el cual se notifican los observadores. 
-    Por ultimo, y viendo en mayor profundidad la implementacion, hay que tomar precauciones a la hora de iterar los observadores a notificar, ya que si un observador se desuscribe al ser notificado, podria llegar a haber problemas al estar modificando una lista que esta siendo recorrida.
+
+* BT: Pueden haber muchos casos. Por dar un ejemplo, si al modificar el objeto observado se produce una nueva notificacion de cambio, en el peor caso se podria producir un ciclo. Otro caso posible es que al momento de que el proximo observador sea notificado, el primer observador haya "consumido" o modificado cierta informacion del objeto observado, dandole importancia al orden en el cual se notifican los observadores. Por ultimo, y viendo en mayor profundidad la implementacion, hay que tomar precauciones a la hora de iterar los observadores a notificar, ya que si un observador se desuscribe al ser notificado, podria llegar a haber problemas al estar modificando una lista que esta siendo recorrida.
 
 ## Composite Pattern
 
@@ -48,4 +45,8 @@ https://www.quora.com/Was-computing-dumbed-down-by-the-arrival-of-computer-scien
 
 1. ¿Qué relevancia tiene la noción de 'algoritmo' en Ciencias de la Computación según Alan Kay? 
 
+* PG: Según Alan Kay, la noción de 'algoritmo' es una pequeña parte de la computación.
+
 2. ¿Cual o cuales son la nociones centrales de la disciplina según Alan Kay?
+
+* PG: Es más relevante para la disciplina el hecho de poder entender, inventar y construir sistemas. Eso nos permite, por ejemplo, explorar las teorías que se formulan. La interacción con los sistemas permite que los mismos crezcan cuando "se quedan cortos" (en la respuesta lo relaciona con la matemática), de esta forma los sistemas evolucionan con el paso del tiempo y no son formulaciones estáticas. Dicho de otra forma, nos permiten seguir aprendiendo.
