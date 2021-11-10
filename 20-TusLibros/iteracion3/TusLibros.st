@@ -123,7 +123,7 @@ test01CanNotCheckoutAnEmptyCart
 			self assert: anError messageText = Cashier cartCanNotBeEmptyErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/10/2021 18:25:19'!
 test02CalculatedTotalIsCorrect
 
 	| cart cashier |
@@ -138,7 +138,7 @@ test02CalculatedTotalIsCorrect
 		on: testObjectsFactory today 
 		registeringOn: OrderedCollection new.
 		
-	self assert: cashier checkOut = (testObjectsFactory itemSoldByTheStorePrice * 2)! !
+	self assert: cashier checkOut total = (testObjectsFactory itemSoldByTheStorePrice * 2)! !
 
 !CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:05:48'!
 test03CanNotCheckoutWithAnExpiredCreditCart
@@ -161,7 +161,7 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/10/2021 18:25:32'!
 test04CheckoutRegistersASale
 
 	| cart cashier salesBook total |
@@ -177,12 +177,12 @@ test04CheckoutRegistersASale
 		on: testObjectsFactory today
 		registeringOn: salesBook.
 		
-	total := cashier checkOut.
+	total := cashier checkOut total.
 					
 	self assert: salesBook size = 1.
 	self assert: salesBook first total = total.! !
 
-!CashierTest methodsFor: 'tests' stamp: 'wb 11/7/2021 12:06:36'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/10/2021 18:25:38'!
 test05CashierChargesCreditCardUsingMerchantProcessor
 
 	| cart cashier salesBook total creditCard debitedAmout debitedCreditCard  |
@@ -202,7 +202,7 @@ test05CashierChargesCreditCardUsingMerchantProcessor
 	debitBehavior := [ :anAmount :aCreditCard | 
 		debitedAmout := anAmount.
 		debitedCreditCard := aCreditCard ].
-	total := cashier checkOut.
+	total := cashier checkOut total.
 					
 	self assert: debitedCreditCard = creditCard.
 	self assert: debitedAmout = total.! !
@@ -502,20 +502,12 @@ now
 	^now! !
 
 
-!StoreServiceTest methodsFor: 'list purchases tests' stamp: 'PhG 11/9/2021 23:34:08'!
+!StoreServiceTest methodsFor: 'list purchases tests' stamp: 'PhG 11/10/2021 18:30:56'!
 test13ListPurchasesOfInvalidClientThrowsInvalidCredentialsError
 
-	| storeService cartId |
+	| storeService |
 
-	storeService := self storeServiceAuthenticatingUsers.
-	debitBehavior := [ :anAmount :aCreditCard | true ].
-	
-	cartId  := self createCartForValidUserIn: storeService.
-	storeService addToCart: cartId quantity: 1 of:  (testObjectsFactory itemSoldByTheStore ).
-	
-	self checkoutCart: cartId usingValidCreditCardIn: storeService.
-
-	authenticationBehaviour := [:aUsername :aPassword | self error: StoreService invalidCredentialsErrorDesciption].
+	storeService := self storeServiceWithAuthenticationBehaviour: [:aUsername :aPassword | self error: StoreService invalidCredentialsErrorDesciption].
 	
 	self should: [ storeService listPurchasesFor: (testObjectsFactory invalidUser) with: (testObjectsFactory invalidPassword)]
 		raise: Error
@@ -564,6 +556,22 @@ test15ListPurchasesOfClientWithTwoPurchaseIncludesBothPurchases
 	self assert: (purchases key occurrencesOf: testObjectsFactory itemSoldByTheStore) equals: 2.
 	self assert: (purchases key occurrencesOf: testObjectsFactory anotherItemSoldByTheStore) equals: 2.
 	self assert: purchases value equals: (testObjectsFactory itemSoldByTheStorePrice * 2) + (testObjectsFactory anotherItemSoldByTheStorePrice * 2).
+	! !
+
+!StoreServiceTest methodsFor: 'list purchases tests' stamp: 'PhG 11/10/2021 18:50:44'!
+test16ListPurchasesOfClientWithoutPurchaseHasNoItemsNorTotal
+
+	| storeService purchases |
+
+	storeService := self storeServiceAuthenticatingUsers.
+	debitBehavior := [ :anAmount :aCreditCard | true ].
+	
+	self createCartForValidUserIn: storeService.
+	
+	purchases := storeService listPurchasesFor: (testObjectsFactory validUser) with: (testObjectsFactory validPassword).
+	
+	self assert: purchases key size equals: 0.
+	self assert: purchases value equals: 0.
 	! !
 
 
@@ -689,15 +697,23 @@ registerSale
 
 	salesBook add: (self createSale).! !
 
+!Cashier methodsFor: 'checkout - private' stamp: 'PhG 11/10/2021 18:24:41'!
+registerSale: sale
 
-!Cashier methodsFor: 'checkout' stamp: 'HernanWilkinson 6/17/2013 19:06'!
+	salesBook add: sale.! !
+
+
+!Cashier methodsFor: 'checkout' stamp: 'PhG 11/10/2021 18:25:07'!
 checkOut
+
+	| sale |
 
 	self calculateTotal.
 	self debitTotal.
-	self registerSale.
+	sale := (self createSale).
+	self registerSale: sale.
 
-	^ total! !
+	^ sale.! !
 
 
 !Cashier methodsFor: 'initialization' stamp: 'wb 11/7/2021 12:45:19'!
@@ -795,11 +811,6 @@ total
 	^ total.! !
 
 
-!Sale methodsFor: 'initialization' stamp: 'wb 11/7/2021 13:30:52'!
-initializeTotal: aTotal
-
-	total := aTotal.! !
-
 !Sale methodsFor: 'initialization' stamp: 'PhG 11/10/2021 08:24:42'!
 initializeTotal: aTotal withProducts: someProducts
 
@@ -816,13 +827,6 @@ products
 !classDefinition: 'Sale class' category: 'TusLibros'!
 Sale class
 	instanceVariableNames: ''!
-
-!Sale class methodsFor: 'instance creation' stamp: 'PhG 11/10/2021 08:23:01'!
-of: aTotal
-
-	self assertTotalIsPositive: aTotal.
-	
-	^self new initializeTotal: aTotal.! !
 
 !Sale class methodsFor: 'instance creation' stamp: 'PhG 11/10/2021 08:23:42'!
 of: aTotal with: someProducts
@@ -845,7 +849,7 @@ assertTotalIsPositive: aTotal
 
 !classDefinition: #StoreService category: 'TusLibros'!
 Object subclass: #StoreService
-	instanceVariableNames: 'authenticationService merchantProcessor carts latestCartId latestTransactionId catalogue salesBook cartTimeout clock cartsByUser salesByUser'
+	instanceVariableNames: 'authenticationService merchantProcessor carts latestCartId latestTransactionId catalogue salesBook cartTimeout clock userService'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -861,10 +865,10 @@ addToCart: aCartId quantity: aQuantity of: anItem
 	cart := carts at: aCartId.
 	cart add: aQuantity of: anItem.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 09:12:17'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 19:02:51'!
 checkoutCart: aCartId payingWithCreditCard: aCardNumber expiringOn: anExpirationDate ownedBy: aCardOwner
 
-	| creditCard cart salesByUserKey |
+	| creditCard cart sale |
 	
 	self assertCartExists: aCartId.
 	self assertCartTimeout: aCartId.
@@ -872,17 +876,16 @@ checkoutCart: aCartId payingWithCreditCard: aCardNumber expiringOn: anExpiration
 	creditCard := CreditCard withCardNumber: aCardNumber expiring: anExpirationDate cardOwner: aCardOwner.
 	cart := carts at: aCartId.
 	
-	self checkout: cart chargingOn: creditCard.
+	sale := self checkout: cart chargingOn: creditCard.
 	
-	salesByUserKey := (cartsByUser at: aCartId).
-	salesByUser at: salesByUserKey
-		ifPresent: [:userSales | userSales add: salesBook last]
-		ifAbsent: [ salesByUser at: salesByUserKey put: (OrderedCollection with: salesBook last)].
-	cartsByUser removeKey: aCartId.
+	userService registerPurchase: sale for: (userService userFor: aCartId).
+		
+	carts removeKey: aCartId.
+	cartTimeout removeKey: aCartId.
 	
 	^self nextTransactionId.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 08:36:54'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 19:02:29'!
 createCartFor: aUsername with: aPassword
 		
 	| cartId |
@@ -891,7 +894,7 @@ createCartFor: aUsername with: aPassword
 	cartId := self nextCartId.
 	carts at: cartId put: (Cart acceptingItemsOf: catalogue).
 	cartTimeout at: cartId put: clock now.
-	cartsByUser at: cartId put: (aUsername,aPassword).
+	userService registerCart: cartId for: aUsername.
 
 	^latestCartId.! !
 
@@ -903,24 +906,15 @@ listCart: aCartId
 	
 	^(carts at: aCartId) content copy.! !
 
-!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 09:14:32'!
+!StoreService methodsFor: 'rest interface' stamp: 'PhG 11/10/2021 19:02:16'!
 listPurchasesFor: aUsername with: aPassword
 
-	| allProducts total |
 	self assertAuthenticationForUser: aUsername withPassword: aPassword.
 	
-	allProducts := Bag new.
-	total := 0.
-	
-	(salesByUser at: (aUsername,aPassword)) do: [:aSale |
-		allProducts addAll: aSale products.
-		total := total + aSale total.
-	].
-	
-	^allProducts->total.! !
+	^userService purchasesFor: aUsername.! !
 
 
-!StoreService methodsFor: 'initialization' stamp: 'PhG 11/10/2021 08:38:02'!
+!StoreService methodsFor: 'initialization' stamp: 'PhG 11/10/2021 19:03:04'!
 initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerchantProcessor withCatalogue: aCatalogue withClock: aClock
 	
 	authenticationService := anAuthenticationService.
@@ -929,11 +923,10 @@ initializeWithAuthService: anAuthenticationService withMerchantProcessor: aMerch
 	catalogue := aCatalogue.
 	carts := Dictionary new.
 	cartTimeout := Dictionary new.
-	cartsByUser := Dictionary new.
 	latestCartId := 0.
 	latestTransactionId := 0.
 	salesBook := OrderedCollection new.
-	salesByUser := Dictionary new.! !
+	userService := UserService new.! !
 
 
 !StoreService methodsFor: 'assertions' stamp: 'PhG 11/7/2021 22:41:32'!
@@ -970,7 +963,7 @@ nextTransactionId
 	^ latestTransactionId := latestTransactionId +1! !
 
 
-!StoreService methodsFor: 'checkout' stamp: 'PhG 11/7/2021 22:45:50'!
+!StoreService methodsFor: 'checkout' stamp: 'PhG 11/10/2021 18:24:20'!
 checkout: aCart chargingOn: aCreditCard 
 	
 	| cashier |
@@ -980,7 +973,7 @@ checkout: aCart chargingOn: aCreditCard
 					throught: merchantProcessor 
 					on: (DateAndTime now) 
 					registeringOn: salesBook.
-	cashier checkOut.! !
+	^cashier checkOut.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1113,3 +1106,55 @@ validPassword
 !StoreTestObjectsFactory methodsFor: 'user credentials' stamp: 'PhG 11/4/2021 21:11:58'!
 validUser
 	^'maximilianoCozzetti'! !
+
+
+!classDefinition: #UserService category: 'TusLibros'!
+Object subclass: #UserService
+	instanceVariableNames: 'usersByCart purchasesByUser'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!UserService methodsFor: 'initialization' stamp: 'PhG 11/10/2021 18:55:14'!
+initialize
+	usersByCart := Dictionary new.
+	purchasesByUser := Dictionary new.! !
+
+
+!UserService methodsFor: 'purchases' stamp: 'PhG 11/10/2021 19:01:16'!
+purchasesFor: aUsername
+
+	| allProducts total |
+	
+	(purchasesByUser includesKey: aUsername) ifFalse: [^OrderedCollection new->0].
+	
+	allProducts := Bag new.
+	total := 0.
+	
+	(purchasesByUser at: aUsername) do: [:aSale |
+		allProducts addAll: aSale products.
+		total := total + aSale total.
+	].
+	
+	^allProducts->total.! !
+
+!UserService methodsFor: 'purchases' stamp: 'PhG 11/10/2021 18:54:51'!
+registerPurchase: aPurchase for: aUsername
+
+	purchasesByUser at: aUsername
+		ifPresent: [:userSales | userSales add: aPurchase]
+		ifAbsent: [ purchasesByUser at: aUsername put: (OrderedCollection with: aPurchase)].! !
+
+
+!UserService methodsFor: 'cart register' stamp: 'PhG 11/10/2021 18:51:51'!
+registerCart: aCartId for: aUsername
+
+	usersByCart at: aCartId put: aUsername.! !
+
+
+!UserService methodsFor: 'user' stamp: 'PhG 11/10/2021 18:52:36'!
+userFor: aCartId
+
+	"assert user exists?"
+
+	^usersByCart at: aCartId.! !
