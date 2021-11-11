@@ -18,7 +18,11 @@ Capítulo de Composite de Design Patterns - Lo visto en clase
 
 1. Un compañero de trabajo utiliza un composite para resolver un problema. Explicite todas las razones que considera lo llevaron a utilizarlo.
 
+* PG: El problema que el compañero está resolviendo seguramente tenga como participantes a objetos que pueden ser compuestos o individuales, formando una especie de árbol, donde los objetos individuales pueden ser parte de los objetos compuestos que a su vez pueden ser parte de otros objetos compuestos. Tanto los objetos compuestos como los individuales deben ser tratados de la misma forma
+
 2. Ahora encuentre y explique las desventajas que su compañero puede encontrarse por haber tomado la decisión de utilizar este patrón para resolver su problema.
+
+* PG: Al utilizar un composite para resolver su problema, el compañero puede tener dificultades si en los nuevos requirimientos alguno de los objetos pertenecientes al árbol empieza a necesitar un comportamiento muy distinto en el que la pertenencia al árbol ya no sea tan consistente, desacoplarlo puede llevar un gran trabajo.
 
 
 ## Visitor Pattern
@@ -26,8 +30,11 @@ Capítulo de Composite de Design Patterns - Lo visto en clase
 Capítulo de Visitor de Design Patterns - Lo visto en clase
 
 1. En TODO problema resuelto mediante el patrón Visitor, subyacen los patrones:
+* BT+PG: Composite y Double Dispatch
 
 2. ¿Cuál es el beneficio de utilizar un method object en lo que respecta al double dispatch genérico?
+
+* BT: Usar un method object para el double dispatch nos permite reutilizar esa lógica a través de las distintas clases sobre las que se va a realizar el double dispatch. De esa manera podemos preservar una jerarquia existente pero logrando el mismo comportamiento por medio de compoisición.
 
 
 ## Pattern Abuser
