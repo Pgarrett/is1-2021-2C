@@ -42,9 +42,10 @@ Capítulo de Visitor de Design Patterns - Lo visto en clase
 https://ubadao.files.wordpress.com/2013/07/pattern-abuser.pdf
 
 1. ¿Es conveniente en algún caso aplicar patrones sistemáticamente como describe el artículo? ¿De qué depende?
+* WB: Aplicar patrones sistemáticamente, sin pensar, con reglas preestablecidas y rígidas, no es recomendable, ya que podríamos caer en la falla de sobre-diseñar algo simple, o de querer aplicar siempre la misma solución a distintos problemas ("si mi única herramienta es un martillo, todos mis problemas son clavos", etcétera). Idealmente debemos aplicar un patrón a un diseño si llegamos naturalmente a él (no porque ya teníamos la intención previa de usarlo), y solamente si estamos convencidos de que mejorará nuestra aplicación (la hará más fácil de modificar y entender, más testeable, más escalable).
 
 2. ¿Es cierto que siempre es mala idea combinar más de un patrón de diseño en una solución? Justificar (puede incluir ejemplos)
-
+* WB: En principio no es mala idea incluir más de un patrón de diseño en una solución. Algunas veces un patrón es en realidad combinación de dos patrones; por ejemplo, el Visitor es una mezcla de Composite y Double Dispatch. En otras ocasiones, un patrón resuelve una parte del problema y otro patrón, una diferente. Un Adapter para lidiar con una clase legacy que debemos mantener, luego puede ser incluído en una jerarquía de objetos en un Composite. O en un aeropuerto, para mostrar información de los vuelos en sus pantallas: un Observer para que se vea la info en las pantallas mezclado con un State para mostrar de cierta forma o en ciertas pantallas los vuelos que estén en cierto estado.
 
 ## Alan Kay en Quora
 
