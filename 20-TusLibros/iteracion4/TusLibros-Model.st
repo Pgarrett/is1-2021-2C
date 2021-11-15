@@ -5,6 +5,11 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
+!Cart methodsFor: 'error messages' stamp: 'PhG 11/13/2021 12:42:05'!
+canNotRemoveFromEmptyCartErrorMessage
+
+	^self class invalidItemErrorMessage ! !
+
 !Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/21/2013 23:59'!
 invalidItemErrorMessage
 
@@ -16,6 +21,11 @@ invalidQuantityErrorMessage
 	^self class invalidQuantityErrorMessage ! !
 
 
+!Cart methodsFor: 'assertions' stamp: 'PhG 11/13/2021 12:43:24'!
+assertCartIsNotEmpty
+
+	self isEmpty ifTrue: [self signalCanNotRemoveFromEmptyCart ]! !
+
 !Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/22/2013 14:17'!
 assertIsValidItem: anItem
 
@@ -25,6 +35,11 @@ assertIsValidItem: anItem
 assertIsValidQuantity: aQuantity
 
 	aQuantity strictlyPositive ifFalse: [self signalInvalidQuantity ]! !
+
+!Cart methodsFor: 'assertions' stamp: 'PhG 11/14/2021 17:12:31'!
+assertValidRemovedItems: aQuantity of: anItem
+
+	(aQuantity > (items occurrencesOf: anItem)) ifTrue: [self signalInvalidQuantity ].! !
 
 
 !Cart methodsFor: 'content' stamp: 'HernanWilkinson 6/22/2013 12:17'!
@@ -54,6 +69,11 @@ initializeAcceptingItemsOf: aCatalog
 	catalog := aCatalog.
 	items := Bag new.! !
 
+
+!Cart methodsFor: 'error signal' stamp: 'PhG 11/13/2021 12:41:54'!
+signalCanNotRemoveFromEmptyCart
+
+	self error: self canNotRemoveFromEmptyCartErrorMessage ! !
 
 !Cart methodsFor: 'error signal' stamp: 'HernanWilkinson 6/22/2013 14:18'!
 signalInvalidItem
@@ -90,11 +110,33 @@ add: aQuantity of: anItem
 
 	items add: anItem withOccurrences: aQuantity ! !
 
+
+!Cart methodsFor: 'removing' stamp: 'PhG 11/13/2021 12:45:15'!
+remove: anItem 
+
+	^self remove: 1 of: anItem.
+	! !
+
+!Cart methodsFor: 'removing' stamp: 'PhG 11/14/2021 17:13:09'!
+remove: aQuantity of: anItem 
+
+	self assertCartIsNotEmpty.	
+	self assertIsValidQuantity: aQuantity.
+	self assertIsValidItem: anItem.
+	self assertValidRemovedItems: aQuantity of: anItem.
+	
+	aQuantity timesRepeat: [items remove: anItem.].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cart class' category: 'TusLibros-Model'!
 Cart class
 	instanceVariableNames: ''!
+
+!Cart class methodsFor: 'error messages' stamp: 'PhG 11/13/2021 12:42:17'!
+canNotRemoveFromEmptyCartErrorMessage
+
+	^'Can not remove items from empty cart'! !
 
 !Cart class methodsFor: 'error messages' stamp: 'HernanWilkinson 6/21/2013 23:59'!
 invalidItemErrorMessage
@@ -187,6 +229,11 @@ checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringO
 		throught: systemFacade merchantProcessor
 		on: self today
 		registeringOn: systemFacade salesBook) checkOut ! !
+
+!CartSession methodsFor: 'cart' stamp: 'PhG 11/14/2021 21:13:21'!
+remove: anAmount of: aBook 
+	
+	^cart remove: anAmount of: aBook! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -319,6 +366,54 @@ signalCartCanNotBeEmpty
 	self error: self cartCanNotBeEmptyErrorMessage! !
 
 
+!classDefinition: #Catalogue category: 'TusLibros-Model'!
+Object subclass: #Catalogue
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!Catalogue methodsFor: 'catalogue' stamp: 'PhG 11/13/2021 11:43:33'!
+catalogue
+	self subclassResponsibility.! !
+
+
+!classDefinition: #MockCatalogue category: 'TusLibros-Model'!
+Catalogue subclass: #MockCatalogue
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!MockCatalogue methodsFor: 'catalogue' stamp: 'PhG 11/13/2021 11:48:18'!
+catalogue
+	^ Dictionary new
+		at: self itemSoldByTheStore put: self itemSoldByTheStorePrice;
+		at: self anotherItemSoldByTheStore put: self anotherItemSoldByTheStorePrice;
+		yourself ! !
+
+
+!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:47:13'!
+anotherItemSoldByTheStore
+
+	^'Los Impresentables'! !
+
+!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:47:56'!
+anotherItemSoldByTheStorePrice
+
+	^15! !
+
+!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 12:27:11'!
+itemSoldByTheStore
+
+	^ 'El Pacto Copernico'! !
+
+!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:48:04'!
+itemSoldByTheStorePrice
+
+	^10! !
+
+
 !classDefinition: #Clock category: 'TusLibros-Model'!
 Object subclass: #Clock
 	instanceVariableNames: ''
@@ -335,6 +430,22 @@ now
 today
 
 	self subclassResponsibility ! !
+
+
+!classDefinition: #RealClock category: 'TusLibros-Model'!
+Clock subclass: #RealClock
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!RealClock methodsFor: 'time' stamp: 'PhG 11/13/2021 12:14:43'!
+now
+	^DateAndTime now.! !
+
+!RealClock methodsFor: 'time' stamp: 'PhG 11/13/2021 12:14:47'!
+today
+	^DateAndTime now.! !
 
 
 !classDefinition: #CreditCard category: 'TusLibros-Model'!
@@ -426,6 +537,32 @@ debit: anAmount from: aCreditCard
 	self subclassResponsibility ! !
 
 
+!classDefinition: #MockMerchantProcessor category: 'TusLibros-Model'!
+MerchantProcessor subclass: #MockMerchantProcessor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!MockMerchantProcessor methodsFor: 'debit' stamp: 'PhG 11/13/2021 12:01:54'!
+debit: anAmount from: aCreditCard
+
+	(self creditCardToBeRejected = aCreditCard) ifTrue: [self error: Cashier creditCardHasNoCreditErrorMessage].! !
+
+
+!MockMerchantProcessor methodsFor: 'private - rejected credit card' stamp: 'PhG 11/13/2021 12:03:53'!
+creditCardToBeRejected
+
+	^CreditCard expiringOn: self expiredMonthOfYear.! !
+
+!MockMerchantProcessor methodsFor: 'private - rejected credit card' stamp: 'PhG 11/13/2021 12:04:27'!
+expiredMonthOfYear
+
+	| today |
+	today := DateAndTime now.
+	^ Month month: today monthIndex year: today yearNumber - 1! !
+
+
 !classDefinition: #Sale category: 'TusLibros-Model'!
 Object subclass: #Sale
 	instanceVariableNames: 'customer ticket'
@@ -512,16 +649,15 @@ Object subclass: #TusLibrosRestAPI
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/11/2021 22:08:29'!
+!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/14/2021 22:20:06'!
 initializeWith: aPortNumber
 	
-	tusLibrosFacade := TusLibrosSystemFacade new.
-	"tusLibrosFacade := TusLibrosSystemFacade
-		authenticatingWith: MockUserDB - self validUsersAndPasswords
-		acceptingItemsOf: MockCatalogue - testObjectsFactory defaultCatalog
-		registeringOn: self createSalesBook
+	tusLibrosFacade := TusLibrosSystemFacade
+		authenticatingWith: MockUserDB new users
+		acceptingItemsOf: MockCatalogue new catalogue 
+		registeringOn: OrderedCollection new
 		debitingThrought: MockMerchantProcessor new
-		measuringTimeWith: RealClock new."
+		measuringTimeWith: RealClock new.
 	
 	port:= aPortNumber.
 	
@@ -531,8 +667,9 @@ initializeWith: aPortNumber
 	self registerAddToCartEndpoint.
 	self registerListCartEndpoint.
 	self registerCheckoutCartEndpoint.
-
-	self registerListPurchasesEndpoint.! !
+	self registerListPurchasesEndpoint.
+	self registerListCatalogueEndpoint.
+	self registerRemoveFromCartEndpoint.! !
 
 !TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/11/2021 21:12:13'!
 port
@@ -567,69 +704,83 @@ stopListening
 	! !
 
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 21:53:13'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:37:41'!
 registerAddToCartEndpoint
 
-	^ webServer addService: '/addToCart' action:[:request |	
-		| cartId bookIsbn bookQuantity |
-		cartId := (request fields at: 'cartId' ).
+	webServer addService: '/addToCart' action:[:request |	 | cartId bookIsbn bookQuantity |
+		[cartId := (request fields at: 'cartId' ).
 		bookIsbn := (request fields at: 'bookIsbn' ).
 		bookQuantity := (request fields at: 'bookQuantity' ).
 		tusLibrosFacade add: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
-		self respond200WithBody: 'OK' for: request
-		 ].! !
+		self respond200WithBody: 'OK' for: request]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 22:08:45'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:37:11'!
 registerCheckoutCartEndpoint
-
-	^ webServer addService: '/checkOutCart' action:[:request |	 
-		| cartId cardNumber cardExpirationDate cardHolder ticket |
-		cartId := (request fields at: 'cartId' ).
+	
+	webServer addService: '/checkOutCart' action:[:request |	 | cartId cardNumber cardExpirationDate cardHolder ticket |
+		[cartId := (request fields at: 'cartId' ).
 		cardNumber := (request fields at: 'ccn' ).
 		cardExpirationDate := (request fields at: 'cced' ).
 		cardHolder := (request fields at: 'cco' ).
 		ticket := tusLibrosFacade checkOutCartIdentifiedAs: cartId withCreditCardNumbered: cardNumber ownedBy: cardHolder expiringOn: cardExpirationDate.
-		self respond200WithBody: ('OK') for: request. "consultar transaction id"
-		 ].! !
-
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 21:52:51'!
-registerCreateCartEndpoint
-
-	^ webServer addService: '/createCart' action:[:request |	 | cartId password username |
-		username := (request fields at: 'username' ).
-		password := (request fields at: 'password' ).
-		cartId := tusLibrosFacade createCartFor: username authenticatedWith: password.
-		self respond200WithBody: cartId for: request
-		 ].! !
-
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 21:51:02'!
-registerEndpoint: endpoint withAction: action
-
-	^ webServer addService: endpoint action:[:request |	
-		(action value: request)
+		self respond200WithBody: ('OK') for: request. "consultar transaction id"]
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 21:51:42'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:35:08'!
+registerCreateCartEndpoint
+	
+	webServer addService: '/createCart' action:[:request |	| cartId password username |
+		[username := (request fields at: 'username' ).
+		password := (request fields at: 'password' ).
+		cartId := tusLibrosFacade createCartFor: username authenticatedWith: password.
+		self respond200WithBody: cartId for: request
+		 ]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
+
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:36:36'!
 registerListCartEndpoint
-
-	^ webServer addService: '/listCart' action:[:request |	 
-		| cartId cartContent |
-		cartId := (request fields at: 'cartId' ).
+	
+	webServer addService: '/listCart' action:[:request |	 | cartId cartContent |
+		[cartId := (request fields at: 'cartId' ).
 		cartContent := tusLibrosFacade listCartIdentifiedAs: cartId.
-		self respond200WithBody: cartContent for: request.
-		 ].! !
+		self respond200WithBody: cartContent for: request.]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/11/2021 21:52:08'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 12:26:00'!
+registerListCatalogueEndpoint
+	
+	webServer addService: '/listCatalogue' action:[:request |	 
+		[self respond200WithBody: tusLibrosFacade listCatalogue for: request.]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
+
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:35:44'!
 registerListPurchasesEndpoint
-
-	^ webServer addService: '/listPurchases' action: [:request |
-		 | purchases password username |
-		username := (request fields at: 'username' ).
+	
+	webServer addService: '/listPurchases' action:[:request |	 | purchases password username |
+		[username := (request fields at: 'username' ).
 		password := (request fields at: 'password' ).
 		purchases := tusLibrosFacade listPurchasesOf: username authenticatingWith: password.
-		self respond200WithBody: purchases for: request.
-		 ].! !
+		self respond200WithBody: purchases for: request.]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
+
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/14/2021 17:14:27'!
+registerRemoveFromCartEndpoint
+
+	webServer addService: '/removeFromCart' action:[:request |	 | cartId bookIsbn bookQuantity |
+		[cartId := (request fields at: 'cartId' ).
+		bookIsbn := (request fields at: 'bookIsbn' ).
+		bookQuantity := (request fields at: 'bookQuantity' ).
+		tusLibrosFacade remove: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
+		self respond200WithBody: 'OK' for: request]
+		on: Error 
+		do: (self respond400ErrorFor: request)]! !
 
 
 !TusLibrosRestAPI methodsFor: 'http response' stamp: 'PhG 11/11/2021 21:44:55'!
@@ -660,7 +811,7 @@ listeningOn: aPortNumber
 
 !classDefinition: #TusLibrosSystemFacade category: 'TusLibros-Model'!
 Object subclass: #TusLibrosSystemFacade
-	instanceVariableNames: 'validUsersAndPasswords catalog lastId merchantProcessor salesBook clock cartSessions'
+	instanceVariableNames: 'validUsersAndPasswords catalogue lastId merchantProcessor salesBook clock cartSessions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
@@ -778,13 +929,13 @@ checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber owne
 			expiringOn: anExpirationMonthOfYear ]
 ! !
 
-!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'HernanWilkinson 6/17/2015 20:52'!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'PhG 11/13/2021 12:25:02'!
 createCartFor: aUser authenticatedWith: aPassword
 
 	^ self if: aUser authenticatesWith: aPassword do: [ | cartId cartSession |
 
 		cartId := self generateCartId.
-		cartSession := CartSession ownedBy: aUser with: (Cart acceptingItemsOf: catalog) on: self..
+		cartSession := CartSession ownedBy: aUser with: (Cart acceptingItemsOf: catalogue) on: self..
 		cartSessions at: cartId put: cartSession.
 
 		cartId  ]! !
@@ -793,6 +944,10 @@ createCartFor: aUser authenticatedWith: aPassword
 listCartIdentifiedAs: aCartId
 
 	^ self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession cartContent ]! !
+
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'PhG 11/13/2021 12:25:12'!
+listCatalogue
+	^catalogue copy! !
 
 !TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'HAW 11/26/2018 20:33:49'!
 listPurchasesOf: aUser authenticatingWith: aPassword
@@ -804,6 +959,11 @@ listPurchasesOf: aUser authenticatingWith: aPassword
 			into: [ :salesOrderedByBook :aSale |
 				self list: aSale on: salesOrderedByBook.
 				salesOrderedByBook ] ]! !
+
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'PhG 11/14/2021 21:10:04'!
+remove: anAmount of: aBook toCartIdentifiedAs: aCartId
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession remove: anAmount of: aBook ]! !
 
 
 !TusLibrosSystemFacade methodsFor: 'checkout support' stamp: 'HernanWilkinson 6/17/2015 20:49'!
@@ -833,7 +993,7 @@ salesDoneBy: aUser
 	^ salesBook select: [ :aSale | aSale wasDoneBy: aUser ]! !
 
 
-!TusLibrosSystemFacade methodsFor: 'initialization' stamp: 'HernanWilkinson 6/22/2013 14:17'!
+!TusLibrosSystemFacade methodsFor: 'initialization' stamp: 'PhG 11/13/2021 12:25:02'!
 initializeAuthenticatingWith: aValidUsersAndPasswords
 	acceptingItemsOf: aCatalog
 	registeringOn: aSalesBook
@@ -841,7 +1001,7 @@ initializeAuthenticatingWith: aValidUsersAndPasswords
 	measuringTimeWith: aClock
 
 	validUsersAndPasswords := aValidUsersAndPasswords.
-	catalog := aCatalog.
+	catalogue := aCatalog.
 	salesBook := aSalesBook.
 	merchantProcessor := aMerchantProcessor.
 	clock := aClock.
@@ -868,3 +1028,29 @@ authenticatingWith: aValidUsersAndPasswords
 		registeringOn: aSalesBook
 		debitingThrought: aMerchantProcessor
 		measuringTimeWith: aClock! !
+
+
+!classDefinition: #UserDB category: 'TusLibros-Model'!
+Object subclass: #UserDB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!UserDB methodsFor: 'users' stamp: 'PhG 11/13/2021 11:39:29'!
+users
+	self subclassResponsibility.! !
+
+
+!classDefinition: #MockUserDB category: 'TusLibros-Model'!
+UserDB subclass: #MockUserDB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!MockUserDB methodsFor: 'users' stamp: 'PhG 11/13/2021 11:40:47'!
+users
+	^Dictionary new
+		at: 'maximilianoCozzetti' put: 'admin';
+		yourself! !
