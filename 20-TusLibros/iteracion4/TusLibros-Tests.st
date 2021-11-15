@@ -10,7 +10,7 @@ test01NewCartsAreCreatedEmpty
 
 	self assert: testObjectsFactory createCart isEmpty! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:10'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:44:27'!
 test02CanNotAddItemsThatDoNotBelongToStore
 
 	| cart |
@@ -18,23 +18,23 @@ test02CanNotAddItemsThatDoNotBelongToStore
 	cart := testObjectsFactory createCart.
 
 	self
-		should: [ cart add: testObjectsFactory itemNotSellByTheStore ]
+		should: [ cart add: testObjectsFactory itemNotSoldByTheStore ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:10'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test03AfterAddingAnItemTheCartIsNotEmptyAnymore
 
 	| cart |
 
 	cart := testObjectsFactory createCart.
 
-	cart add: testObjectsFactory itemSellByTheStore.
+	cart add: testObjectsFactory itemSoldByTheStore.
 	self deny: cart isEmpty ! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:10'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test04CanNotAddNonPositiveNumberOfItems
 
 	| cart |
@@ -42,13 +42,13 @@ test04CanNotAddNonPositiveNumberOfItems
 	cart := testObjectsFactory createCart.
 
 	self
-		should: [cart add: 0 of: testObjectsFactory itemSellByTheStore ]
+		should: [cart add: 0 of: testObjectsFactory itemSoldByTheStore ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cart invalidQuantityErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:10'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:44:27'!
 test05CanNotAddMoreThanOneItemNotSellByTheStore
 
 	| cart |
@@ -56,40 +56,138 @@ test05CanNotAddMoreThanOneItemNotSellByTheStore
 	cart := testObjectsFactory createCart.
 
 	self
-		should: [cart add: 2 of: testObjectsFactory itemNotSellByTheStore  ]
+		should: [cart add: 2 of: testObjectsFactory itemNotSoldByTheStore  ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:11'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test06CartRemembersAddedItems
 
 	| cart |
 
 	cart := testObjectsFactory createCart.
 
-	cart add: testObjectsFactory itemSellByTheStore.
-	self assert: (cart includes: testObjectsFactory itemSellByTheStore)! !
+	cart add: testObjectsFactory itemSoldByTheStore.
+	self assert: (cart includes: testObjectsFactory itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:11'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:42'!
 test07CartDoesNotHoldNotAddedItems
 
 	| cart |
 
 	cart := testObjectsFactory createCart.
 
-	self deny: (cart includes: testObjectsFactory itemSellByTheStore)! !
+	self deny: (cart includes: testObjectsFactory itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 18:11'!
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:42'!
 test08CartRemembersTheNumberOfAddedItems
 
 	| cart |
 
 	cart := testObjectsFactory createCart.
 
-	cart add: 2 of: testObjectsFactory itemSellByTheStore.
-	self assert: (cart occurrencesOf: testObjectsFactory itemSellByTheStore) = 2! !
+	cart add: 2 of: testObjectsFactory itemSoldByTheStore.
+	self assert: (cart occurrencesOf: testObjectsFactory itemSoldByTheStore) = 2! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:43:44'!
+test09CanNotRemoveItemsFromEmptyCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	self
+		should: [ cart remove: testObjectsFactory itemSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart canNotRemoveFromEmptyCartErrorMessage .
+			self assert: cart isEmpty ]! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:44:27'!
+test10CanNotRemoveItemsThatNotBelongToStore
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	self
+		should: [ cart remove: testObjectsFactory itemNotSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ]! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:46:37'!
+test11CanNotRemoveNonPositiveNumberOfItems
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	cart add: 1 of: testObjectsFactory itemSoldByTheStore.
+
+	self
+		should: [cart remove: 0 of: testObjectsFactory itemSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidQuantityErrorMessage.
+			self deny: cart isEmpty ]! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:47:25'!
+test12CartIsEmptyAfterAddingAndRemovingItem
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	cart add: 1 of: testObjectsFactory itemSoldByTheStore.
+	cart remove: 1 of: testObjectsFactory itemSoldByTheStore.
+	
+	self assert: cart isEmpty.
+! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/14/2021 17:06:21'!
+test13CanNotRemoveMoreThanOneItemNotSoldByTheStore
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	self
+		should: [ cart remove: 2 of: testObjectsFactory itemNotSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ]! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/14/2021 17:07:03'!
+test14RemovingOneOfTwoAddedItemsLeavesOneItem
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	cart add: 2 of: testObjectsFactory itemSoldByTheStore.
+	cart remove: 1 of: testObjectsFactory itemSoldByTheStore.
+
+	self assert: (cart occurrencesOf: testObjectsFactory itemSoldByTheStore) = 1.! !
+
+!CartTest methodsFor: 'tests' stamp: 'PhG 11/14/2021 17:08:21'!
+test15CanNotRemoveMoreItemsThanAddedInCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	cart add: 1 of: testObjectsFactory itemSoldByTheStore.
+
+	self
+		should: [cart remove: 2 of: testObjectsFactory itemSoldByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidQuantityErrorMessage.
+			self assert: (cart occurrencesOf: testObjectsFactory itemSoldByTheStore) equals: 1]! !
 
 
 !CartTest methodsFor: 'setup' stamp: 'HernanWilkinson 6/17/2013 18:09'!
@@ -124,13 +222,13 @@ test01CanNotCheckoutAnEmptyCart
 			self assert: anError messageText = Cashier cartCanNotBeEmptyErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/22/2013 12:22'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:56'!
 test02CalculatedTotalIsCorrect
 
 	| cart cashier |
 
 	cart := testObjectsFactory createCart.
-	cart add: 2 of: testObjectsFactory itemSellByTheStore.
+	cart add: 2 of: testObjectsFactory itemSoldByTheStore.
 
 	cashier :=  Cashier
 		toCheckout: cart
@@ -140,15 +238,15 @@ test02CalculatedTotalIsCorrect
 		on: testObjectsFactory today
 		registeringOn: OrderedCollection new.
 
-	self assert: cashier checkOut total = (testObjectsFactory itemSellByTheStorePrice * 2)! !
+	self assert: cashier checkOut total = (testObjectsFactory itemSoldByTheStorePrice * 2)! !
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/22/2013 12:01'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test03CanNotCheckoutWithAnExpiredCreditCart
 
 	| cart salesBook |
 
 	cart := testObjectsFactory createCart.
-	cart add: testObjectsFactory itemSellByTheStore.
+	cart add: testObjectsFactory itemSoldByTheStore.
 	salesBook := OrderedCollection new.
 
 	self
@@ -164,13 +262,13 @@ test03CanNotCheckoutWithAnExpiredCreditCart
 			self assert: anError messageText = Cashier canNotChargeAnExpiredCreditCardErrorMessage.
 			self assert: salesBook isEmpty ]! !
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/22/2013 12:23'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test04CheckoutRegistersASale
 
 	| cart cashier salesBook total |
 
 	cart := testObjectsFactory createCart.
-	cart add: testObjectsFactory itemSellByTheStore.
+	cart add: testObjectsFactory itemSoldByTheStore.
 	salesBook := OrderedCollection new.
 
 	cashier:= Cashier
@@ -186,13 +284,13 @@ test04CheckoutRegistersASale
 	self assert: salesBook size = 1.
 	self assert: salesBook first total = total.! !
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/22/2013 12:22'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:42'!
 test05CashierChargesCreditCardUsingMerchantProcessor
 
 	| cart cashier salesBook total creditCard debitedAmout debitedCreditCard  |
 
 	cart := testObjectsFactory createCart.
-	cart add: testObjectsFactory itemSellByTheStore.
+	cart add: testObjectsFactory itemSoldByTheStore.
 	creditCard := testObjectsFactory notExpiredCreditCard.
 	salesBook := OrderedCollection new.
 
@@ -212,13 +310,13 @@ test05CashierChargesCreditCardUsingMerchantProcessor
 	self assert: debitedCreditCard = creditCard.
 	self assert: debitedAmout = total.! !
 
-!CashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/22/2013 12:02'!
+!CashierTest methodsFor: 'tests' stamp: 'PhG 11/13/2021 12:22:43'!
 test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit
 
 	| cart cashier salesBook creditCard |
 
 	cart := testObjectsFactory createCart.
-	cart add: testObjectsFactory itemSellByTheStore.
+	cart add: testObjectsFactory itemSoldByTheStore.
 	creditCard := testObjectsFactory notExpiredCreditCard.
 	salesBook := OrderedCollection new.
  	debitBehavior := [ :anAmount :aCreditCard | self error: Cashier creditCardHasNoCreditErrorMessage].
@@ -311,7 +409,7 @@ test17CanNotAddToCartWhenSessionIsExpired
 ! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'HAW 11/26/2018 18:07:48'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'PhG 11/13/2021 12:23:03'!
 test14ListPurchasesIncludesBoughtItems
 
 	| cartId purchases |
@@ -327,8 +425,8 @@ test14ListPurchasesIncludesBoughtItems
 
 	purchases := systemFacade listPurchasesOf: self validUser authenticatingWith: self validUserPassword.
 
-	self assert: (purchases at: self validBook) equals: (testObjectsFactory itemSellByTheStorePrice * 2).
-	self assert: (purchases at: self anotherValidBook) equals: testObjectsFactory anotherItemSellByTheStorePrice.! !
+	self assert: (purchases at: self validBook) equals: (testObjectsFactory itemSoldByTheStorePrice * 2).
+	self assert: (purchases at: self anotherValidBook) equals: testObjectsFactory anotherItemSoldByTheStorePrice.! !
 
 !TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'HAW 11/26/2018 18:10:29'!
 test15CanNotListPurchasesOfInvalidCustomer
@@ -392,29 +490,29 @@ merchantProcessor
 
 	^self! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'setup' stamp: 'HernanWilkinson 6/17/2015 20:53'!
+!TusLibrosSystemFacadeTest methodsFor: 'setup' stamp: 'PhG 11/13/2021 12:23:08'!
 setUp
 
 	testObjectsFactory := StoreTestObjectsFactory new.
 	clock := ManualClock now: testObjectsFactory today.
 	systemFacade := TusLibrosSystemFacade
 		authenticatingWith: self validUsersAndPasswords
-		acceptingItemsOf: testObjectsFactory defaultCatalog
+		acceptingItemsOf: testObjectsFactory defaultCatalogue
 		registeringOn: self createSalesBook
 		debitingThrought: self merchantProcessor
 		measuringTimeWith: clock
 ! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/22/2013 00:15'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/13/2021 12:22:49'!
 anotherValidBook
 
-	^testObjectsFactory anotherItemSellByTheStore ! !
+	^testObjectsFactory anotherItemSoldByTheStore ! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 23:49'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/13/2021 12:44:27'!
 invalidBook
 
-	^testObjectsFactory itemNotSellByTheStore ! !
+	^testObjectsFactory itemNotSoldByTheStore ! !
 
 !TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 23:25'!
 invalidCartId
@@ -432,10 +530,10 @@ invalidUser
 
 	^'invalidUser'! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 23:50'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/13/2021 12:22:42'!
 validBook
 
-	^testObjectsFactory itemSellByTheStore ! !
+	^testObjectsFactory itemSoldByTheStore ! !
 
 !TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 22:27'!
 validUser
@@ -455,7 +553,7 @@ validUsersAndPasswords
 		yourself! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'HAW 6/19/2018 11:45:13'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'PhG 11/13/2021 12:22:56'!
 test10CanCheckoutACart
 
 	| cartId purchases |
@@ -470,7 +568,7 @@ test10CanCheckoutACart
 
 	purchases := systemFacade listPurchasesOf: self validUser authenticatingWith: self validUserPassword.
 
-	self assert: (purchases at: self validBook) equals: testObjectsFactory itemSellByTheStorePrice.
+	self assert: (purchases at: self validBook) equals: testObjectsFactory itemSoldByTheStorePrice.
 ! !
 
 !TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'HAW 11/26/2018 18:05:20'!
@@ -609,6 +707,87 @@ revertTime: aDuration
 
 	clock revertTime: aDuration ! !
 
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list catalogue' stamp: 'PhG 11/13/2021 12:21:04'!
+test20ListCatalogueOfStoreWithoutCatalogueReturnsEmpty
+	
+	systemFacade := TusLibrosSystemFacade
+		authenticatingWith: self validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory emptyCatalogue 
+		registeringOn: self createSalesBook
+		debitingThrought: self merchantProcessor
+		measuringTimeWith: clock.
+
+	self assert: (systemFacade listCatalogue) isEmpty.
+	! !
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list catalogue' stamp: 'PhG 11/13/2021 12:24:41'!
+test21ListCatalogueOfStoreWithCatalogueReturnsCatalogue
+
+	| catalogue |
+	
+	catalogue := systemFacade listCatalogue.
+
+	self deny: catalogue isEmpty.
+	self assert: (catalogue at: testObjectsFactory itemSoldByTheStore) equals: testObjectsFactory itemSoldByTheStorePrice.
+	self assert: (catalogue at: testObjectsFactory anotherItemSoldByTheStore) equals: testObjectsFactory anotherItemSoldByTheStorePrice.! !
+
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 20:55:14'!
+test22CanRemoveItemsFromACreatedCartWithItems
+
+	| cartId |
+
+	cartId := systemFacade createCartFor: self validUser authenticatedWith: self validUserPassword.
+
+	systemFacade add: 1 of: self validBook toCartIdentifiedAs: cartId.
+	systemFacade remove: 1 of: self validBook toCartIdentifiedAs: cartId.
+
+	self assert: ((systemFacade listCartIdentifiedAs: cartId) occurrencesOf: self validBook) equals: 0
+		! !
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 20:55:33'!
+test23CanNotRemoveItemsFromNotCreatedCart
+
+	self
+		should: [systemFacade remove: 1 of: self validBook toCartIdentifiedAs: self invalidCartId]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText equals: systemFacade invalidCartIdErrorDescription ]
+		! !
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 20:55:48'!
+test24CanNotRemoveItemNotSoldByTheStore
+
+	| cartId |
+
+	cartId := systemFacade createCartFor: self validUser authenticatedWith: self validUserPassword.
+	self
+		should: [systemFacade remove: 1 of: self invalidBook toCartIdentifiedAs: cartId ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText equals: systemFacade invalidItemErrorMessage.
+			self assert: (systemFacade listCartIdentifiedAs: cartId) isEmpty ]
+		! !
+
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 21:11:06'!
+test25CanNotRemoveFromCartWhenSessionIsExpired
+
+	| cartId |
+
+	cartId := systemFacade createCartFor: self validUser authenticatedWith: self validUserPassword.
+	systemFacade add: 1 of: self validBook toCartIdentifiedAs: cartId.
+
+	self advanceTime: (systemFacade sessionDuration + 1 minutes) .
+	self
+		should: [systemFacade remove: 1 of: self validBook toCartIdentifiedAs: cartId]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText equals: systemFacade sessionHasExpiredErrorDescription.
+			self revertTime: systemFacade sessionDuration.
+			self deny: (systemFacade listCartIdentifiedAs: cartId) isEmpty ]
+! !
+
 
 !classDefinition: #ManualClock category: 'TusLibros-Tests'!
 Clock subclass: #ManualClock
@@ -663,44 +842,49 @@ Object subclass: #StoreTestObjectsFactory
 	poolDictionaries: ''
 	category: 'TusLibros-Tests'!
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/22/2013 00:16'!
-anotherItemSellByTheStore
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/13/2021 12:22:49'!
+anotherItemSoldByTheStore
 
 	^'anotherValidBook'! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/22/2013 00:16'!
-anotherItemSellByTheStorePrice
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/13/2021 12:23:03'!
+anotherItemSoldByTheStorePrice
 
 	^15! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
-itemNotSellByTheStore
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/13/2021 12:44:27'!
+itemNotSoldByTheStore
 
 	^'invalidBook'! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
-itemSellByTheStore
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/13/2021 12:22:42'!
+itemSoldByTheStore
 
 	^ 'validBook'! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
-itemSellByTheStorePrice
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'PhG 11/13/2021 12:22:56'!
+itemSoldByTheStorePrice
 
 	^10! !
 
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/13/2021 12:23:08'!
 createCart
 
-	^Cart acceptingItemsOf: self defaultCatalog! !
+	^Cart acceptingItemsOf: self defaultCatalogue! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/22/2013 00:16'!
-defaultCatalog
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/13/2021 12:23:08'!
+defaultCatalogue
 
 	^ Dictionary new
-		at: self itemSellByTheStore put: self itemSellByTheStorePrice;
-		at: self anotherItemSellByTheStore put: self anotherItemSellByTheStorePrice;
+		at: self itemSoldByTheStore put: self itemSoldByTheStorePrice;
+		at: self anotherItemSoldByTheStore put: self anotherItemSoldByTheStorePrice;
 		yourself ! !
+
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'PhG 11/13/2021 12:21:04'!
+emptyCatalogue
+
+	^ Dictionary new! !
 
 
 !StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/22/2013 11:24'!
