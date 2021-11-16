@@ -1,4 +1,346 @@
-!classDefinition: #Cart category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosCatalogueWindow category: #'TusLibros-Model'!
+SystemWindow subclass: #TusLibrosCatalogueWindow
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:42:42'!
+buildListColumnIdentifiedBy: aLabel
+	| columnLayoutMorph catalogueListMorph |
+	
+	catalogueListMorph := PluggableListMorph model: self model listGetter: #words indexGetter: #wordsListIndex indexSetter: #wordsListIndex:.
+	catalogueListMorph  borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
+	
+	columnLayoutMorph := LayoutMorph newColumn.
+	columnLayoutMorph separation: 5; 
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents:aLabel);
+	addMorph: catalogueListMorph.
+	
+	^columnLayoutMorph.
+	! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:43:37'!
+buildListsAndAddRemoveRow
+	| rowLayoutMorph |
+	
+	
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: (self buildListColumnIdentifiedBy: 'Catalogo');
+	addMorph: self buildQuantityAndAddRemoveColumn ;
+	addMorph: (self buildListColumnIdentifiedBy: 'Carrito').
+	
+	^rowLayoutMorph.
+	! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:45:58'!
+buildMorphicWindow
+		
+	self layoutMorph beColumn;
+	separation: 15;
+	axisEdgeWeight: 0;
+	addMorph: (self buildRowWithFirstButton: 'Logout' andSecondButton: 'Historial'); "logout + blank + historial"
+	addMorph: self buildListsAndAddRemoveRow; "catalogo + cantidad + '>>' + '<<' carrito"
+	addMorph: (self buildRowWithFirstButton: 'Carrito Nuevo' andSecondButton: 'Checkout'). "new + blank + checkout"
+	
+"- catalogo
+	* label catalogo
+	* lista catalogo
+	* label cantidad a agregar
+	* textbox cantidad a agregar
+	* boton agregar al carrito
+	* label contenido carrito
+	* lista contenido carrito
+	* label cantidad a sacar
+	* textbox cantidad a sacar
+	* boton sacar del carrito
+	* boton de checkout (consultar si podemos hardcodear cual tarjeta es valida o si hay que ingresarlos al momento de checkout)
+	* label de error de compra
+	* boton desloguearse
+	* boton nueva compra
+	* historial de compras"	! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:38:00'!
+buildQuantityAndAddRemoveColumn
+	| columnLayoutMorph addToCartButtonMorph removeFromCartButtonMorph |
+	
+	addToCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: '>>'.	
+	removeFromCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: '<<'.	
+	
+	columnLayoutMorph := LayoutMorph newColumn.
+	columnLayoutMorph separation: 5; 
+	axisEdgeWeight: 0.5;
+	addMorph: self buildQuantityRow;
+	addMorph: addToCartButtonMorph;
+	addMorph: removeFromCartButtonMorph .
+	
+	^columnLayoutMorph.! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:11:30'!
+buildQuantityRow
+
+	| quantityBoxMorph rowLayoutMorph |
+	
+	quantityBoxMorph := SimpleNumberEntryMorph integerDefault: 0 maxNumChars: 10.
+	quantityBoxMorph  borderWidth: 1; borderColor: Color skyBlue; morphWidth: 10; morphHeight: 25. 
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents:'Cantidad:');
+	addMorph: quantityBoxMorph.
+	
+	^rowLayoutMorph.! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:44:52'!
+buildRowWithFirstButton: firstButtonLabel andSecondButton: secondButtonLabel
+	| logoutButtonMorph rowLayoutMorph historialButtonMorph |
+	
+	logoutButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: firstButtonLabel.	
+	historialButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: secondButtonLabel.	
+	
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: logoutButtonMorph;
+	addMorph: LayoutMorph newColumn;
+	addMorph: historialButtonMorph.
+	
+	^rowLayoutMorph.
+	! !
+
+
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 20:20:15'!
+initializeWith: aTitle
+
+	self setLabel: aTitle.
+	self model: (WordsClientWindowModel new).
+	self buildMorphicWindow.
+	self openInWorld.
+			
+	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TusLibrosCatalogueWindow class' category: #'TusLibros-Model'!
+TusLibrosCatalogueWindow class
+	instanceVariableNames: ''!
+
+!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 20:15:51'!
+open
+	
+	^self new initializeWith: 'TusLibros: List Catalogue'.! !
+
+
+!classDefinition: #TusLibrosCreateCartWindow category: #'TusLibros-Model'!
+SystemWindow subclass: #TusLibrosCreateCartWindow
+	instanceVariableNames: 'invalidCredentialsRow'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 19:46:38'!
+initializeWith: aTitle
+
+	self setLabel: aTitle.
+	self model: (WordsClientWindowModel new).
+	self buildMorphicWindow.
+	self openInWorld.
+			
+	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
+
+
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:11:25'!
+buildCreateCartButtonRow
+	| createCartButtonMorph rowLayoutMorph |
+	
+	createCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: 'Create Cart'.	
+	
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: createCartButtonMorph.
+	
+	^rowLayoutMorph.
+	! !
+
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:11:15'!
+buildInvalidCredentialsRow
+	| rowLayoutMorph |
+	
+	invalidCredentialsRow := (LabelMorph contents:'Invalid Credentials' ).
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: invalidCredentialsRow.
+	invalidCredentialsRow hide.
+	
+	^rowLayoutMorph.! !
+
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:09:29'!
+buildMorphicWindow
+		
+	self layoutMorph beColumn;
+	separation: 15;
+	axisEdgeWeight: 0;
+	addMorph: (self buildTextBoxRowIdentifiedBy: 'Username:');
+	addMorph: (self buildTextBoxRowIdentifiedBy: 'Password:');
+	addMorph: self buildInvalidCredentialsRow;
+	addMorph: self buildCreateCartButtonRow.
+	
+	"- login/createCart:
+	* label username
+	* textbox username
+	* label password
+	* textbox password (checkear despues si se puede ocultar la contraseña)
+	* boton de crear carrito
+	* label credenciales invalidas (o ventana de error)"
+	! !
+
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:11:30'!
+buildTextBoxRowIdentifiedBy: aLabel
+	| rowLayoutMorph textBoxMorph |
+	
+	textBoxMorph := TextModelMorph textProvider: self model textGetter: #sentenceText textSetter: #sentenceText:. 
+	textBoxMorph innerTextMorph setProperty: #keyStroke: toValue: [ :key | textBoxMorph innerTextMorph acceptContents ] .
+	textBoxMorph  borderWidth: 1; borderColor: Color skyBlue; morphWidth: 300; morphHeight: 25. 
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents:aLabel);
+	addMorph: textBoxMorph.
+	
+	^rowLayoutMorph.! !
+
+
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/15/2021 20:14:24'!
+refreshListOfWords
+	
+"	wordsListMorph updateList.
+	wordsListMorph setSelectionIndex: 0."
+	! !
+
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/15/2021 20:09:03'!
+showInvalidCredentialsRow
+	
+	invalidCredentialsRow show.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TusLibrosCreateCartWindow class' category: #'TusLibros-Model'!
+TusLibrosCreateCartWindow class
+	instanceVariableNames: ''!
+
+!TusLibrosCreateCartWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 19:47:15'!
+open
+	
+	^self new initializeWith: 'TusLibros: Create Cart'.! !
+
+
+!classDefinition: #TusLibrosListItemsWindow category: #'TusLibros-Model'!
+SystemWindow subclass: #TusLibrosListItemsWindow
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!TusLibrosListItemsWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 20:53:11'!
+initializeWith: aTitle
+
+	self setLabel: aTitle.
+	self model: (WordsClientWindowModel new).
+	self buildMorphicWindow.
+	self openInWorld.
+			
+	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
+
+
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:13'!
+buildDetailRow: aPrice
+
+	| rowLayoutMorph |
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents: 'aBookIsbn');
+	addMorph: (LabelMorph contents: '1');
+	addMorph: (LabelMorph contents: ('$', aPrice)).
+	
+	^rowLayoutMorph.! !
+
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:00:35'!
+buildHeaderRow
+
+	| rowLayoutMorph |
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents: 'Libro');
+	addMorph: (LabelMorph contents: 'Cantidad');
+	addMorph: (LabelMorph contents: 'Precio').
+	
+	^rowLayoutMorph.! !
+
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:53'!
+buildMorphicWindow
+		
+	self layoutMorph beColumn;
+	separation: 15;
+	axisEdgeWeight: 0;
+	addMorph: (self buildHeaderRow); "Libro + Cantidad + Precio"
+	addMorph: (self buildDetailRow: '15'); "ver como construir esto dinamicamente"
+	addMorph: (self buildDetailRow: '10'); "ver como construir esto dinamicamente"
+	addMorph: (self buildTotalRow: '25'). "blank + totalLabel + totalNumber"
+	
+	"- ticket
+	* lista items
+		+ titulo libro
+		+ cantidad libro
+		+ precio unitario/total (ver cual)
+	* total
+
+
+		column1		column2		  column3
+row	| bookIsbn1 | bookQuantity1 | price1 |
+	| bookIsbn2 | bookQuantity2 | price2 |
+	| bookIsbn3 | bookQuantity3 | price3 |
+	| bookIsbn4 | bookQuantity4 | price4 |
+	| total								 |"! !
+
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:22'!
+buildTotalRow: aTotal
+
+	| rowLayoutMorph |
+		
+	rowLayoutMorph := LayoutMorph newRow.
+	rowLayoutMorph separation: 25;
+	axisEdgeWeight: 0.5;
+	addMorph: LayoutMorph newColumn;
+	addMorph: (LabelMorph contents: 'Total:');
+	addMorph: (LabelMorph contents: ('$',aTotal)).
+	
+	^rowLayoutMorph.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TusLibrosListItemsWindow class' category: #'TusLibros-Model'!
+TusLibrosListItemsWindow class
+	instanceVariableNames: ''!
+
+!TusLibrosListItemsWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 20:54:47'!
+open: detailType
+	
+	^self new initializeWith: ('TusLibros: ', detailType).! !
+
+
+!classDefinition: #Cart category: #'TusLibros-Model'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -129,7 +471,7 @@ remove: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: 'TusLibros-Model'!
+!classDefinition: 'Cart class' category: #'TusLibros-Model'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -155,7 +497,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartSession category: 'TusLibros-Model'!
+!classDefinition: #CartSession category: #'TusLibros-Model'!
 Object subclass: #CartSession
 	instanceVariableNames: 'owner cart lastUsedTime systemFacade'
 	classVariableNames: ''
@@ -237,7 +579,7 @@ remove: anAmount of: aBook
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CartSession class' category: 'TusLibros-Model'!
+!classDefinition: 'CartSession class' category: #'TusLibros-Model'!
 CartSession class
 	instanceVariableNames: ''!
 
@@ -247,7 +589,7 @@ ownedBy: aCustomer with: aCart on: aSystemFacade
 	^self new initializeOwnedBy: aCustomer with: aCart on: aSystemFacade! !
 
 
-!classDefinition: #Cashier category: 'TusLibros-Model'!
+!classDefinition: #Cashier category: #'TusLibros-Model'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard owner ticket'
 	classVariableNames: ''
@@ -315,7 +657,7 @@ initializeToCheckout: aCart ownedBy: anOwner charging: aCreditCard throught: aMe
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: 'TusLibros-Model'!
+!classDefinition: 'Cashier class' category: #'TusLibros-Model'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -366,7 +708,7 @@ signalCartCanNotBeEmpty
 	self error: self cartCanNotBeEmptyErrorMessage! !
 
 
-!classDefinition: #Catalogue category: 'TusLibros-Model'!
+!classDefinition: #Catalogue category: #'TusLibros-Model'!
 Object subclass: #Catalogue
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -378,7 +720,7 @@ catalogue
 	self subclassResponsibility.! !
 
 
-!classDefinition: #MockCatalogue category: 'TusLibros-Model'!
+!classDefinition: #MockCatalogue category: #'TusLibros-Model'!
 Catalogue subclass: #MockCatalogue
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -414,7 +756,7 @@ itemSoldByTheStorePrice
 	^10! !
 
 
-!classDefinition: #Clock category: 'TusLibros-Model'!
+!classDefinition: #Clock category: #'TusLibros-Model'!
 Object subclass: #Clock
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -432,7 +774,7 @@ today
 	self subclassResponsibility ! !
 
 
-!classDefinition: #RealClock category: 'TusLibros-Model'!
+!classDefinition: #RealClock category: #'TusLibros-Model'!
 Clock subclass: #RealClock
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -448,7 +790,7 @@ today
 	^DateAndTime now.! !
 
 
-!classDefinition: #CreditCard category: 'TusLibros-Model'!
+!classDefinition: #CreditCard category: #'TusLibros-Model'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration'
 	classVariableNames: ''
@@ -468,7 +810,7 @@ initializeExpiringOn: aMonth
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: 'TusLibros-Model'!
+!classDefinition: 'CreditCard class' category: #'TusLibros-Model'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -478,7 +820,7 @@ expiringOn: aMonth
 	^self new initializeExpiringOn: aMonth! !
 
 
-!classDefinition: #LineItem category: 'TusLibros-Model'!
+!classDefinition: #LineItem category: #'TusLibros-Model'!
 Object subclass: #LineItem
 	instanceVariableNames: 'item quantity total'
 	classVariableNames: ''
@@ -507,7 +849,7 @@ initializeOf: anItem quantity: aQuantity total: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'LineItem class' category: 'TusLibros-Model'!
+!classDefinition: 'LineItem class' category: #'TusLibros-Model'!
 LineItem class
 	instanceVariableNames: ''!
 
@@ -519,7 +861,7 @@ of: anItem quantity: aQuantity total: aTotal
 ! !
 
 
-!classDefinition: #MerchantProcessor category: 'TusLibros-Model'!
+!classDefinition: #MerchantProcessor category: #'TusLibros-Model'!
 Object subclass: #MerchantProcessor
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -537,7 +879,7 @@ debit: anAmount from: aCreditCard
 	self subclassResponsibility ! !
 
 
-!classDefinition: #MockMerchantProcessor category: 'TusLibros-Model'!
+!classDefinition: #MockMerchantProcessor category: #'TusLibros-Model'!
 MerchantProcessor subclass: #MockMerchantProcessor
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -563,7 +905,7 @@ expiredMonthOfYear
 	^ Month month: today monthIndex year: today yearNumber - 1! !
 
 
-!classDefinition: #Sale category: 'TusLibros-Model'!
+!classDefinition: #Sale category: #'TusLibros-Model'!
 Object subclass: #Sale
 	instanceVariableNames: 'customer ticket'
 	classVariableNames: ''
@@ -596,7 +938,7 @@ lineItemsDo: aBlock
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: 'TusLibros-Model'!
+!classDefinition: 'Sale class' category: #'TusLibros-Model'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -606,7 +948,7 @@ doneBy: aCustomer certifiedWith: aTicket
 	^self new initializeDoneBy: aCustomer certifiedWith: aTicket ! !
 
 
-!classDefinition: #Ticket category: 'TusLibros-Model'!
+!classDefinition: #Ticket category: #'TusLibros-Model'!
 Object subclass: #Ticket
 	instanceVariableNames: 'lineItems'
 	classVariableNames: ''
@@ -632,7 +974,7 @@ lineItemsDo: aBlock
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Ticket class' category: 'TusLibros-Model'!
+!classDefinition: 'Ticket class' category: #'TusLibros-Model'!
 Ticket class
 	instanceVariableNames: ''!
 
@@ -642,14 +984,14 @@ of: aCollectionOfLineItems
 	^self new initializeOf: aCollectionOfLineItems ! !
 
 
-!classDefinition: #TusLibrosRestAPI category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosRestAPI category: #'TusLibros-Model'!
 Object subclass: #TusLibrosRestAPI
 	instanceVariableNames: 'webServer port tusLibrosFacade'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/14/2021 22:20:06'!
+!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/15/2021 17:39:21'!
 initializeWith: aPortNumber
 	
 	tusLibrosFacade := TusLibrosSystemFacade
@@ -659,7 +1001,7 @@ initializeWith: aPortNumber
 		debitingThrought: MockMerchantProcessor new
 		measuringTimeWith: RealClock new.
 	
-	port:= aPortNumber.
+	port := aPortNumber.
 	
 	webServer := WebServer new listenOn: self port.
 	
@@ -704,48 +1046,53 @@ stopListening
 	! !
 
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:37:41'!
-registerAddToCartEndpoint
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:35:20'!
+addToCartFor: request
 
-	webServer addService: '/addToCart' action:[:request |	 | cartId bookIsbn bookQuantity |
-		[cartId := (request fields at: 'cartId' ).
-		bookIsbn := (request fields at: 'bookIsbn' ).
-		bookQuantity := (request fields at: 'bookQuantity' ).
+	| cartId bookIsbn bookQuantity |
+		[cartId := (request fields at: 'cartId' ) asNumber .
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := (request fields at: 'bookQuantity') asNumber .
 		tusLibrosFacade add: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
 		self respond200WithBody: 'OK' for: request]
 		on: Error 
-		do: (self respond400ErrorFor: request)]! !
+		do: (self respond400ErrorFor: request)! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:37:11'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:35:20'!
+registerAddToCartEndpoint
+
+	webServer addService: '/addToCart' action:[:request |	 self addToCartFor: request]! !
+
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:33:43'!
 registerCheckoutCartEndpoint
 	
 	webServer addService: '/checkOutCart' action:[:request |	 | cartId cardNumber cardExpirationDate cardHolder ticket |
-		[cartId := (request fields at: 'cartId' ).
-		cardNumber := (request fields at: 'ccn' ).
-		cardExpirationDate := (request fields at: 'cced' ).
-		cardHolder := (request fields at: 'cco' ).
+		[cartId := (request fields at: 'cartId') asNumber.
+		cardNumber := (request fields at: 'ccn') asNumber.
+		cardExpirationDate := request fields at: 'cced'.
+		cardHolder := request fields at: 'cco'.
 		ticket := tusLibrosFacade checkOutCartIdentifiedAs: cartId withCreditCardNumbered: cardNumber ownedBy: cardHolder expiringOn: cardExpirationDate.
-		self respond200WithBody: ('OK') for: request. "consultar transaction id"]
+		self respond200WithBody: 'OK' for: request.]
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:35:08'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:33:29'!
 registerCreateCartEndpoint
 	
 	webServer addService: '/createCart' action:[:request |	| cartId password username |
-		[username := (request fields at: 'username' ).
-		password := (request fields at: 'password' ).
+		[username := request fields at: 'username'.
+		password := request fields at: 'password'.
 		cartId := tusLibrosFacade createCartFor: username authenticatedWith: password.
 		self respond200WithBody: cartId for: request
 		 ]
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:36:36'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:32:24'!
 registerListCartEndpoint
 	
 	webServer addService: '/listCart' action:[:request |	 | cartId cartContent |
-		[cartId := (request fields at: 'cartId' ).
+		[cartId := (request fields at: 'cartId') asNumber.
 		cartContent := tusLibrosFacade listCartIdentifiedAs: cartId.
 		self respond200WithBody: cartContent for: request.]
 		on: Error 
@@ -759,24 +1106,24 @@ registerListCatalogueEndpoint
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/13/2021 11:35:44'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:33:12'!
 registerListPurchasesEndpoint
 	
 	webServer addService: '/listPurchases' action:[:request |	 | purchases password username |
-		[username := (request fields at: 'username' ).
-		password := (request fields at: 'password' ).
+		[username := request fields at: 'username'.
+		password := request fields at: 'password'.
 		purchases := tusLibrosFacade listPurchasesOf: username authenticatingWith: password.
 		self respond200WithBody: purchases for: request.]
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/14/2021 17:14:27'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:33:03'!
 registerRemoveFromCartEndpoint
 
 	webServer addService: '/removeFromCart' action:[:request |	 | cartId bookIsbn bookQuantity |
-		[cartId := (request fields at: 'cartId' ).
-		bookIsbn := (request fields at: 'bookIsbn' ).
-		bookQuantity := (request fields at: 'bookQuantity' ).
+		[cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
 		tusLibrosFacade remove: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
 		self respond200WithBody: 'OK' for: request]
 		on: Error 
@@ -799,7 +1146,7 @@ respond400ErrorFor: request
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosRestAPI class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosRestAPI class' category: #'TusLibros-Model'!
 TusLibrosRestAPI class
 	instanceVariableNames: ''!
 
@@ -809,7 +1156,7 @@ listeningOn: aPortNumber
 	^self new initializeWith: aPortNumber.! !
 
 
-!classDefinition: #TusLibrosSystemFacade category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosSystemFacade category: #'TusLibros-Model'!
 Object subclass: #TusLibrosSystemFacade
 	instanceVariableNames: 'validUsersAndPasswords catalogue lastId merchantProcessor salesBook clock cartSessions'
 	classVariableNames: ''
@@ -1011,7 +1358,7 @@ initializeAuthenticatingWith: aValidUsersAndPasswords
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosSystemFacade class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosSystemFacade class' category: #'TusLibros-Model'!
 TusLibrosSystemFacade class
 	instanceVariableNames: ''!
 
@@ -1030,7 +1377,7 @@ authenticatingWith: aValidUsersAndPasswords
 		measuringTimeWith: aClock! !
 
 
-!classDefinition: #UserDB category: 'TusLibros-Model'!
+!classDefinition: #UserDB category: #'TusLibros-Model'!
 Object subclass: #UserDB
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -1042,7 +1389,7 @@ users
 	self subclassResponsibility.! !
 
 
-!classDefinition: #MockUserDB category: 'TusLibros-Model'!
+!classDefinition: #MockUserDB category: #'TusLibros-Model'!
 UserDB subclass: #MockUserDB
 	instanceVariableNames: ''
 	classVariableNames: ''
