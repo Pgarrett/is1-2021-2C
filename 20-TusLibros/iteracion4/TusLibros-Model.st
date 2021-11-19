@@ -113,7 +113,7 @@ buildRowWithFirstButton: firstButtonLabel andSecondButton: secondButtonLabel
 	! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 20:20:15'!
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'PhG 11/18/2021 21:22:32'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -121,7 +121,7 @@ initializeWith: aTitle
 	self buildMorphicWindow.
 	self openInWorld.
 			
-	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
+	self model when: #newWordsArrived send: #showCatalogueWindow to: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -137,27 +137,29 @@ open
 
 !classDefinition: #TusLibrosCreateCartWindow category: #'TusLibros-Model'!
 SystemWindow subclass: #TusLibrosCreateCartWindow
-	instanceVariableNames: 'invalidCredentialsRow'
+	instanceVariableNames: 'invalidCredentialsRow restAPI usernameTextMorph passwordTextMorph createCartButtonMorph'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 19:46:38'!
-initializeWith: aTitle
+!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'PhG 11/18/2021 21:22:22'!
+initializeWith: aTitle andRestInterface: aRestAPI
 
+	restAPI := aRestAPI.
 	self setLabel: aTitle.
-	self model: (WordsClientWindowModel new).
+	self model: (TusLibrosCreateCartWindowModel pairedWith: aRestAPI).
 	self buildMorphicWindow.
 	self openInWorld.
-			
-	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
-
-
-!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:11:25'!
-buildCreateCartButtonRow
-	| createCartButtonMorph rowLayoutMorph |
 	
-	createCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: 'Create Cart'.	
+	self model when: #successfulLogin send: #showCatalogueWindow to: self.		
+	self model when: #unsuccessfulLogin send: #showInvalidCredentialsRow to: self.! !
+
+
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:27:18'!
+buildCreateCartButtonRow
+	| rowLayoutMorph |
+	
+	createCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #submitLoginRequest label: 'Create Cart'.	
 	
 	rowLayoutMorph := LayoutMorph newRow.
 	rowLayoutMorph separation: 25;
@@ -181,14 +183,17 @@ buildInvalidCredentialsRow
 	
 	^rowLayoutMorph.! !
 
-!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:09:29'!
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:02:55'!
 buildMorphicWindow
+
+	usernameTextMorph := self buildTextBoxWithTextGetter: #usernameText withTextSetter: #usernameText:.
+	passwordTextMorph := self buildTextBoxWithTextGetter: #passwordText withTextSetter: #passwordText:.
 		
 	self layoutMorph beColumn;
 	separation: 15;
 	axisEdgeWeight: 0;
-	addMorph: (self buildTextBoxRowIdentifiedBy: 'Username:');
-	addMorph: (self buildTextBoxRowIdentifiedBy: 'Password:');
+	addMorph: (self buildTextBoxRowIdentifiedBy: 'Username:' andTextMorph: usernameTextMorph);
+	addMorph: (self buildTextBoxRowIdentifiedBy: 'Password:' andTextMorph: passwordTextMorph);
 	addMorph: self buildInvalidCredentialsRow;
 	addMorph: self buildCreateCartButtonRow.
 	
@@ -201,31 +206,35 @@ buildMorphicWindow
 	* label credenciales invalidas (o ventana de error)"
 	! !
 
-!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:11:30'!
-buildTextBoxRowIdentifiedBy: aLabel
-	| rowLayoutMorph textBoxMorph |
-	
-	textBoxMorph := TextModelMorph textProvider: self model textGetter: #sentenceText textSetter: #sentenceText:. 
-	textBoxMorph innerTextMorph setProperty: #keyStroke: toValue: [ :key | textBoxMorph innerTextMorph acceptContents ] .
-	textBoxMorph  borderWidth: 1; borderColor: Color skyBlue; morphWidth: 300; morphHeight: 25. 
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:03:14'!
+buildTextBoxRowIdentifiedBy: aLabel andTextMorph: aTextMorph
+	| rowLayoutMorph |
 		
 	rowLayoutMorph := LayoutMorph newRow.
 	rowLayoutMorph separation: 25;
 	axisEdgeWeight: 0.5;
 	addMorph: (LabelMorph contents:aLabel);
-	addMorph: textBoxMorph.
+	addMorph: aTextMorph.
 	
 	^rowLayoutMorph.! !
 
-
-!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/15/2021 20:14:24'!
-refreshListOfWords
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 20:59:55'!
+buildTextBoxWithTextGetter: aTextGetter withTextSetter: aTextSetter
+	| textBoxMorph |
 	
-"	wordsListMorph updateList.
-	wordsListMorph setSelectionIndex: 0."
+	textBoxMorph := TextModelMorph textProvider: self model textGetter: aTextGetter textSetter: aTextSetter. 
+	textBoxMorph innerTextMorph setProperty: #keyStroke: toValue: [ :key | textBoxMorph innerTextMorph acceptContents ] .
+	textBoxMorph  borderWidth: 1; borderColor: Color skyBlue; morphWidth: 300; morphHeight: 25. 
+		
+	^textBoxMorph ! !
+
+
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:22:38'!
+showCatalogueWindow
+	
 	! !
 
-!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/15/2021 20:09:03'!
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:21:51'!
 showInvalidCredentialsRow
 	
 	invalidCredentialsRow show.! !
@@ -236,10 +245,10 @@ showInvalidCredentialsRow
 TusLibrosCreateCartWindow class
 	instanceVariableNames: ''!
 
-!TusLibrosCreateCartWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 19:47:15'!
-open
+!TusLibrosCreateCartWindow class methodsFor: 'instance creation' stamp: 'PhG 11/18/2021 20:46:01'!
+openWith: aRestInterface
 	
-	^self new initializeWith: 'TusLibros: Create Cart'.! !
+	^self new initializeWith: 'TusLibros: Create Cart' andRestInterface: aRestInterface.! !
 
 
 !classDefinition: #TusLibrosListItemsWindow category: #'TusLibros-Model'!
@@ -249,7 +258,7 @@ SystemWindow subclass: #TusLibrosListItemsWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosListItemsWindow methodsFor: 'initialization' stamp: 'PhG 11/15/2021 20:53:11'!
+!TusLibrosListItemsWindow methodsFor: 'initialization' stamp: 'PhG 11/18/2021 21:22:32'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -257,7 +266,7 @@ initializeWith: aTitle
 	self buildMorphicWindow.
 	self openInWorld.
 			
-	self model when: #newWordsArrived send: #refreshListOfWords to: self.! !
+	self model when: #newWordsArrived send: #showCatalogueWindow to: self.! !
 
 
 !TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:13'!
@@ -982,6 +991,74 @@ Ticket class
 of: aCollectionOfLineItems
 
 	^self new initializeOf: aCollectionOfLineItems ! !
+
+
+!classDefinition: #TusLibrosCreateCartWindowModel category: #'TusLibros-Model'!
+Object subclass: #TusLibrosCreateCartWindowModel
+	instanceVariableNames: 'restInterface username password cartId errorDescription'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Model'!
+
+!TusLibrosCreateCartWindowModel methodsFor: 'initialization' stamp: 'PhG 11/18/2021 20:49:18'!
+initializeWith: aRestInterface
+
+	restInterface := aRestInterface.
+	username := ''.
+	password := ''.
+	cartId := ''.! !
+
+
+!TusLibrosCreateCartWindowModel methodsFor: 'CredentialsModelMorphSelectors' stamp: 'PhG 11/18/2021 20:56:31'!
+passwordText
+	^password.! !
+
+!TusLibrosCreateCartWindowModel methodsFor: 'CredentialsModelMorphSelectors' stamp: 'PhG 11/18/2021 20:56:18'!
+passwordText: aPassword
+	password := aPassword.
+	^true.! !
+
+!TusLibrosCreateCartWindowModel methodsFor: 'CredentialsModelMorphSelectors' stamp: 'PhG 11/18/2021 20:55:29'!
+usernameText
+	^username.! !
+
+!TusLibrosCreateCartWindowModel methodsFor: 'CredentialsModelMorphSelectors' stamp: 'PhG 11/18/2021 20:55:22'!
+usernameText: aUsername
+	username := aUsername.
+	^true.! !
+
+
+!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'PhG 11/18/2021 21:27:46'!
+submitLoginRequest
+
+	self halt.
+		
+	[
+		cartId := restInterface createCartFor: username authenticatedWith: password.
+		self triggerEvent: #succesfulLogin.
+	]
+	on: Error
+	do: [:error | 
+		errorDescription := error description.
+		self triggerEvent: #unsuccesfulLogin.
+	].
+	
+	
+	
+	"Investiguen mensajes como:
+	self triggerEvent: #newWordsArrived with: 1.
+	self triggerEvent: #newWordsArrived withArguments: (Array with: 1 with: 2)"! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TusLibrosCreateCartWindowModel class' category: #'TusLibros-Model'!
+TusLibrosCreateCartWindowModel class
+	instanceVariableNames: ''!
+
+!TusLibrosCreateCartWindowModel class methodsFor: 'instance creation' stamp: 'PhG 11/18/2021 20:46:58'!
+pairedWith: aRestInterface
+
+	^TusLibrosCreateCartWindowModel basicNew initializeWith: aRestInterface.! !
 
 
 !classDefinition: #TusLibrosRestAPI category: #'TusLibros-Model'!
