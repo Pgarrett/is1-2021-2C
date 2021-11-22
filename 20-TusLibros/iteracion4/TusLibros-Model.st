@@ -5,23 +5,39 @@ SystemWindow subclass: #TusLibrosCatalogueWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:42:42'!
-buildListColumnIdentifiedBy: aLabel
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 12:17:16'!
+buildListColumnCart
 	| columnLayoutMorph catalogueListMorph |
 	
-	catalogueListMorph := PluggableListMorph model: self model listGetter: #words indexGetter: #wordsListIndex indexSetter: #wordsListIndex:.
+	catalogueListMorph := PluggableListMorph model: self model listGetter: #cartItems indexGetter: #cartItemSelectedIndex indexSetter: #cartItemSelectedIndex:.
 	catalogueListMorph  borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
 	
 	columnLayoutMorph := LayoutMorph newColumn.
 	columnLayoutMorph separation: 5; 
 	axisEdgeWeight: 0.5;
-	addMorph: (LabelMorph contents:aLabel);
+	addMorph: (LabelMorph contents:'Carrito');
 	addMorph: catalogueListMorph.
 	
 	^columnLayoutMorph.
 	! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:43:37'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 11:54:25'!
+buildListColumnCatalogue
+	| columnLayoutMorph catalogueListMorph |
+	
+	catalogueListMorph := PluggableListMorph model: self model listGetter: #catalogue indexGetter: #catalogueSelectedIndex indexSetter: #catalogueSelectedIndex:.
+	catalogueListMorph  borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
+	
+	columnLayoutMorph := LayoutMorph newColumn.
+	columnLayoutMorph separation: 5; 
+	axisEdgeWeight: 0.5;
+	addMorph: (LabelMorph contents:'Catalogo');
+	addMorph: catalogueListMorph.
+	
+	^columnLayoutMorph.
+	! !
+
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 12:18:34'!
 buildListsAndAddRemoveRow
 	| rowLayoutMorph |
 	
@@ -29,14 +45,14 @@ buildListsAndAddRemoveRow
 	rowLayoutMorph := LayoutMorph newRow.
 	rowLayoutMorph separation: 25;
 	axisEdgeWeight: 0.5;
-	addMorph: (self buildListColumnIdentifiedBy: 'Catalogo');
-	addMorph: self buildQuantityAndAddRemoveColumn ;
-	addMorph: (self buildListColumnIdentifiedBy: 'Carrito').
+	addMorph: (self buildListColumnCatalogue);
+	addMorph: self buildQuantityAndAddRemoveColumn;
+	addMorph: (self buildListColumnCart).
 	
 	^rowLayoutMorph.
 	! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:45:58'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 10:35:04'!
 buildMorphicWindow
 		
 	self layoutMorph beColumn;
@@ -113,7 +129,7 @@ buildRowWithFirstButton: firstButtonLabel andSecondButton: secondButtonLabel
 	! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'PhG 11/21/2021 22:01:18'!
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 10:29:59'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -129,9 +145,8 @@ initializeWith: aTitle
 TusLibrosCatalogueWindow class
 	instanceVariableNames: ''!
 
-!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 20:15:51'!
+!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'wgb 11/22/2021 10:28:54'!
 open
-	
 	^self new initializeWith: 'TusLibros: List Catalogue'.! !
 
 
@@ -142,7 +157,7 @@ SystemWindow subclass: #TusLibrosCreateCartWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'PhG 11/21/2021 21:57:45'!
+!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 09:41:50'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -228,10 +243,9 @@ buildTextBoxWithTextGetter: aTextGetter withTextSetter: aTextSetter
 	^textBoxMorph ! !
 
 
-!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:22:38'!
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'wgb 11/22/2021 10:25:25'!
 showCatalogueWindow
-	
-	! !
+	TusLibrosCatalogueWindow open.! !
 
 !TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:21:51'!
 showInvalidCredentialsRow
@@ -735,7 +749,7 @@ Catalogue subclass: #MockCatalogue
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!MockCatalogue methodsFor: 'catalogue' stamp: 'PhG 11/13/2021 11:48:18'!
+!MockCatalogue methodsFor: 'catalogue' stamp: 'wgb 11/22/2021 11:22:52'!
 catalogue
 	^ Dictionary new
 		at: self itemSoldByTheStore put: self itemSoldByTheStorePrice;
@@ -743,25 +757,25 @@ catalogue
 		yourself ! !
 
 
-!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:47:13'!
+!MockCatalogue methodsFor: 'items' stamp: 'wgb 11/22/2021 11:24:25'!
 anotherItemSoldByTheStore
-
-	^'Los Impresentables'! !
-
-!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:47:56'!
-anotherItemSoldByTheStorePrice
-
-	^15! !
-
-!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 12:27:11'!
-itemSoldByTheStore
 
 	^ 'El Pacto Copernico'! !
 
-!MockCatalogue methodsFor: 'items' stamp: 'PhG 11/13/2021 11:48:04'!
-itemSoldByTheStorePrice
+!MockCatalogue methodsFor: 'items' stamp: 'wgb 11/22/2021 11:24:36'!
+anotherItemSoldByTheStorePrice
 
 	^10! !
+
+!MockCatalogue methodsFor: 'items' stamp: 'wgb 11/22/2021 11:23:19'!
+itemSoldByTheStore
+
+	^'Los Impresentables'! !
+
+!MockCatalogue methodsFor: 'items' stamp: 'wgb 11/22/2021 11:23:27'!
+itemSoldByTheStorePrice
+
+	^15! !
 
 
 !classDefinition: #Clock category: 'TusLibros-Model'!
@@ -994,15 +1008,50 @@ of: aCollectionOfLineItems
 
 !classDefinition: #TusLibrosCatalogueWindowModel category: 'TusLibros-Model'!
 Object subclass: #TusLibrosCatalogueWindowModel
-	instanceVariableNames: 'restInterface username password cartId errorDescription'
+	instanceVariableNames: 'restInterface username password cartId catalogue catalogueSelectedIndex cartItems cartItemSelectedIndex errorDescription'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'PhG 11/21/2021 22:02:02'!
+!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/22/2021 11:57:55'!
 initialize
 
-	restInterface := TusLibrosRestInterface new.! !
+	restInterface := TusLibrosRestInterface new.
+	catalogue := restInterface listCatalogue keys.
+	catalogueSelectedIndex := 0.
+	cartItems := OrderedCollection new.
+	cartItemSelectedIndex := 0.! !
+
+
+!TusLibrosCatalogueWindowModel methodsFor: 'catalogue list' stamp: 'wgb 11/22/2021 11:21:09'!
+catalogue
+	^catalogue sort.
+	! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'catalogue list' stamp: 'wgb 11/22/2021 12:16:42'!
+catalogueSelectedIndex
+	^catalogueSelectedIndex.
+
+	! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'catalogue list' stamp: 'wgb 11/22/2021 12:16:33'!
+catalogueSelectedIndex: anIndex
+	catalogueSelectedIndex := anIndex.
+
+	! !
+
+
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:42'!
+cartItemSelectedIndex
+	^cartItemSelectedIndex .! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:58'!
+cartItemSelectedIndex: anIndex
+	cartItemSelectedIndex := anIndex .! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:15'!
+cartItems
+	^cartItems .! !
 
 
 !classDefinition: #TusLibrosCreateCartWindowModel category: 'TusLibros-Model'!
@@ -1040,17 +1089,17 @@ usernameText: aUsername
 	^true.! !
 
 
-!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'PhG 11/21/2021 21:52:55'!
+!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'wgb 11/22/2021 10:24:52'!
 submitLoginRequest
 
 	[
-		cartId := restInterface createCartFor: username authenticatedWith: password.
-		self triggerEvent: #succesfulLogin.
+		cartId := restInterface createCartFor: username authenticatedBy: password.
+		self triggerEvent: #successfulLogin.
 	]
 	on: Error
 	do: [:error | 
 		errorDescription := error description.
-		self triggerEvent: #unsuccesfulLogin.
+		self triggerEvent: #unsuccessfulLogin.
 	].
 	
 	
@@ -1080,7 +1129,7 @@ Object subclass: #TusLibrosRestAPI
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/15/2021 17:39:21'!
+!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'wgb 11/22/2021 10:12:31'!
 initializeWith: aPortNumber
 	
 	tusLibrosFacade := TusLibrosSystemFacade
@@ -1094,6 +1143,7 @@ initializeWith: aPortNumber
 	
 	webServer := WebServer new listenOn: self port.
 	
+	self registerHealthcheck.
 	self registerCreateCartEndpoint.
 	self registerAddToCartEndpoint.
 	self registerListCartEndpoint.
@@ -1161,17 +1211,29 @@ registerCheckoutCartEndpoint
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/15/2021 17:33:29'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'wgb 11/22/2021 12:10:52'!
 registerCreateCartEndpoint
 	
 	webServer addService: '/createCart' action:[:request |	| cartId password username |
-		[username := request fields at: 'username'.
+		[
+		username := request fields at: 'username'.
 		password := request fields at: 'password'.
 		cartId := tusLibrosFacade createCartFor: username authenticatedWith: password.
 		self respond200WithBody: cartId for: request
 		 ]
 		on: Error 
-		do: (self respond400ErrorFor: request)]! !
+		do: [self respond400ErrorFor: request]]! !
+
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'wgb 11/22/2021 10:16:32'!
+registerHealthcheck
+
+	webServer addService: '/status' action:[:request |	
+		[
+		self respond200WithBody: 'Server up' for: request]
+		on: Error 
+		do: [self halt.
+			self respond500ErrorFor: request]
+		]! !
 
 !TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/21/2021 21:50:19'!
 registerListCartEndpoint
@@ -1228,6 +1290,12 @@ respond400ErrorFor: request
 
 	^ [ :anError |
 			request send400Response: (anError messageText) ]! !
+
+!TusLibrosRestAPI methodsFor: 'http response' stamp: 'wgb 11/22/2021 10:14:25'!
+respond500ErrorFor: request
+
+	^ [ :anError |
+			request send500Response: (anError messageText). ].! !
 
 
 !TusLibrosRestAPI methodsFor: 'private' stamp: 'PhG 11/21/2021 21:49:25'!
@@ -1305,15 +1373,13 @@ correctlyEncodeSpacesForUrlRequestParameter: aParameter
 	
 	^ aParameter copyReplaceAll: ' ' with: '%20'. ! !
 
-!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'PhG 11/21/2021 21:47:57'!
+!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'wgb 11/22/2021 11:45:30'!
 createCartFor: aUsername authenticatedBy: aPassword
 
 	| fieldDict resp |
 
 	fieldDict := Dictionary newFromPairs: {'username'. aUsername. 'password'. aPassword.}.		
-	
 	resp:= WebClient htmlSubmit: (self url,'/createCart') fields: fieldDict.
-	
 	resp isSuccess 
 		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
 		ifFalse:[^self error: resp content].! !
@@ -1504,15 +1570,12 @@ checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber owne
 			expiringOn: anExpirationMonthOfYear ]
 ! !
 
-!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'PhG 11/13/2021 12:25:02'!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'wgb 11/22/2021 12:15:19'!
 createCartFor: aUser authenticatedWith: aPassword
-
 	^ self if: aUser authenticatesWith: aPassword do: [ | cartId cartSession |
-
 		cartId := self generateCartId.
-		cartSession := CartSession ownedBy: aUser with: (Cart acceptingItemsOf: catalogue) on: self..
+		cartSession := CartSession ownedBy: aUser with: (Cart acceptingItemsOf: catalogue) on: self.
 		cartSessions at: cartId put: cartSession.
-
 		cartId  ]! !
 
 !TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'HernanWilkinson 6/17/2015 20:48'!

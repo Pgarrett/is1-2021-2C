@@ -357,7 +357,7 @@ TestCase subclass: #TusLibrosSystemFacadeTest
 	poolDictionaries: ''
 	category: 'TusLibros-Tests'!
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'HAW 6/19/2018 11:41:46'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test04CanAddItemsToACreatedCart
 
 	| cartId |
@@ -378,7 +378,7 @@ test05CanNotAddItemToNotCreatedCart
 			self assert: anError messageText equals: systemFacade invalidCartIdErrorDescription ]
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'HAW 11/26/2018 18:03:17'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test06CanNotAddItemNotSellByTheStore
 
 	| cartId |
@@ -392,7 +392,7 @@ test06CanNotAddItemNotSellByTheStore
 			self assert: (systemFacade listCartIdentifiedAs: cartId) isEmpty ]
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'HAW 11/26/2018 18:03:58'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - add to cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test17CanNotAddToCartWhenSessionIsExpired
 
 	| cartId |
@@ -409,7 +409,7 @@ test17CanNotAddToCartWhenSessionIsExpired
 ! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'PhG 11/13/2021 12:23:03'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'wgb 11/22/2021 11:49:53'!
 test14ListPurchasesIncludesBoughtItems
 
 	| cartId purchases |
@@ -447,25 +447,25 @@ test16CanNotListPurchasesOfValidCustomerWithInvalidPassword
 			self assert: anError messageText equals: systemFacade invalidUserAndOrPasswordErrorDescription ]! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'HAW 6/19/2018 11:40:51'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test01CanCreateCartWithValidUserAndPassword
 
 	| cartId |
 
 	cartId := systemFacade createCartFor: self validUser authenticatedWith: self validUserPassword.
-	self assert: (systemFacade listCartIdentifiedAs: cartId) isEmpty
-	! !
+	self assert: (systemFacade listCartIdentifiedAs: cartId) isEmpty.
+		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'HAW 11/26/2018 18:02:23'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test02CanNotCreateCartWithInvalidUser
 
 	self
-		should: [ systemFacade createCartFor: self invalidUser authenticatedWith: self validUserPassword ]
+		should: [ systemFacade createCartFor: self invalidUser authenticatedWith: self validUserPassword. ]
 		raise: Error - MessageNotUnderstood
 		withExceptionDo: [ :anError |
 			self assert: anError messageText equals: systemFacade invalidUserAndOrPasswordErrorDescription ]! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'HAW 11/26/2018 18:02:33'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - create cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test03CanNotCreateCartWithInvalidPassword
 
 	self
@@ -520,7 +520,7 @@ invalidCartId
 	"Devuelvo nil porque seguro que siempre sera un id invalido, no importa que sea el id - Hernan"
 	^nil! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 23:06'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'wgb 11/22/2021 11:37:12'!
 invalidPassword
 
 	^'invalidPassword'! !
@@ -553,7 +553,7 @@ validUsersAndPasswords
 		yourself! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'PhG 11/13/2021 12:22:56'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'wgb 11/22/2021 11:49:53'!
 test10CanCheckoutACart
 
 	| cartId purchases |
@@ -586,7 +586,7 @@ test11CanNotCheckoutANotCreatedCart
 
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'HAW 11/26/2018 18:06:07'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'wgb 11/22/2021 11:49:53'!
 test12CanNotCheckoutAnEmptyCart
 
 	| cartId |
@@ -605,7 +605,7 @@ test12CanNotCheckoutAnEmptyCart
 
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'HAW 11/26/2018 18:07:02'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'wgb 11/22/2021 11:49:53'!
 test13CanNotCheckoutWithAnExpiredCreditCard
 
 	| cartId |
@@ -625,7 +625,7 @@ test13CanNotCheckoutWithAnExpiredCreditCard
 
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'HAW 11/26/2018 18:07:15'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'wgb 11/22/2021 11:49:53'!
 test19CanNotCheckOutCartWhenSessionIsExpired
 
 	| cartId |
@@ -648,7 +648,7 @@ test19CanNotCheckOutCartWhenSessionIsExpired
 	! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'HernanWilkinson 6/17/2015 20:53'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test07ListCartOfAnEmptyCartReturnsAnEmptyBag
 
 	| cartId |
@@ -667,7 +667,7 @@ test08CanNotListCartOfInvalidCartId
 			self assert: anError messageText equals: systemFacade invalidCartIdErrorDescription ]
 	! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'HAW 11/26/2018 18:04:32'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test09ListCartReturnsTheRightNumberOfItems
 
 	| cartId cartContent |
@@ -681,7 +681,7 @@ test09ListCartReturnsTheRightNumberOfItems
 	self assert: (cartContent occurrencesOf: self anotherValidBook) equals: 2
 ! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'HAW 11/26/2018 18:04:42'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test18CanNotListCartWhenSessionIsExpired
 
 	| cartId |
@@ -733,7 +733,7 @@ test21ListCatalogueOfStoreWithCatalogueReturnsCatalogue
 	self assert: (catalogue at: testObjectsFactory anotherItemSoldByTheStore) equals: testObjectsFactory anotherItemSoldByTheStorePrice.! !
 
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 20:55:14'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test22CanRemoveItemsFromACreatedCartWithItems
 
 	| cartId |
@@ -756,7 +756,7 @@ test23CanNotRemoveItemsFromNotCreatedCart
 			self assert: anError messageText equals: systemFacade invalidCartIdErrorDescription ]
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 20:55:48'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test24CanNotRemoveItemNotSoldByTheStore
 
 	| cartId |
@@ -770,7 +770,7 @@ test24CanNotRemoveItemNotSoldByTheStore
 			self assert: (systemFacade listCartIdentifiedAs: cartId) isEmpty ]
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'PhG 11/14/2021 21:11:06'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests -  remove from cart' stamp: 'wgb 11/22/2021 11:49:53'!
 test25CanNotRemoveFromCartWhenSessionIsExpired
 
 	| cartId |
