@@ -1,22 +1,22 @@
 !classDefinition: #TusLibrosCatalogueWindow category: 'TusLibros-Model'!
 SystemWindow subclass: #TusLibrosCatalogueWindow
-	instanceVariableNames: ''
+	instanceVariableNames: 'cartWindow quantityBox'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 12:17:16'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 23:05:52'!
 buildListColumnCart
-	| columnLayoutMorph catalogueListMorph |
+	| columnLayoutMorph |
 	
-	catalogueListMorph := PluggableListMorph model: self model listGetter: #cartItems indexGetter: #cartItemSelectedIndex indexSetter: #cartItemSelectedIndex:.
-	catalogueListMorph  borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
+	cartWindow := PluggableListMorph model: self model listGetter: #cartItems indexGetter: #cartItemSelectedIndex indexSetter: #cartItemSelectedIndex:.
+	cartWindow borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
 	
 	columnLayoutMorph := LayoutMorph newColumn.
 	columnLayoutMorph separation: 5; 
 	axisEdgeWeight: 0.5;
 	addMorph: (LabelMorph contents:'Carrito');
-	addMorph: catalogueListMorph.
+	addMorph: cartWindow.
 	
 	^columnLayoutMorph.
 	! !
@@ -79,12 +79,12 @@ buildMorphicWindow
 	* boton nueva compra
 	* historial de compras"	! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 20:38:00'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 22:31:45'!
 buildQuantityAndAddRemoveColumn
 	| columnLayoutMorph addToCartButtonMorph removeFromCartButtonMorph |
 	
-	addToCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: '>>'.	
-	removeFromCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #showWordInTranscript label: '<<'.	
+	addToCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #addItemToCart label: '>>'.	
+	removeFromCartButtonMorph := PluggableButtonMorph model: self model stateGetter: nil  action: #removeItemFromCart label: '<<'.	
 	
 	columnLayoutMorph := LayoutMorph newColumn.
 	columnLayoutMorph separation: 5; 
@@ -95,19 +95,19 @@ buildQuantityAndAddRemoveColumn
 	
 	^columnLayoutMorph.! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:11:30'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 23:18:40'!
 buildQuantityRow
 
-	| quantityBoxMorph rowLayoutMorph |
+	| rowLayoutMorph |
 	
-	quantityBoxMorph := SimpleNumberEntryMorph integerDefault: 0 maxNumChars: 10.
-	quantityBoxMorph  borderWidth: 1; borderColor: Color skyBlue; morphWidth: 10; morphHeight: 25. 
+	quantityBox := SimpleNumberEntryMorph integerDefault: 0 maxNumChars: 10.
+	quantityBox borderWidth: 1; borderColor: Color skyBlue; morphWidth: 10; morphHeight: 25. 
 		
 	rowLayoutMorph := LayoutMorph newRow.
 	rowLayoutMorph separation: 25;
 	axisEdgeWeight: 0.5;
 	addMorph: (LabelMorph contents:'Cantidad:');
-	addMorph: quantityBoxMorph.
+	addMorph: quantityBox.
 	
 	^rowLayoutMorph.! !
 
@@ -129,15 +129,25 @@ buildRowWithFirstButton: firstButtonLabel andSecondButton: secondButtonLabel
 	! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 10:29:59'!
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 23:07:31'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
 	self model: TusLibrosCatalogueWindowModel new.
 	self buildMorphicWindow.
 	self openInWorld.
-			
-	self model when: #newWordsArrived send: #showCatalogueWindow to: self.! !
+
+	self model when: #itemAddedToCart send: #addItemToCartList to: self.
+	self model when: #itemRemovedFromCart send: #removeItemFromCartList: to: self.! !
+
+
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'wgb 11/22/2021 23:25:29'!
+addItemToCartList
+	cartWindow updateList .
+! !
+
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'wgb 11/22/2021 22:54:32'!
+removeItemFromCartList! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1008,12 +1018,12 @@ of: aCollectionOfLineItems
 
 !classDefinition: #TusLibrosCatalogueWindowModel category: 'TusLibros-Model'!
 Object subclass: #TusLibrosCatalogueWindowModel
-	instanceVariableNames: 'restInterface username password cartId catalogue catalogueSelectedIndex cartItems cartItemSelectedIndex errorDescription'
+	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex cartItems cartItemSelectedIndex quantity'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/22/2021 11:57:55'!
+!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/22/2021 23:24:58'!
 initialize
 
 	restInterface := TusLibrosRestInterface new.
@@ -1039,6 +1049,18 @@ catalogueSelectedIndex: anIndex
 	catalogueSelectedIndex := anIndex.
 
 	! !
+
+
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/22/2021 23:25:18'!
+addItemToCart
+
+	cartItems add: (catalogue at: catalogueSelectedIndex).
+	self triggerEvent: #itemAddedToCart.
+! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/22/2021 22:32:49'!
+removeItemFromCart
+! !
 
 
 !TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:42'!
