@@ -1,4 +1,4 @@
-!classDefinition: #TusLibrosCatalogueWindow category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosCatalogueWindow category: #'TusLibros-Model'!
 SystemWindow subclass: #TusLibrosCatalogueWindow
 	instanceVariableNames: 'cartWindow quantityBox'
 	classVariableNames: ''
@@ -21,12 +21,12 @@ buildListColumnCart
 	^columnLayoutMorph.
 	! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 11:54:25'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'bt 11/27/2021 13:48:15'!
 buildListColumnCatalogue
 	| columnLayoutMorph catalogueListMorph |
 	
 	catalogueListMorph := PluggableListMorph model: self model listGetter: #catalogue indexGetter: #catalogueSelectedIndex indexSetter: #catalogueSelectedIndex:.
-	catalogueListMorph  borderColor: Color skyBlue; borderWidth: 1; morphWidth:300.
+	catalogueListMorph  borderColor: Color lightBlue; borderWidth: 1; morphWidth:300.
 	
 	columnLayoutMorph := LayoutMorph newColumn.
 	columnLayoutMorph separation: 5; 
@@ -95,12 +95,15 @@ buildQuantityAndAddRemoveColumn
 	
 	^columnLayoutMorph.! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 23:18:40'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'bt 11/27/2021 16:55:20'!
 buildQuantityRow
 
 	| rowLayoutMorph |
 	
-	quantityBox := SimpleNumberEntryMorph integerDefault: 0 maxNumChars: 10.
+	"quantityBox := SimpleNumberEntryMorph integerRangeFrom: 1 to: 100 maxNumChars: 10."
+	
+	quantityBox := TextModelMorph textProvider: self model textGetter: #quantity textSetter: #quantity:. 
+	quantityBox innerTextMorph setProperty: #keyStroke: toValue: [ :key | quantityBox innerTextMorph acceptContents ] .
 	quantityBox borderWidth: 1; borderColor: Color skyBlue; morphWidth: 10; morphHeight: 25. 
 		
 	rowLayoutMorph := LayoutMorph newRow.
@@ -129,45 +132,39 @@ buildRowWithFirstButton: firstButtonLabel andSecondButton: secondButtonLabel
 	! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 23:07:31'!
-initializeWith: aTitle
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'bt 11/27/2021 18:26:09'!
+initializeWith: aTitle forCart: cartId
 
 	self setLabel: aTitle.
-	self model: TusLibrosCatalogueWindowModel new.
+	self model: (TusLibrosCatalogueWindowModel forCart: cartId).
 	self buildMorphicWindow.
 	self openInWorld.
-
-	self model when: #itemAddedToCart send: #addItemToCartList to: self.
-	self model when: #itemRemovedFromCart send: #removeItemFromCartList: to: self.! !
+	self model when: #cartModified send: #cartListChanged to: self.! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'wgb 11/22/2021 23:25:29'!
-addItemToCartList
-	cartWindow updateList .
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'bt 11/27/2021 17:00:09'!
+cartListChanged	cartWindow updateList .
 ! !
-
-!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'wgb 11/22/2021 22:54:32'!
-removeItemFromCartList! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosCatalogueWindow class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosCatalogueWindow class' category: #'TusLibros-Model'!
 TusLibrosCatalogueWindow class
 	instanceVariableNames: ''!
 
-!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'wgb 11/22/2021 10:28:54'!
-open
-	^self new initializeWith: 'TusLibros: List Catalogue'.! !
+!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'bt 11/27/2021 18:14:25'!
+open: cartId
+	^self new initializeWith: 'TusLibros: List Catalogue - Cart#',cartId forCart: cartId.! !
 
 
-!classDefinition: #TusLibrosCreateCartWindow category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosCreateCartWindow category: #'TusLibros-Model'!
 SystemWindow subclass: #TusLibrosCreateCartWindow
 	instanceVariableNames: 'invalidCredentialsRow usernameTextMorph passwordTextMorph createCartButtonMorph'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'wgb 11/22/2021 09:41:50'!
+!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'bt 11/27/2021 19:02:27'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -175,8 +172,8 @@ initializeWith: aTitle
 	self buildMorphicWindow.
 	self openInWorld.
 	
-	self model when: #successfulLogin send: #showCatalogueWindow to: self.		
-	self model when: #unsuccessfulLogin send: #showInvalidCredentialsRow to: self.! !
+	self model when: #successfulLogin send: #cartCreated: to: self.		
+	self model when: #unsuccessfulLogin send: #loginFailure to: self.! !
 
 
 !TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:27:18'!
@@ -253,9 +250,25 @@ buildTextBoxWithTextGetter: aTextGetter withTextSetter: aTextSetter
 	^textBoxMorph ! !
 
 
-!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'wgb 11/22/2021 10:25:25'!
-showCatalogueWindow
-	TusLibrosCatalogueWindow open.! !
+!TusLibrosCreateCartWindow methodsFor: 'log in' stamp: 'bt 11/27/2021 18:13:07'!
+cartCreated: cartId
+	self hideInvalidCredentialsRow.
+	self showCatalogueWindowForCart: cartId.
+	! !
+
+!TusLibrosCreateCartWindow methodsFor: 'log in' stamp: 'bt 11/27/2021 17:38:31'!
+loginFailure
+	self showInvalidCredentialsRow .! !
+
+
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'bt 11/27/2021 17:37:31'!
+hideInvalidCredentialsRow
+	
+	invalidCredentialsRow hide.! !
+
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'bt 11/27/2021 18:29:13'!
+showCatalogueWindowForCart: cartId
+	TusLibrosCatalogueWindow open: cartId.! !
 
 !TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:21:51'!
 showInvalidCredentialsRow
@@ -264,7 +277,7 @@ showInvalidCredentialsRow
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosCreateCartWindow class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosCreateCartWindow class' category: #'TusLibros-Model'!
 TusLibrosCreateCartWindow class
 	instanceVariableNames: ''!
 
@@ -274,7 +287,7 @@ open
 	^self new initializeWith: 'TusLibros: Create Cart'.! !
 
 
-!classDefinition: #TusLibrosListItemsWindow category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosListItemsWindow category: #'TusLibros-Model'!
 SystemWindow subclass: #TusLibrosListItemsWindow
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -362,7 +375,7 @@ buildTotalRow: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosListItemsWindow class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosListItemsWindow class' category: #'TusLibros-Model'!
 TusLibrosListItemsWindow class
 	instanceVariableNames: ''!
 
@@ -372,7 +385,7 @@ open: detailType
 	^self new initializeWith: ('TusLibros: ', detailType).! !
 
 
-!classDefinition: #Cart category: 'TusLibros-Model'!
+!classDefinition: #Cart category: #'TusLibros-Model'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -503,7 +516,7 @@ remove: aQuantity of: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: 'TusLibros-Model'!
+!classDefinition: 'Cart class' category: #'TusLibros-Model'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -529,7 +542,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartSession category: 'TusLibros-Model'!
+!classDefinition: #CartSession category: #'TusLibros-Model'!
 Object subclass: #CartSession
 	instanceVariableNames: 'owner cart lastUsedTime systemFacade'
 	classVariableNames: ''
@@ -611,7 +624,7 @@ remove: anAmount of: aBook
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CartSession class' category: 'TusLibros-Model'!
+!classDefinition: 'CartSession class' category: #'TusLibros-Model'!
 CartSession class
 	instanceVariableNames: ''!
 
@@ -621,7 +634,7 @@ ownedBy: aCustomer with: aCart on: aSystemFacade
 	^self new initializeOwnedBy: aCustomer with: aCart on: aSystemFacade! !
 
 
-!classDefinition: #Cashier category: 'TusLibros-Model'!
+!classDefinition: #Cashier category: #'TusLibros-Model'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard owner ticket'
 	classVariableNames: ''
@@ -689,7 +702,7 @@ initializeToCheckout: aCart ownedBy: anOwner charging: aCreditCard throught: aMe
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: 'TusLibros-Model'!
+!classDefinition: 'Cashier class' category: #'TusLibros-Model'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -740,7 +753,7 @@ signalCartCanNotBeEmpty
 	self error: self cartCanNotBeEmptyErrorMessage! !
 
 
-!classDefinition: #Catalogue category: 'TusLibros-Model'!
+!classDefinition: #Catalogue category: #'TusLibros-Model'!
 Object subclass: #Catalogue
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -752,7 +765,7 @@ catalogue
 	self subclassResponsibility.! !
 
 
-!classDefinition: #MockCatalogue category: 'TusLibros-Model'!
+!classDefinition: #MockCatalogue category: #'TusLibros-Model'!
 Catalogue subclass: #MockCatalogue
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -788,7 +801,7 @@ itemSoldByTheStorePrice
 	^15! !
 
 
-!classDefinition: #Clock category: 'TusLibros-Model'!
+!classDefinition: #Clock category: #'TusLibros-Model'!
 Object subclass: #Clock
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -806,7 +819,7 @@ today
 	self subclassResponsibility ! !
 
 
-!classDefinition: #RealClock category: 'TusLibros-Model'!
+!classDefinition: #RealClock category: #'TusLibros-Model'!
 Clock subclass: #RealClock
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -822,7 +835,7 @@ today
 	^DateAndTime now.! !
 
 
-!classDefinition: #CreditCard category: 'TusLibros-Model'!
+!classDefinition: #CreditCard category: #'TusLibros-Model'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration'
 	classVariableNames: ''
@@ -842,7 +855,7 @@ initializeExpiringOn: aMonth
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: 'TusLibros-Model'!
+!classDefinition: 'CreditCard class' category: #'TusLibros-Model'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -852,7 +865,7 @@ expiringOn: aMonth
 	^self new initializeExpiringOn: aMonth! !
 
 
-!classDefinition: #LineItem category: 'TusLibros-Model'!
+!classDefinition: #LineItem category: #'TusLibros-Model'!
 Object subclass: #LineItem
 	instanceVariableNames: 'item quantity total'
 	classVariableNames: ''
@@ -881,7 +894,7 @@ initializeOf: anItem quantity: aQuantity total: aTotal
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'LineItem class' category: 'TusLibros-Model'!
+!classDefinition: 'LineItem class' category: #'TusLibros-Model'!
 LineItem class
 	instanceVariableNames: ''!
 
@@ -893,7 +906,7 @@ of: anItem quantity: aQuantity total: aTotal
 ! !
 
 
-!classDefinition: #MerchantProcessor category: 'TusLibros-Model'!
+!classDefinition: #MerchantProcessor category: #'TusLibros-Model'!
 Object subclass: #MerchantProcessor
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -911,7 +924,7 @@ debit: anAmount from: aCreditCard
 	self subclassResponsibility ! !
 
 
-!classDefinition: #MockMerchantProcessor category: 'TusLibros-Model'!
+!classDefinition: #MockMerchantProcessor category: #'TusLibros-Model'!
 MerchantProcessor subclass: #MockMerchantProcessor
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -937,7 +950,7 @@ expiredMonthOfYear
 	^ Month month: today monthIndex year: today yearNumber - 1! !
 
 
-!classDefinition: #Sale category: 'TusLibros-Model'!
+!classDefinition: #Sale category: #'TusLibros-Model'!
 Object subclass: #Sale
 	instanceVariableNames: 'customer ticket'
 	classVariableNames: ''
@@ -970,7 +983,7 @@ lineItemsDo: aBlock
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: 'TusLibros-Model'!
+!classDefinition: 'Sale class' category: #'TusLibros-Model'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -980,7 +993,7 @@ doneBy: aCustomer certifiedWith: aTicket
 	^self new initializeDoneBy: aCustomer certifiedWith: aTicket ! !
 
 
-!classDefinition: #Ticket category: 'TusLibros-Model'!
+!classDefinition: #Ticket category: #'TusLibros-Model'!
 Object subclass: #Ticket
 	instanceVariableNames: 'lineItems'
 	classVariableNames: ''
@@ -1006,7 +1019,7 @@ lineItemsDo: aBlock
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Ticket class' category: 'TusLibros-Model'!
+!classDefinition: 'Ticket class' category: #'TusLibros-Model'!
 Ticket class
 	instanceVariableNames: ''!
 
@@ -1016,21 +1029,24 @@ of: aCollectionOfLineItems
 	^self new initializeOf: aCollectionOfLineItems ! !
 
 
-!classDefinition: #TusLibrosCatalogueWindowModel category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosCatalogueWindowModel category: #'TusLibros-Model'!
 Object subclass: #TusLibrosCatalogueWindowModel
 	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex cartItems cartItemSelectedIndex quantity'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/22/2021 23:24:58'!
-initialize
-
+!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'bt 11/27/2021 18:21:56'!
+initializeWith: aCartId.
+	cartId := aCartId .
+	
 	restInterface := TusLibrosRestInterface new.
 	catalogue := restInterface listCatalogue keys.
-	catalogueSelectedIndex := 0.
+	catalogueSelectedIndex := 1.
 	cartItems := OrderedCollection new.
-	cartItemSelectedIndex := 0.! !
+	cartItemSelectedIndex := 1.
+	
+	quantity := 1.! !
 
 
 !TusLibrosCatalogueWindowModel methodsFor: 'catalogue list' stamp: 'wgb 11/22/2021 11:21:09'!
@@ -1051,16 +1067,20 @@ catalogueSelectedIndex: anIndex
 	! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/22/2021 23:25:18'!
-addItemToCart
-
-	cartItems add: (catalogue at: catalogueSelectedIndex).
-	self triggerEvent: #itemAddedToCart.
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'bt 11/27/2021 17:16:57'!
+addItemToCart	
+	quantity timesRepeat: [ cartItems add: (catalogue at: catalogueSelectedIndex) ].
+	
+	self triggerEvent: #cartModified.
 ! !
 
-!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/22/2021 22:32:49'!
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'bt 11/27/2021 17:16:12'!
 removeItemFromCart
-! !
+	
+	cartItems isEmpty ifFalse: [
+		cartItems removeAt: cartItemSelectedIndex.
+	].
+	self triggerEvent: #cartModified.! !
 
 
 !TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:42'!
@@ -1075,8 +1095,28 @@ cartItemSelectedIndex: anIndex
 cartItems
 	^cartItems .! !
 
+
+!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'bt 11/27/2021 16:53:15'!
+quantity
+	^quantity asString.! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'bt 11/27/2021 16:52:50'!
+quantity: aQuantity
+	quantity := aQuantity asNumber.
+	^true.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TusLibrosCatalogueWindowModel class' category: #'TusLibros-Model'!
+TusLibrosCatalogueWindowModel class
+	instanceVariableNames: ''!
+
+!TusLibrosCatalogueWindowModel class methodsFor: 'initialization' stamp: 'bt 11/27/2021 18:21:10'!
+forCart: cartId
+	^self new initializeWith: cartId.! !
+
 
-!classDefinition: #TusLibrosCreateCartWindowModel category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosCreateCartWindowModel category: #'TusLibros-Model'!
 Object subclass: #TusLibrosCreateCartWindowModel
 	instanceVariableNames: 'restInterface username password cartId errorDescription'
 	classVariableNames: ''
@@ -1111,27 +1151,23 @@ usernameText: aUsername
 	^true.! !
 
 
-!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'wgb 11/22/2021 10:24:52'!
+!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'bt 11/27/2021 19:02:15'!
 submitLoginRequest
 
 	[
 		cartId := restInterface createCartFor: username authenticatedBy: password.
-		self triggerEvent: #successfulLogin.
+		self triggerEvent: #successfulLogin with: cartId.
 	]
 	on: Error
-	do: [:error | 
-		errorDescription := error description.
-		self triggerEvent: #unsuccessfulLogin.
+	do: [:error | 		self triggerEvent: #unsuccessfulLogin.
 	].
-	
-	
-	
+
 	"Investiguen mensajes como:
 	self triggerEvent: #newWordsArrived with: 1.
 	self triggerEvent: #newWordsArrived withArguments: (Array with: 1 with: 2)"! !
 
 
-!classDefinition: #TusLibrosListItemsWindowModel category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosListItemsWindowModel category: #'TusLibros-Model'!
 Object subclass: #TusLibrosListItemsWindowModel
 	instanceVariableNames: 'restInterface username password cartId errorDescription'
 	classVariableNames: ''
@@ -1144,7 +1180,7 @@ initialize
 	restInterface := TusLibrosRestInterface new.! !
 
 
-!classDefinition: #TusLibrosRestAPI category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosRestAPI category: #'TusLibros-Model'!
 Object subclass: #TusLibrosRestAPI
 	instanceVariableNames: 'webServer port tusLibrosFacade'
 	classVariableNames: ''
@@ -1336,7 +1372,7 @@ bagToDictionary: aBag
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosRestAPI class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosRestAPI class' category: #'TusLibros-Model'!
 TusLibrosRestAPI class
 	instanceVariableNames: ''!
 
@@ -1346,7 +1382,7 @@ listeningOn: aPortNumber
 	^self new initializeWith: aPortNumber.! !
 
 
-!classDefinition: #TusLibrosRestInterface category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosRestInterface category: #'TusLibros-Model'!
 Object subclass: #TusLibrosRestInterface
 	instanceVariableNames: 'port'
 	classVariableNames: ''
@@ -1395,16 +1431,20 @@ correctlyEncodeSpacesForUrlRequestParameter: aParameter
 	
 	^ aParameter copyReplaceAll: ' ' with: '%20'. ! !
 
-!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'wgb 11/22/2021 11:45:30'!
+!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'bt 11/27/2021 19:00:08'!
 createCartFor: aUsername authenticatedBy: aPassword
 
 	| fieldDict resp |
 
 	fieldDict := Dictionary newFromPairs: {'username'. aUsername. 'password'. aPassword.}.		
-	resp:= WebClient htmlSubmit: (self url,'/createCart') fields: fieldDict.
-	resp isSuccess 
-		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
-		ifFalse:[^self error: resp content].! !
+	[
+		resp:= WebClient htmlSubmit: (self url,'/createCart') fields: fieldDict.
+	] on: Error
+	do: [:error | 
+		^self error: ('Error processing request').
+	].
+
+	^resp content.! !
 
 !TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'PhG 11/21/2021 21:48:06'!
 listCartIdentifiedAs: aCartId
@@ -1472,7 +1512,7 @@ sendWordsRequest: sentence
 		ifFalse:[^self error: resp content].! !
 
 
-!classDefinition: #TusLibrosSystemFacade category: 'TusLibros-Model'!
+!classDefinition: #TusLibrosSystemFacade category: #'TusLibros-Model'!
 Object subclass: #TusLibrosSystemFacade
 	instanceVariableNames: 'validUsersAndPasswords catalogue lastId merchantProcessor salesBook clock cartSessions'
 	classVariableNames: ''
@@ -1671,7 +1711,7 @@ initializeAuthenticatingWith: aValidUsersAndPasswords
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosSystemFacade class' category: 'TusLibros-Model'!
+!classDefinition: 'TusLibrosSystemFacade class' category: #'TusLibros-Model'!
 TusLibrosSystemFacade class
 	instanceVariableNames: ''!
 
@@ -1690,7 +1730,7 @@ authenticatingWith: aValidUsersAndPasswords
 		measuringTimeWith: aClock! !
 
 
-!classDefinition: #User category: 'TusLibros-Model'!
+!classDefinition: #User category: #'TusLibros-Model'!
 Object subclass: #User
 	instanceVariableNames: 'username password creditCardNumber'
 	classVariableNames: ''
@@ -1716,7 +1756,7 @@ creditCardNumber
 	^creditCardNumber ! !
 
 
-!classDefinition: #UserDB category: 'TusLibros-Model'!
+!classDefinition: #UserDB category: #'TusLibros-Model'!
 Object subclass: #UserDB
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -1728,7 +1768,7 @@ users
 	self subclassResponsibility.! !
 
 
-!classDefinition: #MockUserDB category: 'TusLibros-Model'!
+!classDefinition: #MockUserDB category: #'TusLibros-Model'!
 UserDB subclass: #MockUserDB
 	instanceVariableNames: ''
 	classVariableNames: ''
