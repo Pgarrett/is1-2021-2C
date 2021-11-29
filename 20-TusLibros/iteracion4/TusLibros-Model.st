@@ -132,15 +132,18 @@ buildRowWithFirstButton: firstButtonLabel withAction: firstButtonAction andSecon
 	! !
 
 
-!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'bt 11/29/2021 02:01:57'!
-initializeWith: aTitle forCart: cartId
+!TusLibrosCatalogueWindow methodsFor: 'initialization' stamp: 'bt 11/29/2021 14:19:59'!
+initializeWith: aTitle forCart: cartId withUsername: username withPassword: password.
 
 	self setLabel: aTitle.
-	self model: (TusLibrosCatalogueWindowModel forCart: cartId).
+	self model: (TusLibrosCatalogueWindowModel forCart: cartId withUsername: username withPassword: password).
 	self buildMorphicWindow.
 	self openInWorld.
 	self model when: #cartModified send: #cartListChanged to: self.
 	self model when: #checkoutSuccessful send: #showListItemsWindowForTicket: to: self.
+	self model when: #listPurchases send: #listPurchases: to: self.
+	self model when: #createNewCart send: #createNewCart:username:password: to: self.
+	self model when: #logOut send: #logOut to: self.
 ! !
 
 
@@ -149,10 +152,25 @@ cartListChanged
 	cartWindow updateList .
 ! !
 
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'bt 11/29/2021 14:15:20'!
+createNewCart: cartId username: username password: password.
+	TusLibrosCatalogueWindow open: cartId username: username password: password.
+	self delete.! !
 
-!TusLibrosCatalogueWindow methodsFor: 'access' stamp: 'bt 11/29/2021 02:01:29'!
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'bt 11/29/2021 13:59:47'!
+listPurchases: purchases
+	TusLibrosListItemsWindow open: 'Purchase History' for: purchases.
+	! !
+
+!TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'bt 11/29/2021 14:20:16'!
+logOut
+	self delete.
+	! !
+
+
+!TusLibrosCatalogueWindow methodsFor: 'access' stamp: 'bt 11/29/2021 13:05:01'!
 showListItemsWindowForTicket: ticket
-	TusLibrosListItemsWindow open: 'Ticket'. "Falta pasarle el ticket"! !
+	TusLibrosListItemsWindow open: 'Ticket' for: ticket.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -160,9 +178,9 @@ showListItemsWindowForTicket: ticket
 TusLibrosCatalogueWindow class
 	instanceVariableNames: ''!
 
-!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'bt 11/27/2021 18:14:25'!
-open: cartId
-	^self new initializeWith: 'TusLibros: List Catalogue - Cart#',cartId forCart: cartId.! !
+!TusLibrosCatalogueWindow class methodsFor: 'instance creation' stamp: 'bt 11/29/2021 13:37:27'!
+open: cartId username: aUsername password: aPassword
+	^self new initializeWith: 'TusLibros: List Catalogue - Cart#',cartId forCart: cartId withUsername: aUsername withPassword: aPassword.! !
 
 
 !classDefinition: #TusLibrosCreateCartWindow category: 'TusLibros-Model'!
@@ -172,7 +190,7 @@ SystemWindow subclass: #TusLibrosCreateCartWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'bt 11/27/2021 19:02:27'!
+!TusLibrosCreateCartWindow methodsFor: 'initialization' stamp: 'bt 11/29/2021 13:43:55'!
 initializeWith: aTitle
 
 	self setLabel: aTitle.
@@ -180,7 +198,7 @@ initializeWith: aTitle
 	self buildMorphicWindow.
 	self openInWorld.
 	
-	self model when: #successfulLogin send: #cartCreated: to: self.		
+	self model when: #successfulLogin send: #cartCreated:withUsername:withPassword: to: self.		
 	self model when: #unsuccessfulLogin send: #loginFailure to: self.! !
 
 
@@ -258,10 +276,11 @@ buildTextBoxWithTextGetter: aTextGetter withTextSetter: aTextSetter
 	^textBoxMorph ! !
 
 
-!TusLibrosCreateCartWindow methodsFor: 'log in' stamp: 'bt 11/27/2021 18:13:07'!
-cartCreated: cartId
+!TusLibrosCreateCartWindow methodsFor: 'log in' stamp: 'bt 11/29/2021 13:46:19'!
+cartCreated: cartId withUsername: username withPassword: password.
+
 	self hideInvalidCredentialsRow.
-	self showCatalogueWindowForCart: cartId.
+	self showCatalogueWindowForCart: cartId withUsername: username withPassword: password.
 	! !
 
 !TusLibrosCreateCartWindow methodsFor: 'log in' stamp: 'bt 11/27/2021 17:38:31'!
@@ -274,9 +293,9 @@ hideInvalidCredentialsRow
 	
 	invalidCredentialsRow hide.! !
 
-!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'bt 11/27/2021 18:29:13'!
-showCatalogueWindowForCart: cartId
-	TusLibrosCatalogueWindow open: cartId.! !
+!TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'bt 11/29/2021 13:42:05'!
+showCatalogueWindowForCart: cartId withUsername: username withPassword: password.
+	TusLibrosCatalogueWindow open: cartId username: username password: password.! !
 
 !TusLibrosCreateCartWindow methodsFor: 'access' stamp: 'PhG 11/18/2021 21:21:51'!
 showInvalidCredentialsRow
@@ -302,28 +321,28 @@ SystemWindow subclass: #TusLibrosListItemsWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosListItemsWindow methodsFor: 'initialization' stamp: 'PhG 11/21/2021 22:01:38'!
-initializeWith: aTitle
+!TusLibrosListItemsWindow methodsFor: 'initialization' stamp: 'bt 11/29/2021 13:21:41'!
+initializeWith: aTitle forDetail: aDetail
 
 	self setLabel: aTitle.
 	self model: TusLibrosListItemsWindowModel new.
-	self buildMorphicWindow.
+	self buildMorphicWindow: aDetail.
 	self openInWorld.
 			
 	self model when: #newWordsArrived send: #showCatalogueWindow to: self.! !
 
 
-!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:13'!
-buildDetailRow: aPrice
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 13:30:39'!
+buildDetailRow: bookName quantity: aQuantity price: totalPrice
 
 	| rowLayoutMorph |
 		
 	rowLayoutMorph := LayoutMorph newRow.
 	rowLayoutMorph separation: 25;
 	axisEdgeWeight: 0.5;
-	addMorph: (LabelMorph contents: 'aBookIsbn');
-	addMorph: (LabelMorph contents: '1');
-	addMorph: (LabelMorph contents: ('$', aPrice)).
+	addMorph: (LabelMorph contents: bookName);
+	addMorph: (LabelMorph contents: (aQuantity asString));
+	addMorph: (LabelMorph contents: ('$', totalPrice asString)).
 	
 	^rowLayoutMorph.! !
 
@@ -341,33 +360,24 @@ buildHeaderRow
 	
 	^rowLayoutMorph.! !
 
-!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:53'!
-buildMorphicWindow
-		
-	self layoutMorph beColumn;
-	separation: 15;
-	axisEdgeWeight: 0;
-	addMorph: (self buildHeaderRow); "Libro + Cantidad + Precio"
-	addMorph: (self buildDetailRow: '15'); "ver como construir esto dinamicamente"
-	addMorph: (self buildDetailRow: '10'); "ver como construir esto dinamicamente"
-	addMorph: (self buildTotalRow: '25'). "blank + totalLabel + totalNumber"
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 14:07:53'!
+buildMorphicWindow: aDetail
+	| layout totalPrice |
 	
-	"- ticket
-	* lista items
-		+ titulo libro
-		+ cantidad libro
-		+ precio unitario/total (ver cual)
-	* total
+	layout := self layoutMorph beColumn;		separation: 15;		axisEdgeWeight: 0;		addMorph: (self buildHeaderRow). "Libro + Cantidad + Precio"
+	
+	totalPrice := 0.
+	aDetail do: [:detailEntry |
+			| detailRow |
+			totalPrice := totalPrice + (detailEntry at: 'total').
+			detailRow := self buildDetailRow: (detailEntry at: 'item') quantity: (detailEntry at: 'quantity') price: (detailEntry at: 'total').
+			layout addMorph: 	detailRow. 
+		].
+	
+	layout addMorph: (self buildTotalRow: totalPrice). " blank + totalLabel + totalNumber"
+! !
 
-
-		column1		column2		  column3
-row	| bookIsbn1 | bookQuantity1 | price1 |
-	| bookIsbn2 | bookQuantity2 | price2 |
-	| bookIsbn3 | bookQuantity3 | price3 |
-	| bookIsbn4 | bookQuantity4 | price4 |
-	| total								 |"! !
-
-!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/15/2021 21:02:22'!
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 13:30:42'!
 buildTotalRow: aTotal
 
 	| rowLayoutMorph |
@@ -377,7 +387,7 @@ buildTotalRow: aTotal
 	axisEdgeWeight: 0.5;
 	addMorph: LayoutMorph newColumn;
 	addMorph: (LabelMorph contents: 'Total:');
-	addMorph: (LabelMorph contents: ('$',aTotal)).
+	addMorph: (LabelMorph contents: ('$',aTotal asString)).
 	
 	^rowLayoutMorph.! !
 
@@ -387,10 +397,10 @@ buildTotalRow: aTotal
 TusLibrosListItemsWindow class
 	instanceVariableNames: ''!
 
-!TusLibrosListItemsWindow class methodsFor: 'instance creation' stamp: 'PhG 11/15/2021 20:54:47'!
-open: detailType
+!TusLibrosListItemsWindow class methodsFor: 'instance creation' stamp: 'bt 11/29/2021 13:05:24'!
+open: detailType for: detail
 	
-	^self new initializeWith: ('TusLibros: ', detailType).! !
+	^self new initializeWith: ('TusLibros: ', detailType) forDetail: detail.! !
 
 
 !classDefinition: #Cart category: 'TusLibros-Model'!
@@ -1049,7 +1059,7 @@ of: aCollectionOfLineItems
 
 !classDefinition: #TusLibrosCatalogueWindowModel category: 'TusLibros-Model'!
 Object subclass: #TusLibrosCatalogueWindowModel
-	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex quantity cartItems cartItemsIndex'
+	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex quantity cartItems cartItemsIndex username password'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
@@ -1118,7 +1128,7 @@ catalogueSelectedIndex: anIndex
 	! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'checkout' stamp: 'bt 11/29/2021 01:58:41'!
+!TusLibrosCatalogueWindowModel methodsFor: 'checkout' stamp: 'bt 11/29/2021 14:17:06'!
 submitCheckout
 	| creditCardNumber cardHolder cardExpirationDate today ticket |
 	
@@ -1131,13 +1141,16 @@ submitCheckout
 	
 	ticket := restInterface checkOutCartIdentifiedAs: cartId withCreditCardNumbered: creditCardNumber ownedBy: cardHolder expiringOn: cardExpirationDate.
 	self triggerEvent: #checkoutSuccessful with: ticket.
+	
 ! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/28/2021 22:52:59'!
-initializeWith: aCartId.
-
+!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'bt 11/29/2021 13:48:35'!
+initializeWith: aCartId  withUsername: aUsername withPassword: aPassword
 	cartId := aCartId.
+	username := aUsername.
+	password := aPassword.
+	
 	restInterface := TusLibrosRestInterface new.
 	catalogue := restInterface listCatalogue keys.
 	catalogueSelectedIndex := 1.
@@ -1156,15 +1169,52 @@ quantity: aQuantity
 	[quantity := aQuantity asNumber.] on: Error do: [quantity := 1.].
 	^true.! !
 
+
+!TusLibrosCatalogueWindowModel methodsFor: 'salesHistory' stamp: 'bt 11/29/2021 14:07:10'!
+salesHistory
+	
+	| salesDetail purchaseHistory |
+	
+	salesDetail := restInterface listPurchasesFor: username authenticatedBy: password.
+	
+	purchaseHistory := OrderedCollection new.
+	
+	salesDetail keysAndValuesDo: [:bookName :totalPrice | 
+			| detail |
+			detail := Dictionary new.
+			detail at: 'item' put: bookName .
+			detail at: 'quantity' put: '-'. "no se esta devolviendo en la llamada"
+			detail at: 'total' put: totalPrice .
+			purchaseHistory add: detail.
+		].
+	
+	self triggerEvent: #listPurchases with: purchaseHistory.
+! !
+
+
+!TusLibrosCatalogueWindowModel methodsFor: 'new cart' stamp: 'bt 11/29/2021 14:19:45'!
+logOut
+	"aca estaria la logica de log out contra el servidor"
+	self triggerEvent: #logOut
+	
+	! !
+
+!TusLibrosCatalogueWindowModel methodsFor: 'new cart' stamp: 'bt 11/29/2021 14:11:26'!
+newCart
+	cartId := restInterface createCartFor: username authenticatedBy: password.
+	self triggerEvent: #createNewCart withArguments: (Array  with: cartId with: username with: password).
+	
+	! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TusLibrosCatalogueWindowModel class' category: 'TusLibros-Model'!
 TusLibrosCatalogueWindowModel class
 	instanceVariableNames: ''!
 
-!TusLibrosCatalogueWindowModel class methodsFor: 'initialization' stamp: 'bt 11/27/2021 18:21:10'!
-forCart: cartId
-	^self new initializeWith: cartId.! !
+!TusLibrosCatalogueWindowModel class methodsFor: 'initialization' stamp: 'bt 11/29/2021 13:37:55'!
+forCart: cartId withUsername: aUsername withPassword: aPassword.
+	^self new initializeWith: cartId  withUsername: aUsername withPassword: aPassword.! !
 
 
 !classDefinition: #TusLibrosCreateCartWindowModel category: 'TusLibros-Model'!
@@ -1202,12 +1252,12 @@ usernameText: aUsername
 	^true.! !
 
 
-!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'bt 11/27/2021 19:02:15'!
+!TusLibrosCreateCartWindowModel methodsFor: 'PluggableButtonSelectors' stamp: 'bt 11/29/2021 13:45:14'!
 submitLoginRequest
 
 	[
 		cartId := restInterface createCartFor: username authenticatedBy: password.
-		self triggerEvent: #successfulLogin with: cartId.
+		self triggerEvent: #successfulLogin withArguments: (Array  with: cartId with: username with: password).
 	]
 	on: Error
 	do: [:error | 
@@ -1485,7 +1535,7 @@ addToCart: aQuantity of: aBook toCartIdentifiedAs: aCartId
 		"ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
 		ifFalse:[^self error: resp content]."! !
 
-!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'bt 11/29/2021 01:57:22'!
+!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'bt 11/29/2021 13:03:55'!
 checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCardNumber ownedBy: aCardHolder expiringOn: aCardExpirationDate
 
 	| fieldDict resp |
@@ -1493,7 +1543,7 @@ checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCardNumber ownedBy: a
 	fieldDict := Dictionary newFromPairs: {'cartId'. aCartId. 'ccn'. aCardNumber. 'cced'. aCardExpirationDate. 'cco'. aCardHolder.}.		
 	resp:= WebClient htmlSubmit: (self url,'/checkOutCart') fields: fieldDict.
 	resp isSuccess 
-		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
+		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream)) at: 'content'] 
 		ifFalse:[^self error: resp content].! !
 
 !TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'PhG 11/21/2021 21:47:51'!
@@ -1540,7 +1590,7 @@ listCatalogue
 		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
 		ifFalse:[^self error: resp content].! !
 
-!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'PhG 11/21/2021 21:48:20'!
+!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'bt 11/29/2021 14:02:54'!
 listPurchasesFor: aUsername authenticatedBy: aPassword
 
 	| fieldDict resp |
@@ -1730,11 +1780,11 @@ salesBook
 	^ salesBook! !
 
 
-!TusLibrosSystemFacade methodsFor: 'private' stamp: 'HernanWilkinson 6/17/2015 20:56'!
+!TusLibrosSystemFacade methodsFor: 'private' stamp: 'bt 11/29/2021 13:57:09'!
 list: aSale on: salesOrderedByBook
 
 	"Esto es un indicio de que por ahi conviene empezar a pensar en modelar un SaleBook - Hernan"
-	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal |
+	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal |		
 		oldTotal := salesOrderedByBook at: aLineItem item ifAbsentPut: [ 0 ].
 		newTotal := oldTotal + aLineItem total.
 		salesOrderedByBook at: aLineItem item put: newTotal ]! !
