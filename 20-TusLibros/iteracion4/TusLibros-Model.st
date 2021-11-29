@@ -614,7 +614,7 @@ cartContent
 
 	^cart content! !
 
-!CartSession methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2015 20:35'!
+!CartSession methodsFor: 'cart' stamp: 'PhG 11/29/2021 07:51:55'!
 checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
 
 	^(Cashier
@@ -627,6 +627,11 @@ checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringO
 
 !CartSession methodsFor: 'cart' stamp: 'bt 11/29/2021 00:47:53'!
 remove: anAmount of: aBook 	^cart remove: anAmount of: aBook! !
+
+
+!CartSession methodsFor: 'owner' stamp: 'PhG 11/29/2021 07:48:33'!
+owner
+	^owner.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -658,7 +663,7 @@ createSale
 	^ Sale doneBy: owner certifiedWith: ticket
 ! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/22/2013 12:28'!
+!Cashier methodsFor: 'checkout - private' stamp: 'PhG 11/29/2021 07:54:20'!
 createTicket
 
 	| lineItems |
@@ -667,8 +672,7 @@ createTicket
 	cart itemsAndQuantitiesDo: [ :anItem :aQuantity |
 		lineItems add: (self createLineItemOf: anItem quantity: aQuantity)].
 
-	ticket := Ticket of: lineItems
-	! !
+	ticket := Ticket of: lineItems	! !
 
 !Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/22/2013 12:20'!
 debitTotal
@@ -687,7 +691,7 @@ totalOf: anItem quantity: aQuantity
 	^(cart catalog at: anItem) * aQuantity  ! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'HernanWilkinson 6/22/2013 12:28'!
+!Cashier methodsFor: 'checkout' stamp: 'PhG 11/29/2021 07:52:07'!
 checkOut
 
 	self createTicket.
@@ -881,18 +885,23 @@ Object subclass: #LineItem
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!LineItem methodsFor: 'accessing' stamp: 'HernanWilkinson 6/22/2013 12:33'!
+!LineItem methodsFor: 'accessing' stamp: 'PhG 11/29/2021 07:56:33'!
 item
 
 	^ item! !
 
-!LineItem methodsFor: 'accessing' stamp: 'HernanWilkinson 6/22/2013 12:21'!
+!LineItem methodsFor: 'accessing' stamp: 'PhG 11/29/2021 07:56:39'!
+quantity
+
+	^quantity ! !
+
+!LineItem methodsFor: 'accessing' stamp: 'PhG 11/29/2021 07:56:22'!
 total
 
 	^ total! !
 
 
-!LineItem methodsFor: 'initialization' stamp: 'HernanWilkinson 6/22/2013 12:18'!
+!LineItem methodsFor: 'initialization' stamp: 'PhG 11/29/2021 07:52:52'!
 initializeOf: anItem quantity: aQuantity total: aTotal
 
 	item := anItem.
@@ -1009,7 +1018,7 @@ Object subclass: #Ticket
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!Ticket methodsFor: 'total' stamp: 'HernanWilkinson 6/17/2015 20:39'!
+!Ticket methodsFor: 'total' stamp: 'PhG 11/29/2021 07:55:45'!
 total
 
 	^lineItems sum: [ :aLineItem | aLineItem total]! !
@@ -1021,7 +1030,7 @@ initializeOf: aCollectionOfLineItems
 	lineItems := aCollectionOfLineItems ! !
 
 
-!Ticket methodsFor: 'line items' stamp: 'HernanWilkinson 6/22/2013 12:33'!
+!Ticket methodsFor: 'line items' stamp: 'PhG 11/29/2021 07:55:55'!
 lineItemsDo: aBlock
 
 	^lineItems do: aBlock ! !
@@ -1299,17 +1308,17 @@ registerAddToCartEndpoint
 		do: (self respond400ErrorFor: request)
 		]! !
 
-!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'bt 11/29/2021 01:57:48'!
+!TusLibrosRestAPI methodsFor: 'register endpoints' stamp: 'PhG 11/29/2021 08:22:29'!
 registerCheckoutCartEndpoint
 	
 	webServer addService: '/checkOutCart' action:[:request |	 | cartId cardNumber cardExpirationDate cardHolder ticket |
 		[
-		cartId := (request fields at: 'cartId') asNumber.		
+		cartId := (request fields at: 'cartId') asNumber.	
 		cardNumber := (request fields at: 'ccn') asNumber.
 		cardExpirationDate := request fields at: 'cced'.
 		cardHolder := request fields at: 'cco'.
-		ticket := tusLibrosFacade checkOutCartIdentifiedAs: cartId withCreditCardNumbered: cardNumber ownedBy: cardHolder expiringOn: cardExpirationDate.		"Esto deberia devolver el ticket serializado"
-		self respond200WithBody: 'OK' for: request.]
+		ticket := tusLibrosFacade checkOutCartIdentifiedAs: cartId withCreditCardNumbered: cardNumber ownedBy: cardHolder expiringOn: cardExpirationDate.
+		self respond200WithBody: (self serializeTicket: ticket) for: request.]
 		on: Error 
 		do: (self respond400ErrorFor: request)]! !
 
@@ -1379,7 +1388,7 @@ registerRemoveFromCartEndpoint
 		do: (self respond400ErrorFor: request)]! !
 
 
-!TusLibrosRestAPI methodsFor: 'http response' stamp: 'bt 11/29/2021 01:53:18'!
+!TusLibrosRestAPI methodsFor: 'http response' stamp: 'PhG 11/29/2021 08:17:42'!
 respond200WithBody: responseBody for: request
 	
 	| encodedResponse |
@@ -1400,7 +1409,7 @@ respond500ErrorFor: request
 			request send500Response: (anError messageText). ].! !
 
 
-!TusLibrosRestAPI methodsFor: 'private' stamp: 'PhG 11/21/2021 21:49:25'!
+!TusLibrosRestAPI methodsFor: 'private' stamp: 'PhG 11/29/2021 07:58:22'!
 bagToDictionary: aBag
 
 	| dictionary |
@@ -1413,6 +1422,24 @@ bagToDictionary: aBag
 	].
 	
 	^dictionary.! !
+
+!TusLibrosRestAPI methodsFor: 'private' stamp: 'PhG 11/29/2021 08:20:46'!
+serializeTicket: aTicket
+
+	| serializedTicket ticketContent |
+	
+	serializedTicket := Dictionary new.
+	serializedTicket at: 'total' put: aTicket total.
+		
+	ticketContent := OrderedCollection new.
+	aTicket lineItemsDo: [:aTicketLine | ticketContent add: (Dictionary new
+			at: 'item' put: aTicketLine item;
+			at: 'quantity' put: aTicketLine quantity;
+			at: 'total' put: aTicketLine total;
+			yourself).
+	].
+	serializedTicket at: 'content' put: ticketContent asArray .	
+	^serializedTicket.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1538,20 +1565,6 @@ removeFromCart: aQuantity of: aBook toCartIdentifiedAs: aCartId
 		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream))] 
 		ifFalse:[^self error: resp content].! !
 
-!TusLibrosRestInterface methodsFor: 'sending requests' stamp: 'PhG 11/21/2021 21:48:34'!
-sendWordsRequest: sentence
-
-	| fieldDict resp urlEncodedSentence |
-
-	urlEncodedSentence := self correctlyEncodeSpacesForUrlRequestParameter: sentence.	
-	fieldDict := Dictionary newFromPairs: {'sentence'. urlEncodedSentence.}.		
-	
-	resp:= WebClient htmlSubmit: (self url,'/createCart') fields: fieldDict.
-	
-	resp isSuccess 
-		ifTrue:[^(WebUtils jsonDecode: ((resp content) readStream)) asOrderedCollection .] 
-		ifFalse:[^self error: resp content].! !
-
 
 !classDefinition: #TusLibrosSystemFacade category: 'TusLibros-Model'!
 Object subclass: #TusLibrosSystemFacade
@@ -1602,7 +1615,7 @@ today
 	^clock today! !
 
 
-!TusLibrosSystemFacade methodsFor: 'authentication' stamp: 'HernanWilkinson 6/23/2013 12:18'!
+!TusLibrosSystemFacade methodsFor: 'authentication' stamp: 'PhG 11/29/2021 07:43:23'!
 does: aUser authenticatesWith: aPassword
 
 	"Recordar que esto es solo un ejemplo. No se deben guardar passwords en un sistema de verdad sino un
@@ -1662,20 +1675,15 @@ add: anAmount of: aBook toCartIdentifiedAs: aCartId
 
 	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession addToCart: anAmount of: aBook ]! !
 
-!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'bt 11/29/2021 01:49:03'!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'PhG 11/29/2021 07:51:29'!
 checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
 	
-	| cardExpirationDate today |
-	today := DateAndTime now.
-	cardExpirationDate := Month month: today monthIndex year: today yearNumber + 1.
-	"Pisamos el month of year ya que la tarjeta esta hardcodeada y el monthOfYear no se deserializa bien"
-
 	self
 		withCartSessionIdentifiedAs: aCartId
 		do: [ :cartSession | 		^	cartSession
 			checkOutCartWithCreditCardNumbered: aCreditCartNumber
 			ownedBy: anOwner
-			expiringOn: cardExpirationDate ]
+			expiringOn: (self creditCardExpirationDateFor: cartSession owner) ]
 ! !
 
 !TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'wgb 11/22/2021 12:15:19'!
@@ -1738,7 +1746,7 @@ salesDoneBy: aUser
 	^ salesBook select: [ :aSale | aSale wasDoneBy: aUser ]! !
 
 
-!TusLibrosSystemFacade methodsFor: 'initialization' stamp: 'PhG 11/13/2021 12:25:02'!
+!TusLibrosSystemFacade methodsFor: 'initialization' stamp: 'PhG 11/29/2021 07:43:56'!
 initializeAuthenticatingWith: aValidUsersAndPasswords
 	acceptingItemsOf: aCatalog
 	registeringOn: aSalesBook
@@ -1753,6 +1761,26 @@ initializeAuthenticatingWith: aValidUsersAndPasswords
 
 	cartSessions := Dictionary new.
 	lastId := 0.! !
+
+
+!TusLibrosSystemFacade methodsFor: 'mocks' stamp: 'PhG 11/29/2021 07:47:33'!
+creditCardExpirationDateFor: aUser
+
+	^self mockedCreditCards at: aUser.! !
+
+!TusLibrosSystemFacade methodsFor: 'mocks' stamp: 'PhG 11/29/2021 07:47:02'!
+mockedCreditCards
+
+	| today expiredDate nonExpiredDate |
+
+	today := DateAndTime now.
+	expiredDate := Month month: today monthIndex year: today yearNumber - 1.
+	nonExpiredDate := Month month: today monthIndex year: today yearNumber + 1.
+
+	^Dictionary new
+		at: 'maximoCozzetti' put: nonExpiredDate;
+		at: 'expiredUser' put: expiredDate;
+		yourself.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1815,14 +1843,20 @@ users
 
 !classDefinition: #MockUserDB category: 'TusLibros-Model'!
 UserDB subclass: #MockUserDB
-	instanceVariableNames: ''
+	instanceVariableNames: 'creditCards'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!MockUserDB methodsFor: 'users' stamp: 'PhG 11/21/2021 21:52:24'!
+!MockUserDB methodsFor: 'users' stamp: 'PhG 11/29/2021 07:37:31'!
 users
 	^Dictionary new
 		at: 'maximoCozzetti' put: 'tortugaMaritima';
-		"at: 'maximoCozzetti' put: (User initializeWith: 'mcozzetti' authenticatedBy: 'tortugaMaritima' paysWith: 1234567890123456);"
+		at: 'expiredUser' put: 'expiredPassword';
 		yourself! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MockUserDB class' category: 'TusLibros-Model'!
+MockUserDB class
+	instanceVariableNames: 'creditCards'!
