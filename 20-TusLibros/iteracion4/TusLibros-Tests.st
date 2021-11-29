@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #'TusLibros-Tests'!
+!classDefinition: #CartTest category: 'TusLibros-Tests'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -196,7 +196,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #'TusLibros-Tests'!
+!classDefinition: #CashierTest category: 'TusLibros-Tests'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -350,7 +350,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #TusLibrosSystemFacadeTest category: #'TusLibros-Tests'!
+!classDefinition: #TusLibrosSystemFacadeTest category: 'TusLibros-Tests'!
 TestCase subclass: #TusLibrosSystemFacadeTest
 	instanceVariableNames: 'testObjectsFactory clock systemFacade'
 	classVariableNames: ''
@@ -509,6 +509,11 @@ anotherValidBook
 
 	^testObjectsFactory anotherItemSoldByTheStore ! !
 
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/29/2021 07:50:11'!
+expiredCreditCardUser
+
+	^'expiredUser'! !
+
 !TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/13/2021 12:44:27'!
 invalidBook
 
@@ -535,21 +540,22 @@ validBook
 
 	^testObjectsFactory itemSoldByTheStore ! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 22:27'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/29/2021 07:49:33'!
 validUser
 
-	^'validUser'! !
+	^'maximoCozzetti'! !
 
 !TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 22:28'!
 validUserPassword
 
 	^'validUserPassword'! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'HernanWilkinson 6/21/2013 22:43'!
+!TusLibrosSystemFacadeTest methodsFor: 'test objects' stamp: 'PhG 11/29/2021 07:50:46'!
 validUsersAndPasswords
 
 	^Dictionary new
 		at: self validUser put: self validUserPassword;
+		at: self expiredCreditCardUser put: self validUserPassword;
 		yourself! !
 
 
@@ -605,12 +611,12 @@ test12CanNotCheckoutAnEmptyCart
 
 		! !
 
-!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'wgb 11/22/2021 11:49:53'!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'PhG 11/29/2021 07:50:21'!
 test13CanNotCheckoutWithAnExpiredCreditCard
 
 	| cartId |
 
-	cartId := systemFacade createCartFor: self validUser authenticatedWith: self validUserPassword.
+	cartId := systemFacade createCartFor: self expiredCreditCardUser authenticatedWith: self validUserPassword.
 	systemFacade add: 1 of: self validBook toCartIdentifiedAs: cartId.
 	self
 		should: [systemFacade
@@ -789,7 +795,7 @@ test25CanNotRemoveFromCartWhenSessionIsExpired
 ! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #'TusLibros-Tests'!
+!classDefinition: #StoreTestObjectsFactory category: 'TusLibros-Tests'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -890,7 +896,7 @@ customer
 	^'aCustomer'! !
 
 
-!classDefinition: #ManualClock category: #'TusLibros-Tests'!
+!classDefinition: #ManualClock category: 'TusLibros-Tests'!
 ProtoObject subclass: #ManualClock
 	instanceVariableNames: 'now'
 	classVariableNames: ''
@@ -926,7 +932,7 @@ initializeNow: aTime
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'ManualClock class' category: #'TusLibros-Tests'!
+!classDefinition: 'ManualClock class' category: 'TusLibros-Tests'!
 ManualClock class
 	instanceVariableNames: ''!
 
