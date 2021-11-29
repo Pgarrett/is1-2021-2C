@@ -139,11 +139,13 @@ initializeWith: aTitle forCart: cartId
 	self model: (TusLibrosCatalogueWindowModel forCart: cartId).
 	self buildMorphicWindow.
 	self openInWorld.
-	self model when: #cartModified send: #cartListChanged to: self.! !
+	self model when: #cartModified send: #cartListChanged to: self.
+! !
 
 
 !TusLibrosCatalogueWindow methodsFor: 'events' stamp: 'bt 11/27/2021 17:00:09'!
-cartListChanged	cartWindow updateList .
+cartListChanged
+	cartWindow updateList .
 ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -772,11 +774,14 @@ Catalogue subclass: #MockCatalogue
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!MockCatalogue methodsFor: 'catalogue' stamp: 'wgb 11/22/2021 11:22:52'!
+!MockCatalogue methodsFor: 'catalogue' stamp: 'wgb 11/28/2021 22:25:07'!
 catalogue
 	^ Dictionary new
 		at: self itemSoldByTheStore put: self itemSoldByTheStorePrice;
 		at: self anotherItemSoldByTheStore put: self anotherItemSoldByTheStorePrice;
+		at: 'mmm' put: 10;
+		at: 'bbb' put: 5;
+		at: 'zzz' put:6;
 		yourself ! !
 
 
@@ -1031,21 +1036,20 @@ of: aCollectionOfLineItems
 
 !classDefinition: #TusLibrosCatalogueWindowModel category: #'TusLibros-Model'!
 Object subclass: #TusLibrosCatalogueWindowModel
-	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex cartItems cartItemSelectedIndex quantity'
+	instanceVariableNames: 'restInterface cartId catalogue catalogueSelectedIndex quantity cartItems cartItemsIndex'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'bt 11/27/2021 18:21:56'!
+!TusLibrosCatalogueWindowModel methodsFor: 'initialization' stamp: 'wgb 11/28/2021 22:52:59'!
 initializeWith: aCartId.
-	cartId := aCartId .
-	
+
+	cartId := aCartId.
 	restInterface := TusLibrosRestInterface new.
 	catalogue := restInterface listCatalogue keys.
 	catalogueSelectedIndex := 1.
-	cartItems := OrderedCollection new.
-	cartItemSelectedIndex := 1.
-	
+	cartItems := Dictionary new.
+	cartItemsIndex := 1.
 	quantity := 1.! !
 
 
@@ -1067,42 +1071,66 @@ catalogueSelectedIndex: anIndex
 	! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'bt 11/27/2021 17:16:57'!
-addItemToCart	
-	quantity timesRepeat: [ cartItems add: (catalogue at: catalogueSelectedIndex) ].
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/28/2021 22:52:17'!
+addItemToCart
+	|itemName previousQuantity |
 	
+	itemName := (self catalogue) at: self catalogueSelectedIndex.
+	
+	previousQuantity := cartItems at: itemName ifAbsent: [0.].	
+	cartItems at: itemName put: (previousQuantity + self quantity asNumber).
+
 	self triggerEvent: #cartModified.
 ! !
 
-!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'bt 11/27/2021 17:16:12'!
+!TusLibrosCatalogueWindowModel methodsFor: 'add or remove items' stamp: 'wgb 11/28/2021 22:56:36'!
 removeItemFromCart
+	|quantityToRemove cartItemsKeys|
+
+	[quantityToRemove := quantity asNumber] on: Error do:[quantityToRemove :=0.].
+	cartItemsKeys := cartItems keys.
 	
-	cartItems isEmpty ifFalse: [
-		cartItems removeAt: cartItemSelectedIndex.
-	].
-	self triggerEvent: #cartModified.! !
+	cartItemsKeys isEmpty ifFalse:[
+		|previousQuantity selectedItem|
+		
+		selectedItem := cartItemsKeys at: cartItemsIndex.
+		previousQuantity := cartItems at: selectedItem ifAbsent:[0.].
+		
+		(previousQuantity - quantityToRemove >= 0) ifTrue: [
+			cartItems at: selectedItem put: (previousQuantity -quantityToRemove).
+			].
+		
+		(cartItems at: selectedItem) =0 ifTrue:[cartItems removeKey: selectedItem.
+										cartItemsIndex := cartItemsIndex - 1.].
+									
+		cartItemsIndex <=0 ifTrue:[cartItemsIndex := 1.].
+
+		self triggerEvent: #cartModified.
+	]! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:42'!
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/28/2021 22:52:34'!
 cartItemSelectedIndex
-	^cartItemSelectedIndex .! !
+	^cartItemsIndex .! !
 
-!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:58'!
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/28/2021 22:52:34'!
 cartItemSelectedIndex: anIndex
-	cartItemSelectedIndex := anIndex .! !
+	cartItemsIndex := anIndex.
+! !
 
-!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/22/2021 11:55:15'!
+!TusLibrosCatalogueWindowModel methodsFor: 'cart items' stamp: 'wgb 11/28/2021 22:52:17'!
 cartItems
-	^cartItems .! !
+	^cartItems keys collect: [:cartItem | cartItem , ' (', (cartItems at: cartItem) asString ,').'].! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'bt 11/27/2021 16:53:15'!
+!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'wgb 11/28/2021 20:51:05'!
 quantity
-	^quantity asString.! !
+	^[quantity asNumber asString.] on: Error do: [^'0'.].! !
 
-!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'bt 11/27/2021 16:52:50'!
+!TusLibrosCatalogueWindowModel methodsFor: 'quantity' stamp: 'wgb 11/28/2021 20:44:48'!
 quantity: aQuantity
-	quantity := aQuantity asNumber.
+
+	[quantity := aQuantity asNumber.] on: Error do: [quantity := ''.].
 	^true.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -1159,7 +1187,8 @@ submitLoginRequest
 		self triggerEvent: #successfulLogin with: cartId.
 	]
 	on: Error
-	do: [:error | 		self triggerEvent: #unsuccessfulLogin.
+	do: [:error | 
+		self triggerEvent: #unsuccessfulLogin.
 	].
 
 	"Investiguen mensajes como:

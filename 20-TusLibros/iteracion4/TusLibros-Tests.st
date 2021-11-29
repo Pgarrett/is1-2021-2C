@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: 'TusLibros-Tests'!
+!classDefinition: #CartTest category: #'TusLibros-Tests'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -196,7 +196,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: 'TusLibros-Tests'!
+!classDefinition: #CashierTest category: #'TusLibros-Tests'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -350,7 +350,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #TusLibrosSystemFacadeTest category: 'TusLibros-Tests'!
+!classDefinition: #TusLibrosSystemFacadeTest category: #'TusLibros-Tests'!
 TestCase subclass: #TusLibrosSystemFacadeTest
 	instanceVariableNames: 'testObjectsFactory clock systemFacade'
 	classVariableNames: ''
@@ -789,53 +789,7 @@ test25CanNotRemoveFromCartWhenSessionIsExpired
 ! !
 
 
-!classDefinition: #ManualClock category: 'TusLibros-Tests'!
-Clock subclass: #ManualClock
-	instanceVariableNames: 'now'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TusLibros-Tests'!
-
-!ManualClock methodsFor: 'time change' stamp: 'HernanWilkinson 6/22/2013 12:54'!
-advanceTime: aDuration
-
-	now := now + aDuration ! !
-
-!ManualClock methodsFor: 'time change' stamp: 'HernanWilkinson 6/22/2013 13:08'!
-revertTime: aDuration
-
-	now := now + aDuration negated ! !
-
-
-!ManualClock methodsFor: 'time' stamp: 'HernanWilkinson 6/22/2013 12:56'!
-now
-
-	^ now! !
-
-!ManualClock methodsFor: 'time' stamp: 'HernanWilkinson 6/22/2013 12:53'!
-today
-
-	^now date! !
-
-
-!ManualClock methodsFor: 'initialization' stamp: 'HernanWilkinson 6/22/2013 12:52'!
-initializeNow: aTime
-
-	now := aTime ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'ManualClock class' category: 'TusLibros-Tests'!
-ManualClock class
-	instanceVariableNames: ''!
-
-!ManualClock class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/22/2013 12:52'!
-now: aTime
-
-	^self new initializeNow: aTime ! !
-
-
-!classDefinition: #StoreTestObjectsFactory category: 'TusLibros-Tests'!
+!classDefinition: #StoreTestObjectsFactory category: #'TusLibros-Tests'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -934,3 +888,49 @@ today
 customer
 
 	^'aCustomer'! !
+
+
+!classDefinition: #ManualClock category: #'TusLibros-Tests'!
+ProtoObject subclass: #ManualClock
+	instanceVariableNames: 'now'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Tests'!
+
+!ManualClock methodsFor: 'time change' stamp: 'HernanWilkinson 6/22/2013 12:54'!
+advanceTime: aDuration
+
+	now := now + aDuration ! !
+
+!ManualClock methodsFor: 'time change' stamp: 'HernanWilkinson 6/22/2013 13:08'!
+revertTime: aDuration
+
+	now := now + aDuration negated ! !
+
+
+!ManualClock methodsFor: 'time' stamp: 'HernanWilkinson 6/22/2013 12:56'!
+now
+
+	^ now! !
+
+!ManualClock methodsFor: 'time' stamp: 'HernanWilkinson 6/22/2013 12:53'!
+today
+
+	^now date! !
+
+
+!ManualClock methodsFor: 'initialization' stamp: 'HernanWilkinson 6/22/2013 12:52'!
+initializeNow: aTime
+
+	now := aTime ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ManualClock class' category: #'TusLibros-Tests'!
+ManualClock class
+	instanceVariableNames: ''!
+
+!ManualClock class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/22/2013 12:52'!
+now: aTime
+
+	^self new initializeNow: aTime ! !
