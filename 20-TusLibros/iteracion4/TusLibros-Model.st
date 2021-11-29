@@ -5,7 +5,7 @@ SystemWindow subclass: #TusLibrosCatalogueWindow
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 23:05:52'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/29/2021 14:28:07'!
 buildListColumnCart
 	| columnLayoutMorph |
 	
@@ -52,32 +52,15 @@ buildListsAndAddRemoveRow
 	^rowLayoutMorph.
 	! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 01:09:23'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/29/2021 14:28:39'!
 buildMorphicWindow
 		
 	self layoutMorph beColumn;
 	separation: 15;
 	axisEdgeWeight: 0;
-	addMorph: (self buildRowWithFirstButton: 'Logout' withAction: #logOut andSecondButton: 'Historial' withAction: #salesHistory); "logout + blank + historial"
-	addMorph: self buildListsAndAddRemoveRow; "catalogo + cantidad + '>>' + '<<' carrito"
-	addMorph: (self buildRowWithFirstButton: 'Carrito Nuevo' withAction: #newCart andSecondButton: 'Checkout' withAction: #submitCheckout). "new + blank + checkout"
-	
-"- catalogo
-	* label catalogo
-	* lista catalogo
-	* label cantidad a agregar
-	* textbox cantidad a agregar
-	* boton agregar al carrito
-	* label contenido carrito
-	* lista contenido carrito
-	* label cantidad a sacar
-	* textbox cantidad a sacar
-	* boton sacar del carrito
-	* boton de checkout (consultar si podemos hardcodear cual tarjeta es valida o si hay que ingresarlos al momento de checkout)
-	* label de error de compra
-	* boton desloguearse
-	* boton nueva compra
-	* historial de compras"	! !
+	addMorph: (self buildRowWithFirstButton: 'Logout' withAction: #logOut andSecondButton: 'Historial' withAction: #salesHistory);
+	addMorph: self buildListsAndAddRemoveRow;
+	addMorph: (self buildRowWithFirstButton: 'Carrito Nuevo' withAction: #newCart andSecondButton: 'Checkout' withAction: #submitCheckout).! !
 
 !TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'wgb 11/22/2021 22:31:45'!
 buildQuantityAndAddRemoveColumn
@@ -95,12 +78,10 @@ buildQuantityAndAddRemoveColumn
 	
 	^columnLayoutMorph.! !
 
-!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'bt 11/27/2021 16:55:20'!
+!TusLibrosCatalogueWindow methodsFor: 'GUI building' stamp: 'PhG 11/29/2021 14:29:24'!
 buildQuantityRow
 
 	| rowLayoutMorph |
-	
-	"quantityBox := SimpleNumberEntryMorph integerRangeFrom: 1 to: 100 maxNumChars: 10."
 	
 	quantityBox := TextModelMorph textProvider: self model textGetter: #quantity textSetter: #quantity:. 
 	quantityBox innerTextMorph setProperty: #keyStroke: toValue: [ :key | quantityBox innerTextMorph acceptContents ] .
@@ -230,7 +211,7 @@ buildInvalidCredentialsRow
 	
 	^rowLayoutMorph.! !
 
-!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:02:55'!
+!TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/29/2021 14:30:02'!
 buildMorphicWindow
 
 	usernameTextMorph := self buildTextBoxWithTextGetter: #usernameText withTextSetter: #usernameText:.
@@ -242,16 +223,7 @@ buildMorphicWindow
 	addMorph: (self buildTextBoxRowIdentifiedBy: 'Username:' andTextMorph: usernameTextMorph);
 	addMorph: (self buildTextBoxRowIdentifiedBy: 'Password:' andTextMorph: passwordTextMorph);
 	addMorph: self buildInvalidCredentialsRow;
-	addMorph: self buildCreateCartButtonRow.
-	
-	"- login/createCart:
-	* label username
-	* textbox username
-	* label password
-	* textbox password (checkear despues si se puede ocultar la contraseña)
-	* boton de crear carrito
-	* label credenciales invalidas (o ventana de error)"
-	! !
+	addMorph: self buildCreateCartButtonRow.! !
 
 !TusLibrosCreateCartWindow methodsFor: 'GUI building' stamp: 'PhG 11/18/2021 21:03:14'!
 buildTextBoxRowIdentifiedBy: aLabel andTextMorph: aTextMorph
@@ -360,11 +332,11 @@ buildHeaderRow
 	
 	^rowLayoutMorph.! !
 
-!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 14:07:53'!
+!TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'PhG 11/29/2021 14:30:28'!
 buildMorphicWindow: aDetail
 	| layout totalPrice |
 	
-	layout := self layoutMorph beColumn;		separation: 15;		axisEdgeWeight: 0;		addMorph: (self buildHeaderRow). "Libro + Cantidad + Precio"
+	layout := self layoutMorph beColumn;		separation: 15;		axisEdgeWeight: 0;		addMorph: (self buildHeaderRow).
 	
 	totalPrice := 0.
 	aDetail do: [:detailEntry |
@@ -374,7 +346,7 @@ buildMorphicWindow: aDetail
 			layout addMorph: 	detailRow. 
 		].
 	
-	layout addMorph: (self buildTotalRow: totalPrice). " blank + totalLabel + totalNumber"
+	layout addMorph: (self buildTotalRow: totalPrice).
 ! !
 
 !TusLibrosListItemsWindow methodsFor: 'GUI building' stamp: 'bt 11/29/2021 13:30:42'!
@@ -1128,13 +1100,12 @@ catalogueSelectedIndex: anIndex
 	! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'checkout' stamp: 'bt 11/29/2021 14:17:06'!
+!TusLibrosCatalogueWindowModel methodsFor: 'checkout' stamp: 'PhG 11/29/2021 14:32:03'!
 submitCheckout
 	| creditCardNumber cardHolder cardExpirationDate today ticket |
 	
-	"Todos estos datos se van a ignorar del lado del servidor"
 	creditCardNumber := '4242424242424242'.
-	cardHolder := 'Pepito'.
+	cardHolder := 'Emilio Ravenna'.
 	
 	today := DateAndTime now.
 	cardExpirationDate := Month month: today monthIndex year: today yearNumber + 1.
@@ -1170,7 +1141,7 @@ quantity: aQuantity
 	^true.! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'salesHistory' stamp: 'bt 11/29/2021 14:07:10'!
+!TusLibrosCatalogueWindowModel methodsFor: 'salesHistory' stamp: 'PhG 11/29/2021 14:32:12'!
 salesHistory
 	
 	| salesDetail purchaseHistory |
@@ -1183,7 +1154,7 @@ salesHistory
 			| detail |
 			detail := Dictionary new.
 			detail at: 'item' put: bookName .
-			detail at: 'quantity' put: '-'. "no se esta devolviendo en la llamada"
+			detail at: 'quantity' put: '-'.
 			detail at: 'total' put: totalPrice .
 			purchaseHistory add: detail.
 		].
@@ -1192,9 +1163,8 @@ salesHistory
 ! !
 
 
-!TusLibrosCatalogueWindowModel methodsFor: 'new cart' stamp: 'bt 11/29/2021 14:19:45'!
+!TusLibrosCatalogueWindowModel methodsFor: 'new cart' stamp: 'PhG 11/29/2021 14:31:42'!
 logOut
-	"aca estaria la logica de log out contra el servidor"
 	self triggerEvent: #logOut
 	
 	! !
@@ -1312,14 +1282,9 @@ initializeWith: aPortNumber
 	self registerListCatalogueEndpoint.
 	self registerRemoveFromCartEndpoint.! !
 
-!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/11/2021 21:12:13'!
+!TusLibrosRestAPI methodsFor: 'initialization' stamp: 'PhG 11/29/2021 14:33:08'!
 port
-	"Use a random port to minimise chances of concurrently running test suites clashing."
-	"^ port
-		ifNil: [port := (10000 to: 50000) atRandom]"
-	
-	^port ifNil: [port:=8080].
-	
+	^port ifNil: [port:=8083].
 	! !
 
 
